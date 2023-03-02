@@ -1,0 +1,17 @@
+/venv
+*/__pycache__
+/__pycache__
+/log
+*.spec
+/dist
+/build
+/data
+*/백업
+/search_data
+account_file.txt
+save_file.txt
+/test
+/__test__
+/output
+/chromedriver
+/backup
