@@ -13,7 +13,7 @@ from PyQt5.QtCore import *
 from dtos.gui_dto import *
 from datetime import timedelta
 from timeit import default_timer as timer
-from process.instagram_follow_process import InstagramFollow
+from process.search_process import Search
 
 
 import debugpy
@@ -40,13 +40,13 @@ class SearchThread(QThread):
 
             start_time = timer()
 
-            instagramFollow = InstagramFollow()
+            search = Search()
 
-            instagramFollow.setGuiDto(self.guiDto)
+            search.setGuiDto(self.guiDto)
 
-            instagramFollow.setLogger(self.log_msg)
+            search.setLogger(self.log_msg)
 
-            instagramFollow.work_start()
+            search.work_start()
 
             end_time = timer()
 

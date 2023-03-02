@@ -90,7 +90,7 @@ class MainUI(QWidget):
 
         # 앱 기본 설정
         self.setWindowTitle("tistory")
-        self.resize(1000, 800)
+        self.resize(1200, 800)
         self.center()
         self.show()
 

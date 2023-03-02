@@ -53,7 +53,7 @@ class SearchUI(QWidget):
             # self.log_append(f"글 수집 키워드가 없습니다.")
             QMessageBox.information(self, "작업 시작", f"글 수집 키워드가 없습니다.")
             return
-        
+
         for daum_item in daum_items:
             row = daum_item.row()
             daum = QTableWidgetItem(self.daum_keyword_list_tablewidget.item(row, 0)).text()
@@ -67,17 +67,48 @@ class SearchUI(QWidget):
             # self.log_append(f"글 수집 키워드가 없습니다.")
             QMessageBox.information(self, "작업 시작", f"글 수집 키워드가 없습니다.")
             return
-        
+
         for google_item in google_items:
             row = google_item.row()
             google = QTableWidgetItem(self.google_keyword_list_tablewidget.item(row, 0)).text()
             selected_google_keyword_list.append(google)
 
+        if self.daum_start_page.text() == "":
+            daum_start_page = "5"
+        else:
+            daum_start_page = self.daum_start_page.text()
+
+        if self.daum_end_page.text() == "":
+            daum_end_page = "5"
+        else:
+            daum_end_page = self.daum_end_page.text()
+
+        if self.daum_search_count.text() == "":
+            daum_search_count = "10"
+        else:
+            daum_search_count = self.daum_search_count.text()
+
+        if self.daum_search_count.text() == "":
+            daum_search_count = "10"
+        else:
+            daum_search_count = self.daum_search_count.text()
+
+        # if self.google_search_count.text() == "":
+        #     print(f"수집할 이미지 개수를 입력해주세요.")
+        #     # self.log_append(f"수집할 이미지 개수를 입력해주세요.")
+        #     QMessageBox.information(self, "작업 시작", f"수집할 이미지 개수를 입력해주세요.")
+        #     return
+
         guiDto = GUIDto()
         guiDto.daum_keyword_list = selected_daum_keyword_list
         guiDto.google_keyword_list = selected_google_keyword_list
+        guiDto.daum_start_page = daum_start_page
+        guiDto.daum_end_page = daum_end_page
+        guiDto.daum_search_count = daum_search_count
+        guiDto.google_search_count = self.google_search_count.text()
+        guiDto.daum_search_date = self.daum_search_date.text()
 
-        print(f"{guiDto.daum_keyword_list} {guiDto.google_keyword_list} 작업을 시작합니다.")
+        print(f"{guiDto.daum_start_page} 작업을 시작합니다.")
 
         self.search_thread = SearchThread()
         self.search_thread.log_msg.connect(self.log_append)
@@ -343,9 +374,11 @@ class SearchUI(QWidget):
         # 수집할 페이지 수
         daum_page_setting_groupbox = QGroupBox("수집할 페이지 수")
         self.daum_start_page = QLineEdit()
+        self.daum_start_page.setPlaceholderText("5")
         self.daum_start_page.setValidator(QIntValidator())
         self.daum_page_between = QLabel(" ~ ")
         self.daum_end_page = QLineEdit()
+        self.daum_end_page.setPlaceholderText("10")
         self.daum_end_page.setValidator(QIntValidator())
         self.daum_page_range = QLabel(" 페이지 사이")
 
@@ -359,6 +392,7 @@ class SearchUI(QWidget):
         # 키워드별로 수집할 글 개수
         daum_search_count_groupbox = QGroupBox("키워드별로 수집할 글 개수")
         self.daum_search_count = QLineEdit()
+        self.daum_search_count.setPlaceholderText("10")
         self.daum_search_count.setValidator(QIntValidator())
         self.daum_search_count_label = QLabel("개")
 
@@ -369,7 +403,7 @@ class SearchUI(QWidget):
 
         # 수집할 글 작성일자 (이전에 작성된 글)
         daum_search_date_groupbox = QGroupBox("수집할 글 작성일자")
-        self.daum_search_date = QDateEdit(QDate.currentDate())
+        self.daum_search_date = QDateEdit(QDate.currentDate().addMonths(-1))
 
         daum_search_date_inner_layout = QHBoxLayout()
         daum_search_date_inner_layout.addWidget(self.daum_search_date)
@@ -425,8 +459,8 @@ class SearchUI(QWidget):
         right_layout = QVBoxLayout()
         right_layout.addWidget(daum_page_setting_groupbox)
         right_layout.addWidget(daum_search_count_groupbox)
-        right_layout.addWidget(daum_search_date_groupbox)
         right_layout.addWidget(google_search_count_groupbox)
+        right_layout.addWidget(daum_search_date_groupbox)
         right_layout.addWidget(start_stop_groupbox)
         right_layout.addWidget(log_groupbox)
 
