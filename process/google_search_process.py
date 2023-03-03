@@ -19,7 +19,7 @@ from timeit import default_timer as timer
 from datetime import timedelta
 
 
-class Search:
+class GoogleSearch:
     def __init__(self):
         # 현재 로컬에 저장된 크롬 기준으로 오픈한다.
         # open_browser()
@@ -40,5 +40,5 @@ class Search:
 
 if __name__ == "__main__":
 
-    searcher = Search()
+    searcher = GoogleSearch()
     searcher.work_start()

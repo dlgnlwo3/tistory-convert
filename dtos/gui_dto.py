@@ -7,18 +7,20 @@ class GUIDto:
         self.__daum_start_page = ""
         self.__daum_end_page = ""
 
-        self.__daum_search_count = ''
+        self.__daum_search_count = ""
 
-        self.__daum_search_date = ''
+        self.__daum_search_date = ""
 
-        self.__google_search_count = ''
+        self.__google_search_count = ""
+
+        self.__search_file_save_path = ""
 
     @property
     def daum_keyword_list(self):  # getter
         return self.__daum_keyword_list
 
     @daum_keyword_list.setter
-    def daum_keyword_list(self, value: list):  # setter
+    def daum_keyword_list(self, value):  # setter
         self.__daum_keyword_list = value
 
     @property
@@ -26,7 +28,7 @@ class GUIDto:
         return self.__google_keyword_list
 
     @google_keyword_list.setter
-    def google_keyword_list(self, value: list):  # setter
+    def google_keyword_list(self, value):  # setter
         self.__google_keyword_list = value
 
     @property
@@ -34,7 +36,9 @@ class GUIDto:
         return self.__daum_start_page
 
     @daum_start_page.setter
-    def daum_start_page(self, value: list):  # setter
+    def daum_start_page(self, value):  # setter
+        if value != "":
+            value = int(value)
         self.__daum_start_page = value
 
     @property
@@ -42,7 +46,9 @@ class GUIDto:
         return self.__daum_end_page
 
     @daum_end_page.setter
-    def daum_end_page(self, value: list):  # setter
+    def daum_end_page(self, value):  # setter
+        if value != "":
+            value = int(value)
         self.__daum_end_page = value
 
     @property
@@ -50,7 +56,9 @@ class GUIDto:
         return self.__daum_search_count
 
     @daum_search_count.setter
-    def daum_search_count(self, value: list):  # setter
+    def daum_search_count(self, value):  # setter
+        if value != "":
+            value = int(value)
         self.__daum_search_count = value
 
     @property
@@ -58,7 +66,7 @@ class GUIDto:
         return self.__daum_search_date
 
     @daum_search_date.setter
-    def daum_search_date(self, value: list):  # setter
+    def daum_search_date(self, value):  # setter
         self.__daum_search_date = value
 
     @property
@@ -66,5 +74,13 @@ class GUIDto:
         return self.__google_search_count
 
     @google_search_count.setter
-    def google_search_count(self, value: list):  # setter
+    def google_search_count(self, value):  # setter
         self.__google_search_count = value
+
+    @property
+    def search_file_save_path(self):  # getter
+        return self.__search_file_save_path
+
+    @search_file_save_path.setter
+    def search_file_save_path(self, value):  # setter
+        self.__search_file_save_path = value

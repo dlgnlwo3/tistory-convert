@@ -13,13 +13,14 @@ from PyQt5.QtCore import *
 from dtos.gui_dto import *
 from datetime import timedelta
 from timeit import default_timer as timer
-from process.search_process import Search
 
+from process.daum_search_process import DaumSearch
+from process.google_search_process import GoogleSearch
 
 import debugpy
 
 
-class SearchThread(QThread):
+class DaumSearchThread(QThread):
 
     log_msg = pyqtSignal(str)
     search_finished = pyqtSignal()
@@ -40,7 +41,7 @@ class SearchThread(QThread):
 
             start_time = timer()
 
-            search = Search()
+            search = DaumSearch()
 
             search.setGuiDto(self.guiDto)
 

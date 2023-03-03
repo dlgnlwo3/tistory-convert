@@ -9,7 +9,7 @@ from PyQt5.QtCore import *
 from datetime import *
 
 from dtos.gui_dto import GUIDto
-from threads.search_thread import SearchThread
+from threads.daum_search_thread import DaumSearchThread
 from common.utils import *
 from config import *
 import collections
@@ -24,11 +24,14 @@ class SearchUI(QWidget):
         print(f"PROGRAM_PATH: {PROGRAM_PATH}")
         print(f"USER_SAVE_PATH_DAUM: {USER_SAVE_PATH_DAUM}")
         print(f"USER_SAVE_PATH_GOOGLE: {USER_SAVE_PATH_GOOGLE}")
+        print(f"USER_SAVE_PATH_SETTING: {USER_SAVE_PATH_SETTING}")
 
         self.saved_data_daum = get_save_data_daum()
         self.saved_data_google = get_save_data_google()
+        self.saved_data_setting = get_save_data_setting()
         print(self.saved_data_daum)
         print(self.saved_data_google)
+        print(self.saved_data_setting)
 
         super().__init__()
         self.initUI()
@@ -42,7 +45,7 @@ class SearchUI(QWidget):
         global_log_append(text)
 
     # 검색 시작 클릭
-    def search_start_button_clicked(self):
+    def daum_search_start_button_clicked(self):
         print(f"search start clicked")
 
         selected_daum_keyword_list = []
@@ -59,27 +62,13 @@ class SearchUI(QWidget):
             daum = QTableWidgetItem(self.daum_keyword_list_tablewidget.item(row, 0)).text()
             selected_daum_keyword_list.append(daum)
 
-        selected_google_keyword_list = []
-        self.google_keyword_list_tablewidget.selectAll()
-        google_items = self.google_keyword_list_tablewidget.selectedItems()
-        if len(google_items) <= 0:
-            print(f"글 수집 키워드가 없습니다.")
-            # self.log_append(f"글 수집 키워드가 없습니다.")
-            QMessageBox.information(self, "작업 시작", f"글 수집 키워드가 없습니다.")
-            return
-
-        for google_item in google_items:
-            row = google_item.row()
-            google = QTableWidgetItem(self.google_keyword_list_tablewidget.item(row, 0)).text()
-            selected_google_keyword_list.append(google)
-
         if self.daum_start_page.text() == "":
             daum_start_page = "5"
         else:
             daum_start_page = self.daum_start_page.text()
 
         if self.daum_end_page.text() == "":
-            daum_end_page = "5"
+            daum_end_page = "10"
         else:
             daum_end_page = self.daum_end_page.text()
 
@@ -88,40 +77,39 @@ class SearchUI(QWidget):
         else:
             daum_search_count = self.daum_search_count.text()
 
-        if self.daum_search_count.text() == "":
-            daum_search_count = "10"
+        self.saved_data_setting = get_save_data_setting()
+        if self.saved_data_setting[SaveFileSetting.SEARCH_FILE_SAVE_PATH.value] == "":
+            print(f"저장 경로를 먼저 설정해주세요.")
+            # self.log_append(f"저장 경로를 먼저 설정해주세요.")
+            QMessageBox.information(self, "작업 시작", f"저장 경로를 먼저 설정해주세요.")
+            return
         else:
-            daum_search_count = self.daum_search_count.text()
-
-        # if self.google_search_count.text() == "":
-        #     print(f"수집할 이미지 개수를 입력해주세요.")
-        #     # self.log_append(f"수집할 이미지 개수를 입력해주세요.")
-        #     QMessageBox.information(self, "작업 시작", f"수집할 이미지 개수를 입력해주세요.")
-        #     return
+            search_file_save_path = self.saved_data_setting[SaveFileSetting.SEARCH_FILE_SAVE_PATH.value]
+            print(search_file_save_path)
 
         guiDto = GUIDto()
         guiDto.daum_keyword_list = selected_daum_keyword_list
-        guiDto.google_keyword_list = selected_google_keyword_list
         guiDto.daum_start_page = daum_start_page
         guiDto.daum_end_page = daum_end_page
         guiDto.daum_search_count = daum_search_count
         guiDto.google_search_count = self.google_search_count.text()
         guiDto.daum_search_date = self.daum_search_date.text()
+        guiDto.search_file_save_path = search_file_save_path
 
-        print(f"{guiDto.daum_start_page} 작업을 시작합니다.")
+        print(f"작업을 시작합니다.")
 
-        self.search_thread = SearchThread()
+        self.search_thread = DaumSearchThread()
         self.search_thread.log_msg.connect(self.log_append)
         self.search_thread.search_finished.connect(self.search_finished)
         self.search_thread.setGuiDto(guiDto)
 
-        self.search_start_button.setDisabled(True)
-        self.search_stop_button.setDisabled(False)
+        self.daum_search_start_button.setDisabled(True)
+        self.daum_search_stop_button.setDisabled(False)
         self.search_thread.start()
 
     # 검색 중지 클릭
     @pyqtSlot()
-    def search_stop_button_clicked(self):
+    def daum_search_stop_button_clicked(self):
         print(f"search stop clicked")
         self.log_append(f"중지 클릭")
         self.search_finished()
@@ -132,8 +120,8 @@ class SearchUI(QWidget):
         print(f"search thread finished")
         self.log_append(f"작업 종료")
         self.search_thread.stop()
-        self.search_start_button.setDisabled(False)
-        self.search_stop_button.setDisabled(True)
+        self.daum_search_start_button.setDisabled(False)
+        self.daum_search_stop_button.setDisabled(True)
         print(f"thread_is_running: {self.search_thread.isRunning()}")
 
     def set_daum_keyword_list_tablewidget(self):
@@ -151,7 +139,7 @@ class SearchUI(QWidget):
     def set_google_keyword_list_tablewidget(self):
 
         self.google_keyword_list_tablewidget.setColumnCount(1)
-        self.google_keyword_list_tablewidget.setHorizontalHeaderLabels(["글 수집 키워드"])
+        self.google_keyword_list_tablewidget.setHorizontalHeaderLabels(["이미지 수집 키워드"])
         self.google_keyword_list_tablewidget.setRowCount(len(self.saved_data_google[SaveFileGoogle.GOOGLE.value]))
 
         for i, keyword in enumerate(self.saved_data_google[SaveFileGoogle.GOOGLE.value]):
@@ -291,8 +279,8 @@ class SearchUI(QWidget):
         self.set_google_keyword_list_tablewidget()
 
     def open_save_path_button_clicked(self):
-        print("click")
-        os.startfile(PROGRAM_PATH)
+        self.saved_data_setting = get_save_data_setting()
+        os.startfile(self.saved_data_setting[SaveFileSetting.SEARCH_FILE_SAVE_PATH.value])
 
     # 저장파일 체크
     def refresh_save_file(self):
@@ -420,22 +408,39 @@ class SearchUI(QWidget):
         google_search_count_inner_layout.addWidget(self.google_search_count_label)
         google_search_count_groupbox.setLayout(google_search_count_inner_layout)
 
-        # 시작 중지 그룹박스
-        start_stop_groupbox = QGroupBox("작업 시작")
-        self.search_start_button = QPushButton("시작")
-        self.search_stop_button = QPushButton("중지")
-        self.search_stop_button.setDisabled(True)
+        # 글 수집 시작 중지 그룹박스
+        daum_search_start_stop_groupbox = QGroupBox("글 수집 시작")
+        self.daum_search_start_button = QPushButton("시작")
+        self.daum_search_stop_button = QPushButton("중지")
+        self.daum_search_stop_button.setDisabled(True)
         self.open_save_path_button = QPushButton("저장된 경로 열기")
 
-        self.search_start_button.clicked.connect(self.search_start_button_clicked)
-        self.search_stop_button.clicked.connect(self.search_stop_button_clicked)
+        self.daum_search_start_button.clicked.connect(self.daum_search_start_button_clicked)
+        self.daum_search_stop_button.clicked.connect(self.daum_search_stop_button_clicked)
         self.open_save_path_button.clicked.connect(self.open_save_path_button_clicked)
 
-        start_stop_inner_layout = QHBoxLayout()
-        start_stop_inner_layout.addWidget(self.search_start_button)
-        start_stop_inner_layout.addWidget(self.search_stop_button)
-        start_stop_inner_layout.addWidget(self.open_save_path_button)
-        start_stop_groupbox.setLayout(start_stop_inner_layout)
+        daum_search_start_stop_inner_layout = QHBoxLayout()
+        daum_search_start_stop_inner_layout.addWidget(self.daum_search_start_button)
+        daum_search_start_stop_inner_layout.addWidget(self.daum_search_stop_button)
+        daum_search_start_stop_inner_layout.addWidget(self.open_save_path_button)
+        daum_search_start_stop_groupbox.setLayout(daum_search_start_stop_inner_layout)
+
+        # 이미지 수집 시작 중지 그룹박스
+        google_search_start_stop_groupbox = QGroupBox("이미지 수집 시작")
+        self.google_search_start_button = QPushButton("시작")
+        self.google_search_stop_button = QPushButton("중지")
+        self.google_search_stop_button.setDisabled(True)
+        self.open_save_path_button = QPushButton("저장된 경로 열기")
+
+        # self.google_search_start_button.clicked.connect(self.google_search_start_button_clicked)
+        # self.google_search_stop_button.clicked.connect(self.google_search_stop_button_clicked)
+        self.open_save_path_button.clicked.connect(self.open_save_path_button_clicked)
+
+        google_search_start_stop_inner_layout = QHBoxLayout()
+        google_search_start_stop_inner_layout.addWidget(self.google_search_start_button)
+        google_search_start_stop_inner_layout.addWidget(self.google_search_stop_button)
+        google_search_start_stop_inner_layout.addWidget(self.open_save_path_button)
+        google_search_start_stop_groupbox.setLayout(google_search_start_stop_inner_layout)
 
         # 로그 그룹박스
         log_groupbox = QGroupBox("로그")
@@ -459,9 +464,10 @@ class SearchUI(QWidget):
         right_layout = QVBoxLayout()
         right_layout.addWidget(daum_page_setting_groupbox)
         right_layout.addWidget(daum_search_count_groupbox)
-        right_layout.addWidget(google_search_count_groupbox)
         right_layout.addWidget(daum_search_date_groupbox)
-        right_layout.addWidget(start_stop_groupbox)
+        right_layout.addWidget(google_search_count_groupbox)
+        right_layout.addWidget(daum_search_start_stop_groupbox)
+        right_layout.addWidget(google_search_start_stop_groupbox)
         right_layout.addWidget(log_groupbox)
 
         layout = QHBoxLayout()

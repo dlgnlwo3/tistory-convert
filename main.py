@@ -19,7 +19,7 @@ from PyQt5.QtNetwork import QNetworkAccessManager, QNetworkRequest
 from config import *
 
 from tabs.search_tab import SearchUI
-
+from tabs.setting_tab import SettingUI
 
 # 오류 발생 시 프로그램 강제종료 방지
 def my_exception_hook(exctype, value, traceback):
@@ -77,11 +77,13 @@ class MainUI(QWidget):
         # self.icon.get(QNetworkRequest(QUrl(ICON_IMAGE_URL)))
 
         # 탭 초기화
-        self.instagram_follow_tab = SearchUI()
+        self.search_tab = SearchUI()
+        self.setting_tab = SettingUI()
 
         # 탭 추가
         tabs = QTabWidget()
-        tabs.addTab(self.instagram_follow_tab, "수집")
+        tabs.addTab(self.search_tab, "수집")
+        tabs.addTab(self.setting_tab, "설정")
 
         vbox = QVBoxLayout()
 
