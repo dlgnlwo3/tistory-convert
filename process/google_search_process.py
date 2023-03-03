@@ -17,6 +17,7 @@ from common.utils import global_log_append
 from selenium import webdriver
 from timeit import default_timer as timer
 from datetime import timedelta
+import urllib.request
 
 
 class GoogleSearch:
@@ -26,6 +27,7 @@ class GoogleSearch:
         self.default_wait = 10
         self.driver = get_chrome_driver_new(is_headless=False, is_scret=True, move_to_corner=False)
         self.driver.implicitly_wait(self.default_wait)
+        self.run_time = str(datetime.now())[0:-10].replace(":", "")
 
     def setGuiDto(self, guiDto: GUIDto):
         self.guiDto = guiDto
@@ -33,9 +35,57 @@ class GoogleSearch:
     def setLogger(self, log_msg):
         self.log_msg = log_msg
 
+    # 이미지 저장
+    def save_img_from_url(self, url: str, keyword: str, i: str):
+
+        img_path = os.path.join(self.guiDto.search_file_save_path, f"이미지수집 {self.run_time}")
+        print(img_path)
+        if not os.path.isdir(img_path):
+            os.mkdir(img_path)
+
+        img_format = url[url.find("data:image/") + 11 : url.find(";")]
+        img_file = os.path.join(img_path, f"{keyword}{i.zfill(2)}.{img_format}")
+        print(img_file)
+
+        try:
+            urllib.request.urlretrieve(url, img_file)
+
+        except Exception as e:
+            print(f"{url} 이미지 생성 실패 {e.msg}")
+            global_log_append(f"{url} 이미지 생성 실패 {e.msg}")
+
+        finally:
+            time.sleep(0.2)
+
+        return img_file
+
     def search_google_img(self, google_keyword):
+
+        img_list = []
+
         driver = self.driver
         driver.get(f"https://www.google.co.kr/search?q={google_keyword}&hl=ko&tbm=isch")
+        time.sleep(1)
+
+        # 이미지가 있으면...
+        # $x('//div/h3/following-sibling::a[1]//img')
+        WebDriverWait(driver, 10).until(
+            EC.visibility_of_element_located((By.XPATH, "//div/h3/following-sibling::a[1]//img"))
+        )
+
+        img_urls = driver.find_elements(By.XPATH, "//div/h3/following-sibling::a[1]//img")
+
+        for i, img_url in enumerate(img_urls):
+            img_url = img_url.get_attribute("src")
+
+            img_file = self.save_img_from_url(img_url, google_keyword, str(i + 1))
+
+            img_list.append(img_file)
+
+            if len(img_list) >= self.guiDto.google_search_count:
+                print("수집할 이미지 개수에 도달했습니다.")
+                break
+
         time.sleep(1)
 
     # 전체작업 시작

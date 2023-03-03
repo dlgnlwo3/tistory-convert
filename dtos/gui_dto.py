@@ -75,6 +75,8 @@ class GUIDto:
 
     @google_search_count.setter
     def google_search_count(self, value):  # setter
+        if value != "":
+            value = int(value)
         self.__google_search_count = value
 
     @property
