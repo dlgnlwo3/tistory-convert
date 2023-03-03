@@ -12,6 +12,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium import webdriver
 from common.utils import global_log_append
 from timeit import default_timer as timer
 from datetime import timedelta, datetime
@@ -83,12 +84,24 @@ class DaumSearch:
 
             # 현재 페이지의 블로그 검색 결과
             # $x('//li[contains(@id, "br_tstory")]//a[contains(@class, "f_url")]')
-            blog_links = driver.find_elements(
-                By.XPATH, '//li[contains(@id, "br_tstory")]//a[contains(@class, "f_url")]'
-            )
+            blog_list = driver.find_elements(By.XPATH, '//li[contains(@id, "br_tstory")]')
 
-            print(self.guiDto.daum_search_date)
-            print()
+            # 입력받은 날짜와 블로그 날짜를 비교합니다.
+            search_date = self.guiDto.daum_search_date
+            search_date_format = f"%Y-%m-%d"
+            search_date = datetime.strptime(search_date, search_date_format)
+
+            blog: webdriver.Chrome._web_element_cls
+            for blog in blog_list:
+                blog_date = blog.find_element(By.CSS_SELECTOR, "span[class*='date']").get_attribute("textContent")
+                blog_date_format = f"%Y.%m.%d"
+                blog_date = datetime.strptime(blog_date, blog_date_format)
+
+                if search_date > blog_date:
+                    print("작업 진행")
+                else:
+                    print("넘김")
+                    continue
 
             if len(search_blog_list) >= self.guiDto.daum_search_count:
                 print(f"수집할 글 개수에 도달했습니다.")
