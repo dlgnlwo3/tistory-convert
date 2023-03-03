@@ -30,7 +30,7 @@ def my_exception_hook(exctype, value, traceback):
 
 sys.excepthook = my_exception_hook
 
-# pyinstaller -n "sample v0.0.3" -w --onefile --clean "main.py" --icon "assets\sample.ico"
+# pyinstaller -n "tistory sample v0.0.1" -w --onefile --clean "main.py" --icon "assets\tistory.ico"
 
 
 class MainUI(QWidget):
@@ -71,10 +71,10 @@ class MainUI(QWidget):
     def initUI(self):
 
         # 이미지 주소
-        # ICON_IMAGE_URL = "https://i.imgur.com/gvpW2hL.png"
-        # self.icon = QNetworkAccessManager()
-        # self.icon.finished.connect(self.set_window_icon_from_response)
-        # self.icon.get(QNetworkRequest(QUrl(ICON_IMAGE_URL)))
+        ICON_IMAGE_URL = "https://i.imgur.com/S8uiUDk.png"
+        self.icon = QNetworkAccessManager()
+        self.icon.finished.connect(self.set_window_icon_from_response)
+        self.icon.get(QNetworkRequest(QUrl(ICON_IMAGE_URL)))
 
         # 탭 초기화
         self.search_tab = SearchUI()
