@@ -30,7 +30,7 @@ def my_exception_hook(exctype, value, traceback):
 
 sys.excepthook = my_exception_hook
 
-# pyinstaller -n "tistory sample v0.0.1" -w --onefile --clean "main.py" --icon "assets\tistory.ico"
+# pyinstaller -n "tistory sample v0.0.2" -w --onefile --clean "main.py" --icon "assets\tistory.ico" --additional-hooks-dir=.
 
 
 class MainUI(QWidget):

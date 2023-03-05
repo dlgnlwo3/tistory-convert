@@ -68,7 +68,9 @@ class DaumSearch:
 
     def search_top_blog(self, daum_keyword: str):
         driver = self.driver
-        driver.get(f"https://search.daum.net/search?w=blog&nil_search=btn&enc=utf8&q={daum_keyword}&p=1")
+        driver.get(
+            f"https://search.daum.net/search?w=blog&nil_search=btn&enc=utf8&q={daum_keyword}&f=section&SA=tistory&p=1"
+        )
 
         WebDriverWait(driver, 10).until(
             EC.element_to_be_clickable((By.XPATH, '//li[contains(@id, "br_tstory")]//a[contains(@class, "f_url")]'))
@@ -97,7 +99,7 @@ class DaumSearch:
 
         for current_page in range(self.guiDto.daum_start_page, self.guiDto.daum_end_page + 1):
             driver.get(
-                f"https://search.daum.net/search?w=blog&nil_search=btn&enc=utf8&q={daum_keyword}&p={current_page}"
+                f"https://search.daum.net/search?w=blog&nil_search=btn&enc=utf8&q={daum_keyword}&f=section&SA=tistory&p={current_page}"
             )
 
             WebDriverWait(driver, 10).until(
