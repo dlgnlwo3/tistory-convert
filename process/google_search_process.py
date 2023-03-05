@@ -39,12 +39,15 @@ class GoogleSearch:
     def save_img_from_url(self, url: str, keyword: str, i: str):
 
         img_path = os.path.join(self.guiDto.search_file_save_path, f"이미지수집 {self.run_time}")
-        print(img_path)
         if not os.path.isdir(img_path):
             os.mkdir(img_path)
 
+        keyword_img_path = os.path.join(img_path, f"{keyword}")
+        if not os.path.isdir(keyword_img_path):
+            os.mkdir(keyword_img_path)
+
         img_format = url[url.find("data:image/") + 11 : url.find(";")]
-        img_file = os.path.join(img_path, f"{keyword}{i.zfill(2)}.{img_format}")
+        img_file = os.path.join(keyword_img_path, f"{keyword}{i.zfill(2)}.{img_format}")
         print(img_file)
 
         try:
