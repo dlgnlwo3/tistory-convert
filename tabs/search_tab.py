@@ -21,12 +21,6 @@ class SearchUI(QWidget):
     # 초기화
     def __init__(self):
 
-        print(f"LOG_FOLDER_NAME: {LOG_FOLDER_NAME}")
-        print(f"PROGRAM_PATH: {PROGRAM_PATH}")
-        print(f"USER_SAVE_PATH_DAUM: {USER_SAVE_PATH_DAUM}")
-        print(f"USER_SAVE_PATH_GOOGLE: {USER_SAVE_PATH_GOOGLE}")
-        print(f"USER_SAVE_PATH_SETTING: {USER_SAVE_PATH_SETTING}")
-
         self.saved_data_daum = get_save_data_daum()
         self.saved_data_google = get_save_data_google()
         self.saved_data_setting = get_save_data_setting()

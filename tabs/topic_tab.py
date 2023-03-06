@@ -20,24 +20,22 @@ class TopicUI(QWidget):
         self.saved_data_topic = get_save_data_topic()
         print(self.saved_data_topic)
 
+        self.saved_data_header = get_save_data_HEADER()
+        print(self.saved_data_header)
+
+        self.saved_data_footer = get_save_data_FOOTER()
+        print(self.saved_data_footer)
+
         super().__init__()
         self.initUI()
 
-    # 로그 작성
-    @pyqtSlot(str)
-    def log_append(self, text):
-        today = str(datetime.now())[0:10]
-        now = str(datetime.now())[0:-7]
-        self.browser.append(f"[{now}] {str(text)}")
-        global_log_append(text)
-
     def refresh_save_file(self):
         self.saved_data_topic = get_save_data_topic()
-        print(self.saved_data_topic[SaveFileTopic.TOPIC.value])
-
-    def refresh_topic_button_clicked(self):
-        self.refresh_save_file()
-        self.set_topic_list_tablewidget()
+        print(self.saved_data_topic)
+        self.saved_data_header = get_save_data_HEADER()
+        print(self.saved_data_header)
+        self.saved_data_footer = get_save_data_FOOTER()
+        print(self.saved_data_footer)
 
     def set_topic_list_tablewidget(self):
 
@@ -59,10 +57,10 @@ class TopicUI(QWidget):
             # self.log_append(f"주제를 입력해주세요.")
             return
 
-        keyword = self.topic_input.text()
-        print(keyword)
+        topic = self.topic_input.text()
+        print(topic)
 
-        self.saved_data_topic[SaveFileTopic.TOPIC.value].append(keyword)
+        self.saved_data_topic[SaveFileTopic.TOPIC.value].append(topic)
 
         dict_save = {SaveFileTopic.TOPIC.value: self.saved_data_topic[SaveFileTopic.TOPIC.value]}
 
@@ -71,6 +69,8 @@ class TopicUI(QWidget):
         self.refresh_save_file()
 
         self.set_topic_list_tablewidget()
+
+        self.set_combobox()
 
     def topic_remove_button_clicked(self):
 
@@ -101,7 +101,7 @@ class TopicUI(QWidget):
 
                 write_save_data_topic(dict_save)
 
-                print(current_items)
+                print(dict_save)
 
                 print(f"현재 상태를 저장했습니다.")
             except Exception as e:
@@ -112,6 +112,18 @@ class TopicUI(QWidget):
         self.refresh_save_file()
 
         self.set_topic_list_tablewidget()
+
+        self.set_combobox()
+
+    # 콤보박스 세팅
+    def set_combobox(self):
+
+        self.header_topic_combobox.clear()
+        self.footer_topic_combobox.clear()
+
+        for i, topic in enumerate(self.saved_data_topic[SaveFileTopic.TOPIC.value]):
+            self.header_topic_combobox.addItem(f"{topic}")
+            self.footer_topic_combobox.addItem(f"{topic}")
 
     # 메인 UI
     def initUI(self):
@@ -172,15 +184,23 @@ class TopicUI(QWidget):
         footer_inner_layout.addWidget(self.footer_list_tablewidget, 1, 2, 3, 1)
         footer_groupbox.setLayout(footer_inner_layout)
 
+        self.set_combobox()
+
         # 레이아웃 배치
-        top_layout = QVBoxLayout()
-        top_layout.addWidget(topic_groupbox)
+        top_layout = QHBoxLayout()
+        top_layout.addStretch(1)
+        top_layout.addWidget(topic_groupbox, 7)
+        top_layout.addStretch(1)
 
         mid_layout = QHBoxLayout()
-        mid_layout.addWidget(header_groupbox)
+        mid_layout.addStretch(1)
+        mid_layout.addWidget(header_groupbox, 7)
+        mid_layout.addStretch(1)
 
-        bottom_layout = QVBoxLayout()
-        bottom_layout.addWidget(footer_groupbox)
+        bottom_layout = QHBoxLayout()
+        bottom_layout.addStretch(1)
+        bottom_layout.addWidget(footer_groupbox, 7)
+        bottom_layout.addStretch(1)
 
         layout = QVBoxLayout()
         layout.addLayout(top_layout)

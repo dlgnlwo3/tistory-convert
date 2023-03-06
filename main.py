@@ -39,6 +39,15 @@ class MainUI(QWidget):
     # 초기화
     def __init__(self):
 
+        print(f"LOG_FOLDER_NAME: {LOG_FOLDER_NAME}")
+        print(f"PROGRAM_PATH: {PROGRAM_PATH}")
+        print(f"USER_SAVE_PATH_DAUM: {USER_SAVE_PATH_DAUM}")
+        print(f"USER_SAVE_PATH_GOOGLE: {USER_SAVE_PATH_GOOGLE}")
+        print(f"USER_SAVE_PATH_SETTING: {USER_SAVE_PATH_SETTING}")
+        print(f"USER_SAVE_PATH_TOPIC: {USER_SAVE_PATH_TOPIC}")
+        print(f"USER_SAVE_PATH_HEADER: {USER_SAVE_PATH_HEADER}")
+        print(f"USER_SAVE_PATH_FOOTER: {USER_SAVE_PATH_FOOTER}")
+
         # UI
         super().__init__()
         self.initUI()
