@@ -207,11 +207,7 @@ class SaveFileHEADER(Enum):
 
 # 저장데이터 없는 경우 초기화
 if not get_save_data_HEADER():
-    write_save_data_HEADER(
-        {
-            SaveFileHEADER.HEADER.value: [],
-        }
-    )
+    write_save_data_HEADER({})
 # ------------- 머리말 저장 파일 생성 종료 ------------- #
 
 
@@ -248,11 +244,7 @@ class SaveFileFOOTER(Enum):
 
 # 저장데이터 없는 경우 초기화
 if not get_save_data_FOOTER():
-    write_save_data_FOOTER(
-        {
-            SaveFileFOOTER.FOOTER.value: [],
-        }
-    )
+    write_save_data_FOOTER({})
 # ------------- 맺음말 저장 파일 생성 종료 ------------- #
 
 
