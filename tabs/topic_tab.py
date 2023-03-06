@@ -152,8 +152,56 @@ class TopicUI(QWidget):
         self.set_header_list_tablewidget()
 
     def header_remove_button_clicked(self):
-        self.refresh_save_file()
+
         print(f"{self.header_topic_combobox.currentText()} header remove clicked")
+
+        items = self.header_list_tablewidget.selectedItems()
+        if len(items) <= 0:
+            print(f"선택된 머리글이 없습니다.")
+            QMessageBox.information(self, "머리글 삭제", f"선택된 머리글이 없습니다.")
+            return
+
+        question_msg = "선택된 항목을 삭제하시겠습니까?"
+        reply = QMessageBox.question(self, "삭제", question_msg, QMessageBox.Yes, QMessageBox.No)
+
+        if reply == QMessageBox.Yes:
+
+            # 테이블에서 제거
+            for item in items:
+                row = item.row()
+                self.header_list_tablewidget.removeRow(row)
+
+            try:
+                # 메모장에 실 적용
+                current_items = []
+                for i in range(self.header_list_tablewidget.rowCount()):
+                    current_items.append(self.header_list_tablewidget.item(i, 0).text())
+
+                try:
+                    saved_topic_header = self.saved_data_header[self.header_topic_combobox.currentText()]
+
+                except Exception as e:
+                    saved_topic_header = []
+
+                self.saved_data_header.update({self.header_topic_combobox.currentText(): current_items})
+
+                dict_save = self.saved_data_header
+
+                write_save_data_HEADER(dict_save)
+
+                print(current_items)
+
+                print(f"현재 상태를 저장했습니다.")
+
+            except Exception as e:
+                print(e)
+
+        else:
+            print(f"저장 취소")
+
+        self.refresh_save_file()
+
+        self.set_header_list_tablewidget()
 
     def set_header_list_tablewidget(self):
 
