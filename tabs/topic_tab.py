@@ -151,6 +151,32 @@ class TopicUI(QWidget):
 
         self.set_header_list_tablewidget()
 
+    def footer_save_button_clicked(self):
+
+        if self.footer_input.text() == "":
+            QMessageBox.information(self, "맺음말 저장", f"맺음말을 입력해주세요.")
+            return
+
+        try:
+            saved_topic_footer = self.saved_data_footer[self.footer_topic_combobox.currentText()]
+
+        except Exception as e:
+            saved_topic_footer = []
+
+        saved_topic_footer.append(self.footer_input.text())
+
+        save_topic_footer = {self.footer_topic_combobox.currentText(): saved_topic_footer}
+
+        self.saved_data_footer.update(save_topic_footer)
+
+        dict_save = self.saved_data_footer
+
+        write_save_data_FOOTER(dict_save)
+
+        self.refresh_save_file()
+
+        self.set_footer_list_tablewidget()
+
     def header_remove_button_clicked(self):
 
         print(f"{self.header_topic_combobox.currentText()} header remove clicked")
@@ -203,6 +229,58 @@ class TopicUI(QWidget):
 
         self.set_header_list_tablewidget()
 
+    def footer_remove_button_clicked(self):
+
+        print(f"{self.footer_topic_combobox.currentText()} footer remove clicked")
+
+        items = self.footer_list_tablewidget.selectedItems()
+        if len(items) <= 0:
+            print(f"선택된 머리글이 없습니다.")
+            QMessageBox.information(self, "머리글 삭제", f"선택된 머리글이 없습니다.")
+            return
+
+        question_msg = "선택된 항목을 삭제하시겠습니까?"
+        reply = QMessageBox.question(self, "삭제", question_msg, QMessageBox.Yes, QMessageBox.No)
+
+        if reply == QMessageBox.Yes:
+
+            # 테이블에서 제거
+            for item in items:
+                row = item.row()
+                self.footer_list_tablewidget.removeRow(row)
+
+            try:
+                # 메모장에 실 적용
+                current_items = []
+                for i in range(self.footer_list_tablewidget.rowCount()):
+                    current_items.append(self.footer_list_tablewidget.item(i, 0).text())
+
+                try:
+                    saved_topic_footer = self.saved_data_footer[self.footer_topic_combobox.currentText()]
+
+                except Exception as e:
+                    saved_topic_footer = []
+
+                self.saved_data_footer.update({self.footer_topic_combobox.currentText(): current_items})
+
+                dict_save = self.saved_data_footer
+
+                write_save_data_FOOTER(dict_save)
+
+                print(current_items)
+
+                print(f"현재 상태를 저장했습니다.")
+
+            except Exception as e:
+                print(e)
+
+        else:
+            print(f"저장 취소")
+
+        self.refresh_save_file()
+
+        self.set_footer_list_tablewidget()
+
     def set_header_list_tablewidget(self):
 
         self.header_list_tablewidget.setColumnCount(1)
@@ -219,6 +297,23 @@ class TopicUI(QWidget):
 
         self.header_list_tablewidget.horizontalHeader().setSectionResizeMode(1)
         self.header_list_tablewidget.setSelectionMode(QAbstractItemView.MultiSelection)
+
+    def set_footer_list_tablewidget(self):
+
+        self.footer_list_tablewidget.setColumnCount(1)
+        self.footer_list_tablewidget.setHorizontalHeaderLabels(["맺음말"])
+
+        try:
+            self.footer_list_tablewidget.setRowCount(
+                len(self.saved_data_footer[self.footer_topic_combobox.currentText()])
+            )
+            for i, footer in enumerate(self.saved_data_footer[self.footer_topic_combobox.currentText()]):
+                self.footer_list_tablewidget.setItem(i, 0, QTableWidgetItem(footer))
+        except Exception as e:
+            pass
+
+        self.footer_list_tablewidget.horizontalHeader().setSectionResizeMode(1)
+        self.footer_list_tablewidget.setSelectionMode(QAbstractItemView.MultiSelection)
 
     # 메인 UI
     def initUI(self):
@@ -275,6 +370,9 @@ class TopicUI(QWidget):
         self.footer_remove_button = QPushButton("제거")
         self.footer_list_tablewidget = QTableWidget()
 
+        self.footer_save_button.clicked.connect(self.footer_save_button_clicked)
+        self.footer_remove_button.clicked.connect(self.footer_remove_button_clicked)
+
         footer_inner_layout = QGridLayout()
         footer_inner_layout.addWidget(self.footer_input_label, 0, 0, 1, 1)
         footer_inner_layout.addWidget(self.footer_topic_combobox, 0, 1, 1, 1)
@@ -283,6 +381,8 @@ class TopicUI(QWidget):
         footer_inner_layout.addWidget(self.footer_remove_button, 0, 4, 1, 1)
         footer_inner_layout.addWidget(self.footer_list_tablewidget, 1, 2, 3, 1)
         footer_groupbox.setLayout(footer_inner_layout)
+
+        self.footer_topic_combobox.currentTextChanged.connect(self.set_footer_list_tablewidget)
 
         self.set_combobox()
 
