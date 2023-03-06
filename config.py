@@ -118,7 +118,6 @@ def write_save_data_setting(dict_save: dict):
 
 
 class SaveFileSetting(Enum):
-    DB_EXCEL_FILE = "DB_EXCEL_FILE"
     SEARCH_FILE_SAVE_PATH = "SEARCH_FILE_SAVE_PATH"
 
 
@@ -126,11 +125,51 @@ class SaveFileSetting(Enum):
 if not get_save_data_setting():
     write_save_data_setting(
         {
-            SaveFileSetting.DB_EXCEL_FILE.value: "",
             SaveFileSetting.SEARCH_FILE_SAVE_PATH.value: "",
         }
     )
 # ------------- 경로 저장 파일 생성 종료 ------------- #
+
+
+# ------------- 유의어 저장 파일 생성 ------------- #
+USER_SAVE_PATH_SYNONYM = os.path.join(PROGRAM_PATH, f"{PROGRAM_ID}_SYNONYM.txt")
+
+
+def get_save_data_SYNONYM():
+    saved_data = None
+    if os.path.isfile(USER_SAVE_PATH_SYNONYM):
+        with open(USER_SAVE_PATH_SYNONYM, "r", encoding="utf-8") as f:
+            saved_data = json.loads(f.read())
+    return saved_data
+
+
+def write_save_data_SYNONYM(dict_save: dict):
+
+    if os.path.isfile(USER_SAVE_PATH_SYNONYM):
+        os.remove(USER_SAVE_PATH_SYNONYM)
+        with open(USER_SAVE_PATH_SYNONYM, "w", encoding="utf-8") as f:
+            f.write(json.dumps((dict_save)))
+            f.close()
+    else:
+        with open(USER_SAVE_PATH_SYNONYM, "w", encoding="utf-8") as f:
+            f.write(json.dumps((dict_save)))
+            f.close()
+
+    return dict_save
+
+
+class SaveFileSYNONYM(Enum):
+    SYNONYM_FILE_SAVE_PATH = "SYNONYM_FILE_SAVE_PATH"
+
+
+# 저장데이터 없는 경우 초기화
+if not get_save_data_SYNONYM():
+    write_save_data_SYNONYM(
+        {
+            SaveFileSYNONYM.SYNONYM_FILE_SAVE_PATH.value: "",
+        }
+    )
+# ------------- 유의어 저장 파일 생성 종료 ------------- #
 
 
 # ------------- 주제 저장 파일 생성 ------------- #

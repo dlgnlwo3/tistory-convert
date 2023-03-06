@@ -179,8 +179,6 @@ class TopicUI(QWidget):
 
     def header_remove_button_clicked(self):
 
-        print(f"{self.header_topic_combobox.currentText()} header remove clicked")
-
         items = self.header_list_tablewidget.selectedItems()
         if len(items) <= 0:
             print(f"선택된 머리글이 없습니다.")
@@ -230,8 +228,6 @@ class TopicUI(QWidget):
         self.set_header_list_tablewidget()
 
     def footer_remove_button_clicked(self):
-
-        print(f"{self.footer_topic_combobox.currentText()} footer remove clicked")
 
         items = self.footer_list_tablewidget.selectedItems()
         if len(items) <= 0:
