@@ -21,6 +21,8 @@ from config import *
 from tabs.search_tab import SearchUI
 from tabs.setting_tab import SettingUI
 from tabs.topic_tab import TopicUI
+from tabs.synonym_convert_tab import SynonymConvertUI
+
 
 # 오류 발생 시 프로그램 강제종료 방지
 def my_exception_hook(exctype, value, traceback):
@@ -91,10 +93,12 @@ class MainUI(QWidget):
         self.search_tab = SearchUI()
         self.setting_tab = SettingUI()
         self.topic_tab = TopicUI()
+        self.synonym_convert_tab = SynonymConvertUI()
 
         # 탭 추가
         tabs = QTabWidget()
         tabs.addTab(self.search_tab, "수집")
+        tabs.addTab(self.synonym_convert_tab, "유의어 변환 에디터")
         tabs.addTab(self.setting_tab, "설정")
         tabs.addTab(self.topic_tab, "주제 설정")
 
