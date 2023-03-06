@@ -136,26 +136,55 @@ class TopicUI(QWidget):
         topic_inner_layout.addWidget(self.topic_list_tablewidget, 1, 1, 2, 1)
         topic_groupbox.setLayout(topic_inner_layout)
 
-        # 로그 그룹박스
-        log_groupbox = QGroupBox("로그")
-        self.browser = QTextBrowser()
+        # 머리글 관리
+        header_groupbox = QGroupBox("머리글 관리")
+        self.header_input_label = QLabel("머리글 관리")
+        self.header_topic_combobox = QComboBox()
+        self.header_input = QLineEdit()
+        self.header_save_button = QPushButton("저장")
+        self.header_remove_button = QPushButton("제거")
+        self.header_list_tablewidget = QTableWidget()
 
-        log_inner_layout = QHBoxLayout()
-        log_inner_layout.addWidget(self.browser)
-        log_groupbox.setLayout(log_inner_layout)
+        header_inner_layout = QGridLayout()
+        header_inner_layout.addWidget(self.header_input_label, 0, 0, 1, 1)
+        header_inner_layout.addWidget(self.header_topic_combobox, 0, 1, 1, 1)
+        header_inner_layout.addWidget(self.header_input, 0, 2, 1, 1)
+        header_inner_layout.addWidget(self.header_save_button, 0, 3, 1, 1)
+        header_inner_layout.addWidget(self.header_remove_button, 0, 4, 1, 1)
+        header_inner_layout.addWidget(self.header_list_tablewidget, 1, 2, 3, 1)
+        header_groupbox.setLayout(header_inner_layout)
+
+        # 맺음말 관리
+        footer_groupbox = QGroupBox("맺음말 관리")
+        self.footer_input_label = QLabel("맺음말 관리")
+        self.footer_topic_combobox = QComboBox()
+        self.footer_input = QLineEdit()
+        self.footer_save_button = QPushButton("저장")
+        self.footer_remove_button = QPushButton("제거")
+        self.footer_list_tablewidget = QTableWidget()
+
+        footer_inner_layout = QGridLayout()
+        footer_inner_layout.addWidget(self.footer_input_label, 0, 0, 1, 1)
+        footer_inner_layout.addWidget(self.footer_topic_combobox, 0, 1, 1, 1)
+        footer_inner_layout.addWidget(self.footer_input, 0, 2, 1, 1)
+        footer_inner_layout.addWidget(self.footer_save_button, 0, 3, 1, 1)
+        footer_inner_layout.addWidget(self.footer_remove_button, 0, 4, 1, 1)
+        footer_inner_layout.addWidget(self.footer_list_tablewidget, 1, 2, 3, 1)
+        footer_groupbox.setLayout(footer_inner_layout)
 
         # 레이아웃 배치
         top_layout = QVBoxLayout()
         top_layout.addWidget(topic_groupbox)
 
         mid_layout = QHBoxLayout()
+        mid_layout.addWidget(header_groupbox)
 
-        log_layout = QVBoxLayout()
-        log_layout.addWidget(log_groupbox)
+        bottom_layout = QVBoxLayout()
+        bottom_layout.addWidget(footer_groupbox)
 
         layout = QVBoxLayout()
         layout.addLayout(top_layout)
         layout.addLayout(mid_layout)
-        layout.addLayout(log_layout)
+        layout.addLayout(bottom_layout)
 
         self.setLayout(layout)
