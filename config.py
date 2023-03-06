@@ -90,7 +90,7 @@ if not get_save_data_google():
     write_save_data_google({SaveFileGoogle.GOOGLE.value: []})
 
 
-# ------------- 상품 등록 저장 파일 생성 ------------- #
+# ------------- 경로 저장 파일 생성 ------------- #
 USER_SAVE_PATH_SETTING = os.path.join(PROGRAM_PATH, f"{PROGRAM_ID}_SETTING.txt")
 
 
@@ -130,7 +130,48 @@ if not get_save_data_setting():
             SaveFileSetting.SEARCH_FILE_SAVE_PATH.value: "",
         }
     )
-# ------------- 상품 등록 저장 파일 생성 종료 ------------- #
+# ------------- 경로 저장 파일 생성 종료 ------------- #
+
+
+# ------------- 주제 저장 파일 생성 ------------- #
+USER_SAVE_PATH_TOPIC = os.path.join(PROGRAM_PATH, f"{PROGRAM_ID}_TOPIC.txt")
+
+
+def get_save_data_topic():
+    saved_data = None
+    if os.path.isfile(USER_SAVE_PATH_TOPIC):
+        with open(USER_SAVE_PATH_TOPIC, "r", encoding="utf-8") as f:
+            saved_data = json.loads(f.read())
+    return saved_data
+
+
+def write_save_data_topic(dict_save: dict):
+
+    if os.path.isfile(USER_SAVE_PATH_TOPIC):
+        os.remove(USER_SAVE_PATH_TOPIC)
+        with open(USER_SAVE_PATH_TOPIC, "w", encoding="utf-8") as f:
+            f.write(json.dumps((dict_save)))
+            f.close()
+    else:
+        with open(USER_SAVE_PATH_TOPIC, "w", encoding="utf-8") as f:
+            f.write(json.dumps((dict_save)))
+            f.close()
+
+    return dict_save
+
+
+class SaveFileTopic(Enum):
+    TOPIC = "TOPIC"
+
+
+# 저장데이터 없는 경우 초기화
+if not get_save_data_topic():
+    write_save_data_topic(
+        {
+            SaveFileTopic.TOPIC.value: [],
+        }
+    )
+# ------------- 주제 저장 파일 생성 종료 ------------- #
 
 
 # ------------- 로그파일 경로 생성 시작 ------------- #

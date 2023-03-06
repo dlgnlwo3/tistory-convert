@@ -32,7 +32,7 @@ class SearchUI(QWidget):
         self.saved_data_setting = get_save_data_setting()
         print(self.saved_data_daum)
         print(self.saved_data_google)
-        print(self.saved_data_setting)
+        # print(self.saved_data_setting)
 
         super().__init__()
         self.initUI()

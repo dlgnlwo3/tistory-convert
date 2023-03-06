@@ -45,6 +45,7 @@ class SettingUI(QWidget):
 
         if reply == QMessageBox.Yes:
             write_save_data_setting(dict_save)
+            QMessageBox.information(self, "경로 저장", f"현재 상태를 저장했습니다.")
             print(f"현재 상태를 저장했습니다.")
         else:
             print(f"저장 취소")
