@@ -32,7 +32,6 @@ def get_save_data_daum():
 
 
 def write_save_data_daum(dict_save: dict):
-
     if os.path.isfile(USER_SAVE_PATH_DAUM):
         os.remove(USER_SAVE_PATH_DAUM)
         with open(USER_SAVE_PATH_DAUM, "w", encoding="utf-8") as f:
@@ -67,7 +66,6 @@ def get_save_data_google():
 
 
 def write_save_data_google(dict_save: dict):
-
     if os.path.isfile(USER_SAVE_PATH_GOOGLE):
         os.remove(USER_SAVE_PATH_GOOGLE)
         with open(USER_SAVE_PATH_GOOGLE, "w", encoding="utf-8") as f:
@@ -103,7 +101,6 @@ def get_save_data_setting():
 
 
 def write_save_data_setting(dict_save: dict):
-
     if os.path.isfile(USER_SAVE_PATH_SETTING):
         os.remove(USER_SAVE_PATH_SETTING)
         with open(USER_SAVE_PATH_SETTING, "w", encoding="utf-8") as f:
@@ -144,7 +141,6 @@ def get_save_data_SYNONYM():
 
 
 def write_save_data_SYNONYM(dict_save: dict):
-
     if os.path.isfile(USER_SAVE_PATH_SYNONYM):
         os.remove(USER_SAVE_PATH_SYNONYM)
         with open(USER_SAVE_PATH_SYNONYM, "w", encoding="utf-8") as f:
@@ -185,7 +181,6 @@ def get_save_data_topic():
 
 
 def write_save_data_topic(dict_save: dict):
-
     if os.path.isfile(USER_SAVE_PATH_TOPIC):
         os.remove(USER_SAVE_PATH_TOPIC)
         with open(USER_SAVE_PATH_TOPIC, "w", encoding="utf-8") as f:
@@ -226,7 +221,6 @@ def get_save_data_HEADER():
 
 
 def write_save_data_HEADER(dict_save: dict):
-
     if os.path.isfile(USER_SAVE_PATH_HEADER):
         os.remove(USER_SAVE_PATH_HEADER)
         with open(USER_SAVE_PATH_HEADER, "w", encoding="utf-8") as f:
@@ -263,7 +257,6 @@ def get_save_data_FOOTER():
 
 
 def write_save_data_FOOTER(dict_save: dict):
-
     if os.path.isfile(USER_SAVE_PATH_FOOTER):
         os.remove(USER_SAVE_PATH_FOOTER)
         with open(USER_SAVE_PATH_FOOTER, "w", encoding="utf-8") as f:

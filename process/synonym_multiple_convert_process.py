@@ -6,22 +6,20 @@ if 1 == 1:
 
 import time
 from dtos.gui_dto import GUIDto
-from common.utils import random_delay
-from common.chrome import get_chrome_driver_new
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium import webdriver
 from common.utils import global_log_append
 from timeit import default_timer as timer
 from datetime import timedelta, datetime
-from features.tistory_newspaper import TistoryNewsPaper
 from dtos.top_blog_detail_dto import *
 from config import *
 import pandas as pd
 import re
 from docx import Document
+from features.convert_sentence import (
+    convert_from_db,
+    shuffle_sentence,
+    insert_header_to_sentence,
+    insert_footer_to_sentence,
+)
 
 
 class SynonymMultipleConvert:
@@ -34,125 +32,99 @@ class SynonymMultipleConvert:
     def setLogger(self, log_msg):
         self.log_msg = log_msg
 
-    # 엑셀 저장
-    def blog_detail_to_excel(self, top_blog_detail_dtos):
-        article_excel = os.path.join(self.guiDto.search_file_save_path, f"상위노출데이터 {self.run_time}.xlsx")
-        pd.DataFrame.from_dict(top_blog_detail_dtos).to_excel(article_excel, index=False)
-        time.sleep(1)
-
     # 워드 저장
-    def blog_detail_to_docx(self, article_title: str, article_text: str):
-        article_path = os.path.join(self.guiDto.search_file_save_path, f"글수집 {self.run_time}")
+    def sentence_to_docx(self, file_name: str, sentence: str):
+        save_path = os.path.join(self.guiDto.convert_path, f"유의어 변환 ({self.run_time})")
 
-        if os.path.isdir(article_path) == False:
-            os.mkdir(article_path)
+        if os.path.isdir(save_path) == False:
+            os.mkdir(save_path)
         else:
             pass
 
-        article_docx = os.path.join(article_path, f"{article_title} {self.run_time[:-5]}.docx")
+        sentence_docx = os.path.join(save_path, f"{file_name}.docx")
 
         doc = Document()
 
-        doc.add_paragraph(article_text)
+        doc.add_paragraph(sentence)
 
-        doc.save(article_docx)
+        doc.save(sentence_docx)
 
-        time.sleep(1)
+        self.log_msg.emit(f"{file_name}.docx 저장 완료")
 
-    def search_top_blog(self, daum_keyword: str):
-        driver = self.driver
-        driver.get(
-            f"https://search.daum.net/search?w=blog&nil_search=btn&enc=utf8&q={daum_keyword}&f=section&SA=tistory&p=1"
-        )
+    def get_sentence_from_file(self, file_path: str):
+        sentence = ""
 
-        WebDriverWait(driver, 10).until(
-            EC.element_to_be_clickable((By.XPATH, '//li[contains(@id, "br_tstory")]//a[contains(@class, "f_url")]'))
-        )
+        # docx 파일인 경우
+        if file_path.rfind(".docx") > -1:
+            doc = Document(file_path)
+            all_text = []
+            for para in doc.paragraphs:
+                all_text.append(para.text)
+            for table in doc.tables:
+                for row in table.rows:
+                    for cell in row.cells:
+                        all_text.append(cell.text)
+            all_text = " ".join(all_text)
+            sentence = all_text
 
-        # 현재 페이지의 블로그 검색 결과
-        # $x('//li[contains(@id, "br_tstory")]//a[contains(@class, "f_url")]')
-        blog_links = driver.find_elements(By.XPATH, '//li[contains(@id, "br_tstory")]//a[contains(@class, "f_url")]')[
-            :3
-        ]
+        # txt 파일인 경우
+        elif file_path.rfind(".txt") > -1:
+            with open(file_path, "r") as f:
+                text = f.read()
+                sentence = text
 
-        for blog_link in blog_links:
-            blog_url = blog_link.get_attribute("href")
+        else:
+            pass
 
-            # newspaper3k로 진행
-            top_blog_detail_dto: TopBlogDetailDto = TistoryNewsPaper().get_article_from_blog_url(blog_url, daum_keyword)
-            self.top_blog_detail_dtos.append(top_blog_detail_dto.get_dict())
-            self.blog_detail_to_excel(self.top_blog_detail_dtos)
-
-        time.sleep(1)
-
-    def search_blog(self, daum_keyword: str):
-        driver = self.driver
-
-        search_blog_list = []
-
-        for current_page in range(self.guiDto.daum_start_page, self.guiDto.daum_end_page + 1):
-            driver.get(
-                f"https://search.daum.net/search?w=blog&nil_search=btn&enc=utf8&q={daum_keyword}&f=section&SA=tistory&p={current_page}"
-            )
-
-            WebDriverWait(driver, 10).until(
-                EC.element_to_be_clickable((By.XPATH, '//li[contains(@id, "br_tstory")]//a[contains(@class, "f_url")]'))
-            )
-
-            # 현재 페이지의 블로그 검색 결과
-            # $x('//li[contains(@id, "br_tstory")]//a[contains(@class, "f_url")]')
-            blog_list = driver.find_elements(By.XPATH, '//li[contains(@id, "br_tstory")]')
-
-            # 입력받은 날짜와 블로그 날짜를 비교합니다.
-            search_date = self.guiDto.daum_search_date
-            search_date_format = f"%Y-%m-%d"
-            search_date = datetime.strptime(search_date, search_date_format)
-
-            blog: webdriver.Chrome._web_element_cls
-            for blog in blog_list:
-                blog_date = blog.find_element(By.CSS_SELECTOR, "span[class*='date']").get_attribute("textContent")
-                blog_date_format = f"%Y.%m.%d"
-
-                try:
-                    blog_date = datetime.strptime(blog_date, blog_date_format)
-                except Exception as e:
-                    print(f"날짜 형식에 맞지 않습니다.")
-                    blog_date = datetime.now()
-
-                if search_date > blog_date:
-                    blog_url = blog.find_element(By.CSS_SELECTOR, 'a[class*="f_url"]').get_attribute("href")
-                    top_blog_detail_dto: TopBlogDetailDto = TistoryNewsPaper().get_article_from_blog_url(
-                        blog_url, daum_keyword
-                    )
-                    top_blog_detail_dict = top_blog_detail_dto.get_dict()
-                    article_text = top_blog_detail_dict["내용"]
-                    article_title = top_blog_detail_dict["제목"]
-                    article_title = re.sub('[\/:*?"<>|.]', "", article_title)
-
-                    # 워드 저장
-                    self.blog_detail_to_docx(article_title, article_text)
-
-                    search_blog_list.append(article_title)
-
-                else:
-                    print(f"({search_date}) 보다 이후에 작성된 글입니다. ({blog_date})")
-                    continue
-
-            if len(search_blog_list) >= self.guiDto.daum_search_count:
-                print(f"수집할 글 개수에 도달했습니다.")
-                break
-
-        time.sleep(1)
+        return sentence
 
     # 전체작업 시작
     def work_start(self):
         print(f"converter: work_start {self.run_time}")
 
-        # 파일에서 문자열 획득
+        file: str
+        for i, file in enumerate(self.guiDto.convert_list):
+            file_path = os.path.join(self.guiDto.convert_path, file)
+            file_format = file[file.rfind(".") :]
 
-        # 문자열 변환
+            # 파일 유효성 검사
+            if os.path.isfile(file_path):
+                print(file_path)
+            else:
+                continue
 
-        # 문자열 저장
+            # 파일에서 문자열 획득
+            original_sentence = self.get_sentence_from_file(file_path)
+
+            # 문자열 변환
+            sentence = convert_from_db(
+                original_sentence, "", self.guiDto.df_two_way, self.guiDto.df_one_way, self.guiDto.synonym_convert_limit
+            )
+
+            # 문단 랜덤 섞기 체크 시
+            if self.guiDto.shuffle_paragraphs_check:
+                sentence = shuffle_sentence(sentence)
+
+            # 머리글 삽입
+            if self.guiDto.header_check:
+                header_topic = self.guiDto.header_topic
+                saved_data_header = get_save_data_HEADER()
+                sentence = insert_header_to_sentence(
+                    sentence, header_topic, saved_data_header, convert_keyword=file.rstrip(file_format)
+                )
+
+            # 맺음말 삽입
+            if self.guiDto.footer_check:
+                footer_topic = self.guiDto.footer_topic
+                saved_data_footer = get_save_data_FOOTER()
+                sentence = insert_footer_to_sentence(
+                    sentence, footer_topic, saved_data_footer, convert_keyword=file.rstrip(file_format)
+                )
+
+            print(sentence)
+
+            # 문자열 파일 저장
+            self.sentence_to_docx(file.rstrip(file_format), sentence)
 
 
 if __name__ == "__main__":
