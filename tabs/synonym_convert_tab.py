@@ -10,9 +10,9 @@ from datetime import *
 
 from common.utils import *
 from config import *
-
-
-from features.convert_content import convert_content
+from features.convert_sentence import convert_sentence
+from common.synonym_file import SynonymFile
+import pandas as pd
 
 
 class SynonymConvertUI(QWidget):
@@ -24,8 +24,8 @@ class SynonymConvertUI(QWidget):
         self.initUI()
 
     def convert_sentence_button_clicked(self):
-        print("convert_sentence_button_clicked")
 
+        # 값이 입력되어있는지 확인
         if self.input_sentence_textedit.toPlainText() == "":
             QMessageBox.information(self, "변환하기", f"입력된 값이 없습니다.")
             return
@@ -47,8 +47,33 @@ class SynonymConvertUI(QWidget):
             return
 
         # 양식에 맞는 엑셀파일인지 검증 필요
+        try:
+            synonym_file = SynonymFile(search_file_save_path)
+            df_two_way: pd.DataFrame = synonym_file.df_two_way
+            df_one_way: pd.DataFrame = synonym_file.df_one_way
+        except Exception as e:
+            print(e)
+            QMessageBox.information(self, "작업 시작", f"양식에 맞지 않는 파일입니다. \n{e}")
+            return
 
-        time.sleep(1)
+        # 양방향 작업
+        original_sentence = self.input_sentence_textedit.toPlainText()
+        sentence = original_sentence
+        for i, row in df_two_way[:].iterrows():
+            try:
+                data = str(row["data"])
+                synonym_list = data.split(",")
+                sentence = convert_sentence(sentence, synonym_list)
+
+            except Exception as e:
+                print(e)
+                QMessageBox.information(self, "오류", f"작업 중 오류가 발생했습니다. \n{e}")
+                return
+
+        print(sentence)
+
+        self.result_sentence_textedit.clear()
+        self.result_sentence_textedit.setText(sentence)
 
     def retry_sentence_button_clicked(self):
         print("retry_sentence_button_clicked")
