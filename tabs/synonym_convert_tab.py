@@ -37,6 +37,7 @@ class SynonymConvertUI(QWidget):
         if self.header_select_checkbox.isChecked() or self.footer_select_checkbox.isChecked():
             if self.convert_keyword_input.text() == "":
                 print("치환 키워드 필수 입력")
+                QMessageBox.information(self, "작업 시작", f"치환 키워드를 입력해주세요.")
                 return
             print(f"convert_keyword: {convert_keyword}")
 
@@ -101,11 +102,27 @@ class SynonymConvertUI(QWidget):
 
         # 머리글 삽입
         if self.header_select_checkbox.isChecked():
-            print()
+            header_topic = self.header_topic_combobox.currentText()
+
+            self.saved_data_header = get_save_data_HEADER()
+            header: str = random.choice(self.saved_data_header[header_topic])
+
+            header = header.replace("$키워드$", convert_keyword)
+            header += f"\n\n"
+
+            sentence = header + sentence
 
         # 맺음말 삽입
         if self.footer_select_checkbox.isChecked():
-            print()
+            footer_topic = self.footer_topic_combobox.currentText()
+
+            self.saved_data_footer = get_save_data_FOOTER()
+            footer: str = random.choice(self.saved_data_footer[footer_topic])
+
+            footer = footer.replace("$키워드$", convert_keyword)
+            footer = f"\n\n" + footer
+
+            sentence = sentence + footer
 
         print()
         print(sentence)
