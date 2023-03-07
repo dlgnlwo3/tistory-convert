@@ -34,18 +34,34 @@ class SynonymMultipleConvertTab(QWidget):
     # 메인 UI
     def initUI(self):
         # 유의어 변환 횟수
-        synonym_convert_limit_groupbox = QGroupBox("유의어 변환 횟수")
+        synonym_convert_limit_groupbox = QGroupBox()
+        self.synonym_convert_limit_label = QLabel("유의어 변환 횟수")
+        self.synonym_convert_limit = QLineEdit()
+        self.synonym_convert_limit.setValidator(QIntValidator())
+
         synonym_convert_limit_inner_layout = QHBoxLayout()
+        synonym_convert_limit_inner_layout.addWidget(self.synonym_convert_limit_label)
+        synonym_convert_limit_inner_layout.addWidget(self.synonym_convert_limit)
         synonym_convert_limit_groupbox.setLayout(synonym_convert_limit_inner_layout)
 
         # 변환할 폴더 선택
-        convert_path_groupbox = QGroupBox("변환할 폴더 선택")
+        convert_path_groupbox = QGroupBox()
+        self.convert_path = QLineEdit()
+        self.convert_path.setDisabled(True)
+        self.convert_path_select_button = QPushButton("변환할 폴더 선택")
+
         convert_path_inner_layout = QHBoxLayout()
+        convert_path_inner_layout.addWidget(self.convert_path, 4)
+        convert_path_inner_layout.addWidget(self.convert_path_select_button, 1)
         convert_path_groupbox.setLayout(convert_path_inner_layout)
 
         # 파일 목록 그룹박스
         convert_list_groupbox = QGroupBox("파일 목록")
+        self.convert_listwidget = QListWidget(self)
+        self.convert_listwidget.setSelectionMode(QAbstractItemView.MultiSelection)
+
         convert_list_inner_layout = QHBoxLayout()
+        convert_list_inner_layout.addWidget(self.convert_listwidget)
         convert_list_groupbox.setLayout(convert_list_inner_layout)
 
         # 문단 랜덤 섞기
@@ -124,8 +140,8 @@ class SynonymMultipleConvertTab(QWidget):
 
         # 레이아웃 배치
         top_layout = QHBoxLayout()
-        top_layout.addWidget(synonym_convert_limit_groupbox)
-        top_layout.addWidget(convert_path_groupbox)
+        top_layout.addWidget(synonym_convert_limit_groupbox, 2)
+        top_layout.addWidget(convert_path_groupbox, 3)
 
         mid_layout = QHBoxLayout()
         mid_layout.addWidget(convert_list_groupbox)
