@@ -24,15 +24,9 @@ import re
 from docx import Document
 
 
-class DaumSearch:
+class SynonymMultipleConvert:
     def __init__(self):
-        # 현재 로컬에 저장된 크롬 기준으로 오픈한다.
-        # open_browser()
-        self.default_wait = 10
-        self.driver = get_chrome_driver_new(is_headless=False, is_scret=True, move_to_corner=False)
-        self.driver.implicitly_wait(self.default_wait)
         self.run_time = str(datetime.now())[0:-10].replace(":", "")
-        self.top_blog_detail_dtos = []
 
     def setGuiDto(self, guiDto: GUIDto):
         self.guiDto = guiDto
@@ -152,29 +146,15 @@ class DaumSearch:
 
     # 전체작업 시작
     def work_start(self):
-        print(f"daum_search_process: work_start")
+        print(f"converter: work_start {self.run_time}")
 
-        try:
-            for daum_keyword in self.guiDto.daum_keyword_list:
-                print(daum_keyword)
+        # 파일에서 문자열 획득
 
-                # 검색어 블로그 주소
-                # https://search.daum.net/search?w=blog&nil_search=btn&enc=utf8&q={검색어}&p=5
-                # 1. 다음 블로그 검색 후 최상단 3개의 글 수집
-                self.search_top_blog(daum_keyword)
+        # 문자열 변환
 
-                # 2. 입력받은 페이지에서 입력한 갯수만큼 블로그 글 수집
-                self.search_blog(daum_keyword)
-
-        except Exception as e:
-            print(e)
-            self.log_msg.emit(str(e))
-            print(f"다음 작업 실패")
-
-        finally:
-            time.sleep(1)
+        # 문자열 저장
 
 
 if __name__ == "__main__":
-    searcher = DaumSearch()
-    searcher.work_start()
+    converter = SynonymMultipleConvert()
+    converter.work_start()

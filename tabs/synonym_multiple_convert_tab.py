@@ -16,7 +16,7 @@ import pandas as pd
 import clipboard
 import random
 
-from threads.convert_thread import ConvertThread
+from threads.synonym_multiple_convert_thread import ConvertThread
 from dtos.gui_dto import GUIDto
 
 

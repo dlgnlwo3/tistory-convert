@@ -18,6 +18,8 @@ from timeit import default_timer as timer
 import debugpy
 import time
 
+from process.synonym_multiple_convert_process import SynonymMultipleConvert
+
 
 class ConvertThread(QThread):
     log_msg = pyqtSignal(str)
@@ -35,9 +37,18 @@ class ConvertThread(QThread):
         try:
             debugpy.debug_this_thread()
 
-            self.log_msg.emit(f"작업 시작")
+            self.log_msg.emit(f"유의어 변환 작업 시작")
 
             start_time = timer()
+
+            # 작업 시작
+            converter = SynonymMultipleConvert()
+
+            converter.setGuiDto(self.guiDto)
+
+            converter.setLogger(self.log_msg)
+
+            converter.work_start()
 
             end_time = timer()
 
