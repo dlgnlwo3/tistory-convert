@@ -26,7 +26,6 @@ from tabs.file_convert_tab import FileConvertTab
 from tabs.synonym_multiple_convert_tab import SynonymMultipleConvertTab
 
 
-
 # 오류 발생 시 프로그램 강제종료 방지
 def my_exception_hook(exctype, value, traceback):
     print(exctype, value, traceback)
@@ -40,10 +39,8 @@ sys.excepthook = my_exception_hook
 
 
 class MainUI(QWidget):
-
     # 초기화
     def __init__(self):
-
         print(f"LOG_FOLDER_NAME: {LOG_FOLDER_NAME}")
         print(f"PROGRAM_PATH: {PROGRAM_PATH}")
         print(f"USER_SAVE_PATH_DAUM: {USER_SAVE_PATH_DAUM}")
@@ -85,7 +82,6 @@ class MainUI(QWidget):
 
     # 메인 UI
     def initUI(self):
-
         # 이미지 주소
         ICON_IMAGE_URL = "https://i.imgur.com/S8uiUDk.png"
         self.icon = QNetworkAccessManager()

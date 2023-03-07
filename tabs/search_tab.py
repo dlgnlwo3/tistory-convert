@@ -17,10 +17,8 @@ import collections
 
 
 class SearchTab(QWidget):
-
     # 초기화
     def __init__(self):
-
         self.saved_data_daum = get_save_data_daum()
         self.saved_data_google = get_save_data_google()
         self.saved_data_setting = get_save_data_setting()
@@ -185,7 +183,6 @@ class SearchTab(QWidget):
         print(f"thread_is_running: {self.google_search_thread.isRunning()}")
 
     def set_daum_keyword_list_tablewidget(self):
-
         self.daum_keyword_list_tablewidget.setColumnCount(1)
         self.daum_keyword_list_tablewidget.setHorizontalHeaderLabels(["글 수집 키워드"])
         self.daum_keyword_list_tablewidget.setRowCount(len(self.saved_data_daum[SaveFileDaum.DAUM.value]))
@@ -197,7 +194,6 @@ class SearchTab(QWidget):
         self.daum_keyword_list_tablewidget.setSelectionMode(QAbstractItemView.MultiSelection)
 
     def set_google_keyword_list_tablewidget(self):
-
         self.google_keyword_list_tablewidget.setColumnCount(1)
         self.google_keyword_list_tablewidget.setHorizontalHeaderLabels(["이미지 수집 키워드"])
         self.google_keyword_list_tablewidget.setRowCount(len(self.saved_data_google[SaveFileGoogle.GOOGLE.value]))
@@ -217,7 +213,6 @@ class SearchTab(QWidget):
         self.set_google_keyword_list_tablewidget()
 
     def daum_save_button_clicked(self):
-
         if self.daum_input.text() == "":
             print(f"글 수집 키워드를 입력해주세요.")
             self.log_append(f"글 수집 키워드를 입력해주세요.")
@@ -237,7 +232,6 @@ class SearchTab(QWidget):
         self.set_daum_keyword_list_tablewidget()
 
     def google_save_button_clicked(self):
-
         if self.google_input.text() == "":
             print(f"이미지 수집 키워드를 입력해주세요.")
             self.log_append(f"이미지 수집 키워드를 입력해주세요.")
@@ -257,7 +251,6 @@ class SearchTab(QWidget):
         self.set_google_keyword_list_tablewidget()
 
     def daum_remove_button_clicked(self):
-
         items = self.daum_keyword_list_tablewidget.selectedItems()
         if len(items) <= 0:
             print(f"선택된 글 수집 키워드가 없습니다.")
@@ -269,7 +262,6 @@ class SearchTab(QWidget):
         reply = QMessageBox.question(self, "삭제", question_msg, QMessageBox.Yes, QMessageBox.No)
 
         if reply == QMessageBox.Yes:
-
             # 테이블에서 제거
             for item in items:
                 row = item.row()
@@ -298,7 +290,6 @@ class SearchTab(QWidget):
         self.set_daum_keyword_list_tablewidget()
 
     def google_remove_button_clicked(self):
-
         items = self.google_keyword_list_tablewidget.selectedItems()
         if len(items) <= 0:
             print(f"선택된 이미지 수집 키워드가 없습니다.")
@@ -310,7 +301,6 @@ class SearchTab(QWidget):
         reply = QMessageBox.question(self, "삭제", question_msg, QMessageBox.Yes, QMessageBox.No)
 
         if reply == QMessageBox.Yes:
-
             # 테이블에서 제거
             for item in items:
                 row = item.row()
@@ -351,7 +341,6 @@ class SearchTab(QWidget):
 
     # 메인 UI
     def initUI(self):
-
         # 다음 입력 그룹박스
         daum_input_groupbox = QGroupBox("글 수집 키워드")
         self.daum_input = QLineEdit()

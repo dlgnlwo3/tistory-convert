@@ -18,15 +18,12 @@ import random
 
 
 class SynonymConvertTab(QWidget):
-
     # 초기화
     def __init__(self):
-
         super().__init__()
         self.initUI()
 
     def convert_sentence_button_clicked(self):
-
         # 값이 입력되어있는지 확인
         if self.input_sentence_textedit.toPlainText() == "":
             QMessageBox.information(self, "변환하기", f"입력된 값이 없습니다.")
@@ -88,12 +85,12 @@ class SynonymConvertTab(QWidget):
                 print(e)
                 QMessageBox.information(self, "오류", f"작업 중 오류가 발생했습니다. \n{e}")
                 return
-            
+
         # 일방향 작업
         for j, row in df_one_way[:].iterrows():
             try:
                 before = str(row["before"])
-                after = str(row['after'])
+                after = str(row["after"])
 
                 if any(s in before for s in ban_synonym_list):
                     continue
@@ -105,7 +102,7 @@ class SynonymConvertTab(QWidget):
                 print(e)
                 QMessageBox.information(self, "오류", f"작업 중 오류가 발생했습니다. \n{e}")
                 return
-            
+
         print(sentence)
 
         # 문단 랜덤 섞기 체크 시
@@ -174,7 +171,6 @@ class SynonymConvertTab(QWidget):
             self.footer_topic_combobox.clear()
 
     def set_header_topic_combobox(self):
-
         self.saved_data_topic = get_save_data_topic()
         print(self.saved_data_topic)
 
@@ -184,7 +180,6 @@ class SynonymConvertTab(QWidget):
             self.header_topic_combobox.addItem(f"{topic}")
 
     def set_footer_topic_combobox(self):
-
         self.saved_data_topic = get_save_data_topic()
         print(self.saved_data_topic)
 
@@ -195,7 +190,6 @@ class SynonymConvertTab(QWidget):
 
     # 메인 UI
     def initUI(self):
-
         # 변환 금지어 입력
         ban_synonym_groupbox = QGroupBox()
         self.ban_synonym_input_label = QLabel("변환 금지어 입력")

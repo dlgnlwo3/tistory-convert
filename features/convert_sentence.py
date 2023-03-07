@@ -15,7 +15,6 @@ def synonym_random_select(synonym_list: list, word: str):
 
 
 def convert_sentence(sentence: str, synonym_list: list):
-
     for word in synonym_list:
         if word in sentence:
             print(f"'{word}'가 포함되어있습니다.")
@@ -27,9 +26,8 @@ def convert_sentence(sentence: str, synonym_list: list):
 
 
 def convert_one_way_sentence(sentence: str, before_word: str, synonym_list: list):
-
     before_word_count = sentence.count(before_word)
-    before_synonym = ''
+    before_synonym = ""
 
     for i in range(before_word_count):
         synonym = synonym_random_select(synonym_list, before_synonym)
@@ -40,8 +38,6 @@ def convert_one_way_sentence(sentence: str, before_word: str, synonym_list: list
         before_synonym = synonym
 
     return sentence
-
-
 
 
 # sentence = convert_sentence(sentence, synonym_list)

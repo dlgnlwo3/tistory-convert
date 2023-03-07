@@ -13,10 +13,8 @@ from config import *
 
 
 class SettingTab(QWidget):
-
     # 초기화
     def __init__(self):
-
         self.saved_data_setting = get_save_data_setting()
         print(self.saved_data_setting)
 
@@ -90,7 +88,6 @@ class SettingTab(QWidget):
 
     # 메인 UI
     def initUI(self):
-
         # 수집 파일 저장 경로
         search_file_save_path_groupbox = QGroupBox("수집 파일 저장 경로")
         self.search_file_save_path = QLineEdit(
