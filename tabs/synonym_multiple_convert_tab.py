@@ -31,6 +31,53 @@ class SynonymMultipleConvertTab(QWidget):
         self.browser.append(f"[{now}] {str(text)}")
         global_log_append(text)
 
+    def header_select_checkbox_changed(self):
+        print(f"header: {self.header_select_checkbox.isChecked()}")
+
+        if self.header_select_checkbox.isChecked():
+            self.set_header_topic_combobox()
+        else:
+            self.header_topic_combobox.clear()
+
+    def footer_select_checkbox_changed(self):
+        print(f"footer: {self.footer_select_checkbox.isChecked()}")
+
+        if self.footer_select_checkbox.isChecked():
+            self.set_footer_topic_combobox()
+        else:
+            self.footer_topic_combobox.clear()
+
+    def set_header_topic_combobox(self):
+        self.saved_data_topic = get_save_data_topic()
+        print(self.saved_data_topic)
+
+        self.header_topic_combobox.clear()
+
+        for i, topic in enumerate(self.saved_data_topic[SaveFileTopic.TOPIC.value]):
+            self.header_topic_combobox.addItem(f"{topic}")
+
+    def set_footer_topic_combobox(self):
+        self.saved_data_topic = get_save_data_topic()
+        print(self.saved_data_topic)
+
+        self.footer_topic_combobox.clear()
+
+        for i, topic in enumerate(self.saved_data_topic[SaveFileTopic.TOPIC.value]):
+            self.footer_topic_combobox.addItem(f"{topic}")
+
+    # 파일 선택 클릭 (블로그)
+    def convert_path_select_button_clicked(self):
+        self.convert_listwidget.clear()
+        folder = QFileDialog.getExistingDirectory(self, "Select Directory")
+        if folder != "":
+            self.convert_path.setText(folder)
+            file_list = os.listdir(folder)
+            print(file_list)
+            for file in file_list:
+                self.convert_listwidget.addItem(file)
+        else:
+            self.log_append(f"파일 선택 취소")
+
     # 메인 UI
     def initUI(self):
         # 유의어 변환 횟수
@@ -49,6 +96,8 @@ class SynonymMultipleConvertTab(QWidget):
         self.convert_path = QLineEdit()
         self.convert_path.setDisabled(True)
         self.convert_path_select_button = QPushButton("변환할 폴더 선택")
+
+        self.convert_path_select_button.clicked.connect(self.convert_path_select_button_clicked)
 
         convert_path_inner_layout = QHBoxLayout()
         convert_path_inner_layout.addWidget(self.convert_path, 4)
@@ -82,7 +131,7 @@ class SynonymMultipleConvertTab(QWidget):
         header_select_inner_layout.addWidget(self.header_topic_combobox)
         header_select_groupbox.setLayout(header_select_inner_layout)
 
-        # self.header_select_checkbox.stateChanged.connect(self.header_select_checkbox_changed)
+        self.header_select_checkbox.stateChanged.connect(self.header_select_checkbox_changed)
 
         # 맺음말 삽입
         footer_select_groupbox = QGroupBox()
@@ -94,7 +143,7 @@ class SynonymMultipleConvertTab(QWidget):
         footer_select_inner_layout.addWidget(self.footer_topic_combobox)
         footer_select_groupbox.setLayout(footer_select_inner_layout)
 
-        # self.footer_select_checkbox.stateChanged.connect(self.footer_select_checkbox_changed)
+        self.footer_select_checkbox.stateChanged.connect(self.footer_select_checkbox_changed)
 
         # 변환 시작 중지 그룹박스
         convert_start_stop_groupbox = QGroupBox("변환하기")
