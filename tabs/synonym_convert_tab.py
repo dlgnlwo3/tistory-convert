@@ -13,6 +13,8 @@ from config import *
 from features.convert_sentence import convert_sentence
 from common.synonym_file import SynonymFile
 import pandas as pd
+import clipboard
+import random
 
 
 class SynonymConvertUI(QWidget):
@@ -57,11 +59,20 @@ class SynonymConvertUI(QWidget):
             return
 
         # 양방향 작업
+        ban_synonym = self.ban_synonym_input.text()
+        if ban_synonym == "":
+            ban_synonym_list = []
+        else:
+            ban_synonym_list = ban_synonym.split(",")
         original_sentence = self.input_sentence_textedit.toPlainText()
         sentence = original_sentence
         for i, row in df_two_way[:].iterrows():
             try:
                 data = str(row["data"])
+
+                if any(s in data for s in ban_synonym_list):
+                    continue
+
                 synonym_list = data.split(",")
                 sentence = convert_sentence(sentence, synonym_list)
 
@@ -69,6 +80,17 @@ class SynonymConvertUI(QWidget):
                 print(e)
                 QMessageBox.information(self, "오류", f"작업 중 오류가 발생했습니다. \n{e}")
                 return
+
+        # 문단 랜덤 섞기 체크 시
+        if self.shuffle_paragraphs_checkbox.isChecked():
+            sentence_to_list = sentence.split(f"\n\n")
+            print(sentence_to_list)
+
+            random.shuffle(sentence_to_list)
+            print(sentence_to_list)
+
+            if len(sentence_to_list) > 0:
+                sentence = f"\n\n".join(sentence_to_list)
 
         print(sentence)
 
@@ -80,6 +102,9 @@ class SynonymConvertUI(QWidget):
 
     def copy_sentence_button_clicked(self):
         print("copy_sentence_button_clicked")
+        sentence = self.result_sentence_textedit.toPlainText()
+        clipboard.copy(str(sentence))
+        QMessageBox.information(self, "복사", f"클립보드에 복사되었습니다.")
 
     # 메인 UI
     def initUI(self):
@@ -87,7 +112,7 @@ class SynonymConvertUI(QWidget):
         # 변환 금지어 입력
         ban_synonym_groupbox = QGroupBox()
         self.ban_synonym_input_label = QLabel("변환 금지어 입력")
-        self.ban_synonym_input = QLineEdit()
+        self.ban_synonym_input = QLineEdit("화려하게")
 
         ban_synonym_inner_layout = QHBoxLayout()
         ban_synonym_inner_layout.addWidget(self.ban_synonym_input_label)
@@ -132,7 +157,10 @@ class SynonymConvertUI(QWidget):
 
         # 변환할 문장
         input_sentence_groupbox = QGroupBox("문장 입력")
-        self.input_sentence_textedit = QTextEdit("폐어망·폐생수통이 '갤럭시 S23'으로 화려하게 변신")
+        self.input_sentence_textedit = QTextEdit()
+        self.input_sentence_textedit.setPlainText(
+            f"폐어망·폐생수통이 '갤럭시 S23'으로 화려하게 변신\n\n'전자팔찌 끊고 도주' 김봉현 도운 친구 등 3명 기소\n\n결국 소비자들에게 돌아가는 혜택이 축소되는 결과로 이어질 수 있다고 예상했다."
+        )
         self.convert_sentence_button = QPushButton("변환하기")
 
         self.convert_sentence_button.clicked.connect(self.convert_sentence_button_clicked)
