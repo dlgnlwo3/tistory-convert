@@ -18,10 +18,13 @@ from common.utils import global_log_append
 from PyQt5.QtNetwork import QNetworkAccessManager, QNetworkRequest
 from config import *
 
-from tabs.search_tab import SearchUI
-from tabs.setting_tab import SettingUI
-from tabs.topic_tab import TopicUI
-from tabs.synonym_convert_tab import SynonymConvertUI
+from tabs.search_tab import SearchTab
+from tabs.setting_tab import SettingTab
+from tabs.topic_tab import TopicTab
+from tabs.synonym_convert_tab import SynonymConvertTab
+from tabs.file_convert_tab import FileConvertTab
+from tabs.synonym_multiple_convert_tab import SynonymMultipleConvertTab
+
 
 
 # 오류 발생 시 프로그램 강제종료 방지
@@ -33,7 +36,7 @@ def my_exception_hook(exctype, value, traceback):
 
 sys.excepthook = my_exception_hook
 
-# pyinstaller -n "tistory sample v0.0.3" -w --onefile --clean "main.py" --icon "assets\tistory.ico" --add-data "venv/Lib/site-packages/newspaper;newspaper"
+# pyinstaller -n "tistory sample v0.0.4 (변환 에디터 적용)" -w --onefile --clean "main.py" --icon "assets\tistory.ico" --add-data "venv/Lib/site-packages/newspaper;newspaper"
 
 
 class MainUI(QWidget):
@@ -90,15 +93,19 @@ class MainUI(QWidget):
         self.icon.get(QNetworkRequest(QUrl(ICON_IMAGE_URL)))
 
         # 탭 초기화
-        self.search_tab = SearchUI()
-        self.setting_tab = SettingUI()
-        self.topic_tab = TopicUI()
-        self.synonym_convert_tab = SynonymConvertUI()
+        self.search_tab = SearchTab()
+        self.setting_tab = SettingTab()
+        self.topic_tab = TopicTab()
+        self.synonym_convert_tab = SynonymConvertTab()
+        self.synonym_multiple_convertTab = SynonymMultipleConvertTab()
+        self.file_convert_tab = FileConvertTab()
 
         # 탭 추가
         tabs = QTabWidget()
         tabs.addTab(self.search_tab, "수집")
         tabs.addTab(self.synonym_convert_tab, "유의어 변환 에디터")
+        tabs.addTab(self.synonym_multiple_convertTab, "유의어 일괄 변환")
+        tabs.addTab(self.file_convert_tab, "파일 변환")
         tabs.addTab(self.setting_tab, "설정")
         tabs.addTab(self.topic_tab, "주제 설정")
 

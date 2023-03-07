@@ -12,7 +12,7 @@ from common.utils import *
 from config import *
 
 
-class TopicUI(QWidget):
+class TopicTab(QWidget):
 
     # 초기화
     def __init__(self):

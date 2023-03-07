@@ -16,7 +16,7 @@ from config import *
 import collections
 
 
-class SearchUI(QWidget):
+class SearchTab(QWidget):
 
     # 초기화
     def __init__(self):

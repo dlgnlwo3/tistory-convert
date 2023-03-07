@@ -10,14 +10,14 @@ from datetime import *
 
 from common.utils import *
 from config import *
-from features.convert_sentence import convert_sentence, convert_one_way_sentence
+from features.convert_sentence import convert_sentence
 from common.synonym_file import SynonymFile
 import pandas as pd
 import clipboard
 import random
 
 
-class SynonymConvertTab(QWidget):
+class SynonymMultipleConvertTab(QWidget):
 
     # 초기화
     def __init__(self):
@@ -88,25 +88,6 @@ class SynonymConvertTab(QWidget):
                 print(e)
                 QMessageBox.information(self, "오류", f"작업 중 오류가 발생했습니다. \n{e}")
                 return
-            
-        # 일방향 작업
-        for j, row in df_one_way[:].iterrows():
-            try:
-                before = str(row["before"])
-                after = str(row['after'])
-
-                if any(s in before for s in ban_synonym_list):
-                    continue
-
-                synonym_list = after.split(",")
-                sentence = convert_one_way_sentence(sentence, before, synonym_list)
-
-            except Exception as e:
-                print(e)
-                QMessageBox.information(self, "오류", f"작업 중 오류가 발생했습니다. \n{e}")
-                return
-            
-        print(sentence)
 
         # 문단 랜덤 섞기 체크 시
         if self.shuffle_paragraphs_checkbox.isChecked():
@@ -199,7 +180,7 @@ class SynonymConvertTab(QWidget):
         # 변환 금지어 입력
         ban_synonym_groupbox = QGroupBox()
         self.ban_synonym_input_label = QLabel("변환 금지어 입력")
-        self.ban_synonym_input = QLineEdit()
+        self.ban_synonym_input = QLineEdit("화려하게")
 
         ban_synonym_inner_layout = QHBoxLayout()
         ban_synonym_inner_layout.addWidget(self.ban_synonym_input_label)

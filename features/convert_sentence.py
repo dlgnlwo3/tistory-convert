@@ -26,6 +26,15 @@ def convert_sentence(sentence: str, synonym_list: list):
     return sentence
 
 
+def convert_one_way_sentence(sentence: str, before: str, synonym_list: list):
+
+    synonym = synonym_random_select(synonym_list, before)
+    sentence = sentence.replace(before, synonym)
+    return sentence
+
+
+
+
 sentence = convert_sentence(sentence, synonym_list)
 
 print(sentence)
