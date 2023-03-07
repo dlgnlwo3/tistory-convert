@@ -279,6 +279,9 @@ class TopicUI(QWidget):
 
     def set_header_list_tablewidget(self):
 
+        self.header_list_tablewidget.clear()
+        self.header_list_tablewidget.setRowCount(0)
+
         self.header_list_tablewidget.setColumnCount(1)
         self.header_list_tablewidget.setHorizontalHeaderLabels(["머리글"])
 
@@ -295,6 +298,9 @@ class TopicUI(QWidget):
         self.header_list_tablewidget.setSelectionMode(QAbstractItemView.MultiSelection)
 
     def set_footer_list_tablewidget(self):
+
+        self.footer_list_tablewidget.clear()
+        self.footer_list_tablewidget.setRowCount(0)
 
         self.footer_list_tablewidget.setColumnCount(1)
         self.footer_list_tablewidget.setHorizontalHeaderLabels(["맺음말"])
