@@ -32,6 +32,14 @@ class SynonymConvertUI(QWidget):
             QMessageBox.information(self, "변환하기", f"입력된 값이 없습니다.")
             return
 
+        # 치환 키워드
+        convert_keyword = self.convert_keyword_input.text()
+        if self.header_select_checkbox.isChecked() or self.footer_select_checkbox.isChecked():
+            if self.convert_keyword_input.text() == "":
+                print("치환 키워드 필수 입력")
+                return
+            print(f"convert_keyword: {convert_keyword}")
+
         # 엑셀 DB 확인
         self.saved_data_synonym = get_save_data_SYNONYM()
         if self.saved_data_synonym[SaveFileSYNONYM.SYNONYM_FILE_SAVE_PATH.value] == "":
@@ -41,7 +49,6 @@ class SynonymConvertUI(QWidget):
             return
         else:
             search_file_save_path = self.saved_data_synonym[SaveFileSYNONYM.SYNONYM_FILE_SAVE_PATH.value]
-            print(search_file_save_path)
 
         # 파일 유효성 검사
         if not os.path.isfile(search_file_save_path):
@@ -92,8 +99,16 @@ class SynonymConvertUI(QWidget):
             if len(sentence_to_list) > 0:
                 sentence = f"\n\n".join(sentence_to_list)
 
-        print(sentence)
+        # 머리글 삽입
+        if self.header_select_checkbox.isChecked():
+            print()
 
+        # 맺음말 삽입
+        if self.footer_select_checkbox.isChecked():
+            print()
+
+        print()
+        print(sentence)
         self.result_sentence_textedit.clear()
         self.result_sentence_textedit.setText(sentence)
 
@@ -105,6 +120,42 @@ class SynonymConvertUI(QWidget):
         sentence = self.result_sentence_textedit.toPlainText()
         clipboard.copy(str(sentence))
         QMessageBox.information(self, "복사", f"클립보드에 복사되었습니다.")
+
+    def header_select_checkbox_changed(self):
+        print(f"header: {self.header_select_checkbox.isChecked()}")
+
+        if self.header_select_checkbox.isChecked():
+            self.set_header_topic_combobox()
+        else:
+            self.header_topic_combobox.clear()
+
+    def footer_select_checkbox_changed(self):
+        print(f"footer: {self.footer_select_checkbox.isChecked()}")
+
+        if self.footer_select_checkbox.isChecked():
+            self.set_footer_topic_combobox()
+        else:
+            self.footer_topic_combobox.clear()
+
+    def set_header_topic_combobox(self):
+
+        self.saved_data_topic = get_save_data_topic()
+        print(self.saved_data_topic)
+
+        self.header_topic_combobox.clear()
+
+        for i, topic in enumerate(self.saved_data_topic[SaveFileTopic.TOPIC.value]):
+            self.header_topic_combobox.addItem(f"{topic}")
+
+    def set_footer_topic_combobox(self):
+
+        self.saved_data_topic = get_save_data_topic()
+        print(self.saved_data_topic)
+
+        self.footer_topic_combobox.clear()
+
+        for i, topic in enumerate(self.saved_data_topic[SaveFileTopic.TOPIC.value]):
+            self.footer_topic_combobox.addItem(f"{topic}")
 
     # 메인 UI
     def initUI(self):
@@ -130,22 +181,26 @@ class SynonymConvertUI(QWidget):
         # 머리글 삽입
         header_select_groupbox = QGroupBox()
         self.header_select_checkbox = QCheckBox("머리글 삽입")
-        self.header_select_combobox = QComboBox()
+        self.header_topic_combobox = QComboBox()
 
         header_select_inner_layout = QHBoxLayout()
         header_select_inner_layout.addWidget(self.header_select_checkbox)
-        header_select_inner_layout.addWidget(self.header_select_combobox)
+        header_select_inner_layout.addWidget(self.header_topic_combobox)
         header_select_groupbox.setLayout(header_select_inner_layout)
+
+        self.header_select_checkbox.stateChanged.connect(self.header_select_checkbox_changed)
 
         # 맺음말 삽입
         footer_select_groupbox = QGroupBox()
         self.footer_select_checkbox = QCheckBox("맺음말 삽입")
-        self.footer_select_combobox = QComboBox()
+        self.footer_topic_combobox = QComboBox()
 
         footer_select_inner_layout = QHBoxLayout()
         footer_select_inner_layout.addWidget(self.footer_select_checkbox)
-        footer_select_inner_layout.addWidget(self.footer_select_combobox)
+        footer_select_inner_layout.addWidget(self.footer_topic_combobox)
         footer_select_groupbox.setLayout(footer_select_inner_layout)
+
+        self.footer_select_checkbox.stateChanged.connect(self.footer_select_checkbox_changed)
 
         # 치환 키워드 입력
         convert_keyword_groupbox = QGroupBox("치환 키워드 입력")
@@ -181,7 +236,7 @@ class SynonymConvertUI(QWidget):
 
         result_sentence_inner_layout = QGridLayout()
         result_sentence_inner_layout.addWidget(self.result_sentence_textedit, 0, 0, 1, 2)
-        result_sentence_inner_layout.addWidget(self.retry_sentence_button, 1, 0, 1, 1)
+        # result_sentence_inner_layout.addWidget(self.retry_sentence_button, 1, 0, 1, 1)
         result_sentence_inner_layout.addWidget(self.copy_sentence_button, 1, 1, 1, 1)
         result_sentence_groupbox.setLayout(result_sentence_inner_layout)
 
