@@ -10,7 +10,13 @@ from datetime import *
 
 from common.utils import *
 from config import *
-from features.convert_sentence import convert_sentence, convert_one_way_sentence
+from features.convert_sentence import (
+    convert_from_db,
+    shuffle_sentence,
+    insert_header_to_sentence,
+    insert_footer_to_sentence,
+)
+
 from common.synonym_file import SynonymFile
 import pandas as pd
 import clipboard
@@ -63,82 +69,30 @@ class SynonymConvertTab(QWidget):
             QMessageBox.information(self, "작업 시작", f"양식에 맞지 않는 파일입니다. \n{e}")
             return
 
-        # 양방향 작업
+        # 변환 금지어
         ban_synonym = self.ban_synonym_input.text()
-        if ban_synonym == "":
-            ban_synonym_list = []
-        else:
-            ban_synonym_list = ban_synonym.split(",")
+
+        # 원본 텍스트
         original_sentence = self.input_sentence_textedit.toPlainText()
-        sentence = original_sentence
-        for i, row in df_two_way[:].iterrows():
-            try:
-                data = str(row["data"])
 
-                if any(s in data for s in ban_synonym_list):
-                    continue
-
-                synonym_list = data.split(",")
-                sentence = convert_sentence(sentence, synonym_list)
-
-            except Exception as e:
-                print(e)
-                QMessageBox.information(self, "오류", f"작업 중 오류가 발생했습니다. \n{e}")
-                return
-
-        # 일방향 작업
-        for j, row in df_one_way[:].iterrows():
-            try:
-                before = str(row["before"])
-                after = str(row["after"])
-
-                if any(s in before for s in ban_synonym_list):
-                    continue
-
-                synonym_list = after.split(",")
-                sentence = convert_one_way_sentence(sentence, before, synonym_list)
-
-            except Exception as e:
-                print(e)
-                QMessageBox.information(self, "오류", f"작업 중 오류가 발생했습니다. \n{e}")
-                return
-
-        print(sentence)
+        # 양방향 작업
+        sentence = convert_from_db(original_sentence, ban_synonym, df_two_way, df_one_way)
 
         # 문단 랜덤 섞기 체크 시
         if self.shuffle_paragraphs_checkbox.isChecked():
-            sentence_to_list = sentence.split(f"\n\n")
-            print(sentence_to_list)
-
-            random.shuffle(sentence_to_list)
-            print(sentence_to_list)
-
-            if len(sentence_to_list) > 0:
-                sentence = f"\n\n".join(sentence_to_list)
+            sentence = shuffle_sentence(sentence)
 
         # 머리글 삽입
         if self.header_select_checkbox.isChecked():
             header_topic = self.header_topic_combobox.currentText()
-
             self.saved_data_header = get_save_data_HEADER()
-            header: str = random.choice(self.saved_data_header[header_topic])
-
-            header = header.replace("$키워드$", convert_keyword)
-            header += f"\n\n"
-
-            sentence = header + sentence
+            sentence = insert_header_to_sentence(sentence, header_topic, self.saved_data_header, convert_keyword)
 
         # 맺음말 삽입
         if self.footer_select_checkbox.isChecked():
             footer_topic = self.footer_topic_combobox.currentText()
-
             self.saved_data_footer = get_save_data_FOOTER()
-            footer: str = random.choice(self.saved_data_footer[footer_topic])
-
-            footer = footer.replace("$키워드$", convert_keyword)
-            footer = f"\n\n" + footer
-
-            sentence = sentence + footer
+            sentence = insert_footer_to_sentence(sentence, footer_topic, self.saved_data_footer, convert_keyword)
 
         print()
         print(sentence)

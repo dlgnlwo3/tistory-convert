@@ -16,6 +16,9 @@ import pandas as pd
 import clipboard
 import random
 
+from threads.convert_thread import ConvertThread
+from dtos.gui_dto import GUIDto
+
 
 class SynonymMultipleConvertTab(QWidget):
     # 초기화
@@ -33,7 +36,6 @@ class SynonymMultipleConvertTab(QWidget):
 
     def header_select_checkbox_changed(self):
         print(f"header: {self.header_select_checkbox.isChecked()}")
-
         if self.header_select_checkbox.isChecked():
             self.set_header_topic_combobox()
         else:
@@ -41,7 +43,6 @@ class SynonymMultipleConvertTab(QWidget):
 
     def footer_select_checkbox_changed(self):
         print(f"footer: {self.footer_select_checkbox.isChecked()}")
-
         if self.footer_select_checkbox.isChecked():
             self.set_footer_topic_combobox()
         else:
@@ -50,24 +51,21 @@ class SynonymMultipleConvertTab(QWidget):
     def set_header_topic_combobox(self):
         self.saved_data_topic = get_save_data_topic()
         print(self.saved_data_topic)
-
         self.header_topic_combobox.clear()
-
         for i, topic in enumerate(self.saved_data_topic[SaveFileTopic.TOPIC.value]):
             self.header_topic_combobox.addItem(f"{topic}")
 
     def set_footer_topic_combobox(self):
         self.saved_data_topic = get_save_data_topic()
         print(self.saved_data_topic)
-
         self.footer_topic_combobox.clear()
-
         for i, topic in enumerate(self.saved_data_topic[SaveFileTopic.TOPIC.value]):
             self.footer_topic_combobox.addItem(f"{topic}")
 
-    # 파일 선택 클릭 (블로그)
+    # 폴더 선택 클릭
     def convert_path_select_button_clicked(self):
         self.convert_listwidget.clear()
+        self.convert_path.clear()
         folder = QFileDialog.getExistingDirectory(self, "Select Directory")
         if folder != "":
             self.convert_path.setText(folder)
@@ -76,7 +74,59 @@ class SynonymMultipleConvertTab(QWidget):
             for file in file_list:
                 self.convert_listwidget.addItem(file)
         else:
-            self.log_append(f"파일 선택 취소")
+            self.log_append(f"폴더 선택 취소")
+
+    # 검색 시작 클릭
+    def convert_start_button_clicked(self):
+        print(f"search start clicked")
+
+        self.saved_data_setting = get_save_data_setting()
+        if self.saved_data_setting[SaveFileSetting.SEARCH_FILE_SAVE_PATH.value] == "":
+            print(f"저장 경로를 먼저 설정해주세요.")
+            # self.log_append(f"저장 경로를 먼저 설정해주세요.")
+            QMessageBox.information(self, "작업 시작", f"저장 경로를 먼저 설정해주세요.")
+            return
+        else:
+            search_file_save_path = self.saved_data_setting[SaveFileSetting.SEARCH_FILE_SAVE_PATH.value]
+            print(search_file_save_path)
+
+        guiDto = GUIDto()
+        guiDto.search_file_save_path = search_file_save_path
+
+        print(f"작업을 시작합니다.")
+
+        self.convert_thread = ConvertThread()
+        self.convert_thread.log_msg.connect(self.log_append)
+        self.convert_thread.convert_finished.connect(self.convert_finished)
+        self.convert_thread.setGuiDto(guiDto)
+
+        self.convert_start_button.setDisabled(True)
+        self.convert_stop_button.setDisabled(False)
+        self.convert_thread.start()
+
+    # 검색 중지 클릭
+    @pyqtSlot()
+    def convert_stop_button_clicked(self):
+        print(f"search stop clicked")
+        self.log_append(f"중지 클릭")
+        self.convert_finished()
+
+    # 검색 작업 종료
+    @pyqtSlot()
+    def convert_finished(self):
+        print(f"search thread finished")
+        self.log_append(f"작업 종료")
+        self.convert_thread.stop()
+        self.convert_start_button.setDisabled(False)
+        self.convert_stop_button.setDisabled(True)
+        print(f"thread_is_running: {self.convert_thread.isRunning()}")
+
+    def open_save_path_button_clicked(self):
+        if self.convert_path.text() == "":
+            QMessageBox.information(self, "폴더 열기", f"폴더를 먼저 설정해주세요.")
+            return
+
+        os.startfile(self.convert_path.text())
 
     # 메인 UI
     def initUI(self):
@@ -152,9 +202,9 @@ class SynonymMultipleConvertTab(QWidget):
         self.convert_stop_button.setDisabled(True)
         self.convert_open_save_path_button = QPushButton("저장된 경로 열기")
 
-        # self.convert_start_button.clicked.connect(self.convert_start_button_clicked)
-        # self.convert_stop_button.clicked.connect(self.convert_stop_button_clicked)
-        # self.convert_open_save_path_button.clicked.connect(self.convert_open_save_path_button_clicked)
+        self.convert_start_button.clicked.connect(self.convert_start_button_clicked)
+        self.convert_stop_button.clicked.connect(self.convert_stop_button_clicked)
+        self.convert_open_save_path_button.clicked.connect(self.open_save_path_button_clicked)
 
         convert_start_stop_inner_layout = QHBoxLayout()
         convert_start_stop_inner_layout.addWidget(self.convert_start_button)
