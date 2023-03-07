@@ -72,7 +72,9 @@ class SynonymMultipleConvertTab(QWidget):
             file_list = os.listdir(folder)
             print(file_list)
             for file in file_list:
-                self.convert_listwidget.addItem(file)
+                # 파일 형식을 지정합니다.
+                if file.find("txt") > -1 or file.find("docx") > -1:
+                    self.convert_listwidget.addItem(file)
         else:
             self.log_append(f"폴더 선택 취소")
 
@@ -80,21 +82,67 @@ class SynonymMultipleConvertTab(QWidget):
     def convert_start_button_clicked(self):
         print(f"search start clicked")
 
-        self.saved_data_setting = get_save_data_setting()
-        if self.saved_data_setting[SaveFileSetting.SEARCH_FILE_SAVE_PATH.value] == "":
-            print(f"저장 경로를 먼저 설정해주세요.")
-            # self.log_append(f"저장 경로를 먼저 설정해주세요.")
-            QMessageBox.information(self, "작업 시작", f"저장 경로를 먼저 설정해주세요.")
+        # 유의어 변환 횟수
+        if self.synonym_convert_limit.text() == "":
+            QMessageBox.information(self, "작업 시작", f"유의어 변환 횟수를 입력해주세요.")
+            return
+
+        # 파일 목록
+        selected_file_list = []
+        self.convert_listwidget.selectAll()
+        if len(self.convert_listwidget.selectedItems()) <= 0:
+            print(f"선택된 파일이 없습니다.")
+            QMessageBox.information(self, "작업 시작", f"선택된 파일이 없습니다.")
             return
         else:
-            search_file_save_path = self.saved_data_setting[SaveFileSetting.SEARCH_FILE_SAVE_PATH.value]
-            print(search_file_save_path)
+            file_list_items = self.convert_listwidget.selectedItems()
+            for file_item in file_list_items:
+                selected_file_list.append(file_item.text())
+        print(selected_file_list)
 
+        # 엑셀 DB 확인
+        self.saved_data_synonym = get_save_data_SYNONYM()
+        if self.saved_data_synonym[SaveFileSYNONYM.SYNONYM_FILE_SAVE_PATH.value] == "":
+            print(f"엑셀DB 파일을 설정해주세요.")
+            # self.log_append(f"저장 경로를 먼저 설정해주세요.")
+            QMessageBox.information(self, "작업 시작", f"엑셀DB 파일을 설정해주세요.")
+            return
+        else:
+            search_file_save_path = self.saved_data_synonym[SaveFileSYNONYM.SYNONYM_FILE_SAVE_PATH.value]
+
+        # 파일 유효성 검사
+        if not os.path.isfile(search_file_save_path):
+            QMessageBox.information(self, "작업 시작", f"엑셀 경로가 잘못되었습니다.")
+            return
+
+        # 양식에 맞는 엑셀파일인지 검증 필요
+        try:
+            synonym_file = SynonymFile(search_file_save_path)
+            df_two_way: pd.DataFrame = synonym_file.df_two_way
+            df_one_way: pd.DataFrame = synonym_file.df_one_way
+        except Exception as e:
+            print(e)
+            QMessageBox.information(self, "작업 시작", f"양식에 맞지 않는 파일입니다. \n{e}")
+            return
+
+        # GUIDto
         guiDto = GUIDto()
-        guiDto.search_file_save_path = search_file_save_path
+        guiDto.synonym_convert_limit = self.synonym_convert_limit.text()
+        guiDto.convert_path = self.convert_path.text()
+        guiDto.convert_list = selected_file_list
+        guiDto.shuffle_paragraphs_check = self.shuffle_paragraphs_checkbox.isChecked()
+        guiDto.header_check = self.header_select_checkbox.isChecked()
+        guiDto.header_topic = self.header_topic_combobox.currentText()
+        guiDto.footer_check = self.footer_select_checkbox.isChecked()
+        guiDto.footer_topic = self.footer_topic_combobox.currentText()
+        guiDto.df_one_way = df_one_way
+        guiDto.df_two_way = df_two_way
+        guiDto.header_dict = get_save_data_HEADER()
+        guiDto.footer_dict = get_save_data_FOOTER()
 
         print(f"작업을 시작합니다.")
 
+        # 스레드 호출
         self.convert_thread = ConvertThread()
         self.convert_thread.log_msg.connect(self.log_append)
         self.convert_thread.convert_finished.connect(self.convert_finished)

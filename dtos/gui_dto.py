@@ -32,6 +32,14 @@ class GUIDto:
 
         self.__footer_topic = ""
 
+        self.__header_dict = ""
+
+        self.__footer_dict = ""
+
+        self.__df_one_way = ""
+
+        self.__df_two_way = ""
+
     @property
     def daum_keyword_list(self):  # getter
         return self.__daum_keyword_list
@@ -171,3 +179,35 @@ class GUIDto:
     @footer_topic.setter
     def footer_topic(self, value):  # setter
         self.__footer_topic = value
+
+    @property
+    def header_dict(self):  # getter
+        return self.__header_dict
+
+    @header_dict.setter
+    def header_dict(self, value):  # setter
+        self.__header_dict = value
+
+    @property
+    def footer_dict(self):  # getter
+        return self.__footer_dict
+
+    @footer_dict.setter
+    def footer_dict(self, value):  # setter
+        self.__footer_dict = value
+
+    @property
+    def df_one_way(self):  # getter
+        return self.__df_one_way
+
+    @df_one_way.setter
+    def df_one_way(self, value):  # setter
+        self.__df_one_way = value
+
+    @property
+    def df_two_way(self):  # getter
+        return self.__df_two_way
+
+    @df_two_way.setter
+    def df_two_way(self, value):  # setter
+        self.__df_two_way = value
