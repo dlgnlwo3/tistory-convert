@@ -35,7 +35,7 @@ def my_exception_hook(exctype, value, traceback):
 
 sys.excepthook = my_exception_hook
 
-# pyinstaller -n "tistory sample v0.0.5 (파일 변환 완료)" -w --onefile --clean "main.py" --icon "assets\tistory.ico" --add-data "venv/Lib/site-packages/newspaper;newspaper"
+# pyinstaller -n "tistory convert v0.0.5" -w --onefile --clean "main.py" --icon "assets\tistory.ico" --add-data "venv/Lib/site-packages/newspaper;newspaper"
 
 
 class MainUI(QWidget):
