@@ -37,7 +37,6 @@ class GoogleSearch:
 
     # 이미지 저장
     def save_img_from_url(self, url: str, keyword: str, i: str):
-
         img_path = os.path.join(self.guiDto.search_file_save_path, f"이미지수집 {self.run_time}")
         if not os.path.isdir(img_path):
             os.mkdir(img_path)
@@ -46,7 +45,12 @@ class GoogleSearch:
         if not os.path.isdir(keyword_img_path):
             os.mkdir(keyword_img_path)
 
-        img_format = url[url.find("data:image/") + 11 : url.find(";")]
+        print(url)
+        format = url.split(".")[-1]
+        img_format = "jpg"
+        if format in ("jpg", "JPG", "jpeg", "JPEG", "png", "PNG", "gif", "GIF"):
+            img_format = format
+
         img_file = os.path.join(keyword_img_path, f"{keyword}{i.zfill(2)}.{img_format}")
         print(img_file)
 
@@ -54,16 +58,42 @@ class GoogleSearch:
             urllib.request.urlretrieve(url, img_file)
 
         except Exception as e:
-            print(f"{url} 이미지 생성 실패 {e.msg}")
-            global_log_append(f"{url} 이미지 생성 실패 {e.msg}")
+            print(f"이미지 생성 실패 {e}")
+            self.log_msg.emit(f"이미지 생성 실패")
 
         finally:
             time.sleep(0.2)
 
         return img_file
 
-    def search_google_img(self, google_keyword):
+    def repeat_scroll(self, driver: webdriver.Chrome):
+        driver.implicitly_wait(1)
 
+        SCROLL_PAUSE_TIME = 1
+
+        last_height = driver.execute_script("return document.body.scrollHeight")
+
+        while True:
+            driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+            time.sleep(SCROLL_PAUSE_TIME)
+            new_height = driver.execute_script("return document.body.scrollHeight")
+
+            if new_height == last_height:
+                try:
+                    driver.find_element(By.XPATH, '//input[@value="결과 더보기"]').click()
+                except:
+                    break
+
+            last_height = new_height
+
+            img_links = driver.find_elements(By.XPATH, "//div/h3/following-sibling::a[1]//img")
+
+            if len(img_links) >= self.guiDto.google_search_count:
+                break
+
+        driver.implicitly_wait(self.default_wait)
+
+    def search_google_img(self, google_keyword):
         img_list = []
 
         driver = self.driver
@@ -76,10 +106,32 @@ class GoogleSearch:
             EC.visibility_of_element_located((By.XPATH, "//div/h3/following-sibling::a[1]//img"))
         )
 
-        img_urls = driver.find_elements(By.XPATH, "//div/h3/following-sibling::a[1]//img")
+        self.repeat_scroll(driver)
 
-        for i, img_url in enumerate(img_urls):
-            img_url = img_url.get_attribute("src")
+        time.sleep(1)
+
+        img_links = driver.find_elements(By.XPATH, "//div/h3/following-sibling::a[1]//img")
+
+        for i, img_link in enumerate(img_links):
+            img_link.click()
+            time.sleep(0.5)
+
+            # $x('//c-wiz//a[@rel="noopener"][@role="link"][@target="_blank"]/img[contains(@class, "iPVvYb")]')
+            # $x('//c-wiz//div[@role="region"]//img[contains(@src, "http")]')
+
+            try:
+                driver.implicitly_wait(1)
+
+                img_url = driver.find_element(
+                    By.XPATH, '//c-wiz//div[@role="region"]//img[contains(@src, "http")]'
+                ).get_attribute("src")
+
+            except Exception as e:
+                img_url = ""
+                print("원본 이미지 획득 실패")
+
+            finally:
+                driver.implicitly_wait(self.default_wait)
 
             img_file = self.save_img_from_url(img_url, google_keyword, str(i + 1))
 
@@ -113,6 +165,5 @@ class GoogleSearch:
 
 
 if __name__ == "__main__":
-
     searcher = GoogleSearch()
     searcher.work_start()
