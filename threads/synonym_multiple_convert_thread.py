@@ -13,10 +13,10 @@ from PyQt5.QtCore import *
 from dtos.gui_dto import *
 from datetime import timedelta
 from timeit import default_timer as timer
-
-
-import debugpy
 import time
+
+
+# import debugpy
 
 from process.synonym_multiple_convert_process import SynonymMultipleConvert
 
@@ -35,7 +35,7 @@ class ConvertThread(QThread):
 
     def run(self):
         try:
-            debugpy.debug_this_thread()
+            # debugpy.debug_this_thread()
 
             self.log_msg.emit(f"유의어 변환 작업 시작")
 

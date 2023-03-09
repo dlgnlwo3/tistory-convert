@@ -17,6 +17,7 @@ import clipboard
 import random
 
 from threads.synonym_multiple_convert_thread import ConvertThread
+from threads.google_search_thread import GoogleSearchThread
 from dtos.gui_dto import GUIDto
 
 
@@ -78,7 +79,6 @@ class SynonymMultipleConvertTab(QWidget):
         else:
             self.log_append(f"폴더 선택 취소")
 
-    # 검색 시작 클릭
     def convert_start_button_clicked(self):
         print(f"search start clicked")
 
@@ -153,14 +153,12 @@ class SynonymMultipleConvertTab(QWidget):
         self.convert_stop_button.setDisabled(False)
         self.convert_thread.start()
 
-    # 검색 중지 클릭
     @pyqtSlot()
     def convert_stop_button_clicked(self):
         print(f"search stop clicked")
         self.log_append(f"중지 클릭")
         self.convert_finished()
 
-    # 검색 작업 종료
     @pyqtSlot()
     def convert_finished(self):
         print(f"search thread finished")
@@ -176,6 +174,64 @@ class SynonymMultipleConvertTab(QWidget):
             return
 
         os.startfile(self.convert_path.text())
+
+    # 검색 시작 클릭
+    def google_search_start_button_clicked(self):
+        print(f"google search start clicked")
+
+        selected_google_keyword_list = []
+        self.convert_listwidget.selectAll()
+        if len(self.convert_listwidget.selectedItems()) <= 0:
+            print(f"선택된 파일이 없습니다.")
+            QMessageBox.information(self, "작업 시작", f"선택된 파일이 없습니다.")
+            return
+        else:
+            file_list_items = self.convert_listwidget.selectedItems()
+            for file_item in file_list_items:
+                file_name = file_item.text()
+                file_name = file_name.replace(".docx", "").replace(".txt", "")
+                selected_google_keyword_list.append(file_name)
+        print(selected_google_keyword_list)
+
+        # 고객 요구사항 -> 고정 100개
+        google_search_count = "100"
+
+        # 파일을 읽어온 폴더
+        search_file_save_path = self.convert_path.text()
+        print(search_file_save_path)
+
+        guiDto = GUIDto()
+        guiDto.google_keyword_list = selected_google_keyword_list
+        guiDto.google_search_count = google_search_count
+        guiDto.search_file_save_path = search_file_save_path
+
+        print(f"작업을 시작합니다.")
+
+        self.google_search_thread = GoogleSearchThread()
+        self.google_search_thread.log_msg.connect(self.log_append)
+        self.google_search_thread.search_finished.connect(self.google_search_finished)
+        self.google_search_thread.setGuiDto(guiDto)
+
+        self.google_search_start_button.setDisabled(True)
+        self.google_search_stop_button.setDisabled(False)
+        self.google_search_thread.start()
+
+    # 검색 중지 클릭
+    @pyqtSlot()
+    def google_search_stop_button_clicked(self):
+        print(f"search stop clicked")
+        self.log_append(f"중지 클릭")
+        self.google_search_finished()
+
+    # 검색 작업 종료
+    @pyqtSlot()
+    def google_search_finished(self):
+        print(f"search thread finished")
+        self.log_append(f"작업 종료")
+        self.google_search_thread.stop()
+        self.google_search_start_button.setDisabled(False)
+        self.google_search_stop_button.setDisabled(True)
+        print(f"thread_is_running: {self.google_search_thread.isRunning()}")
 
     # 메인 UI
     def initUI(self):
@@ -269,9 +325,9 @@ class SynonymMultipleConvertTab(QWidget):
         self.google_search_stop_button.setDisabled(True)
         self.open_save_path_button = QPushButton("저장된 경로 열기")
 
-        # self.google_search_start_button.clicked.connect(self.google_search_start_button_clicked)
-        # self.google_search_stop_button.clicked.connect(self.google_search_stop_button_clicked)
-        # self.open_save_path_button.clicked.connect(self.open_save_path_button_clicked)
+        self.google_search_start_button.clicked.connect(self.google_search_start_button_clicked)
+        self.google_search_stop_button.clicked.connect(self.google_search_stop_button_clicked)
+        self.open_save_path_button.clicked.connect(self.open_save_path_button_clicked)
 
         google_search_start_stop_inner_layout = QHBoxLayout()
         google_search_start_stop_inner_layout.addWidget(self.google_search_start_button)
