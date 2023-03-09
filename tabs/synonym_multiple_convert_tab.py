@@ -84,8 +84,9 @@ class SynonymMultipleConvertTab(QWidget):
 
         # 유의어 변환 횟수
         if self.synonym_convert_limit.text() == "":
-            QMessageBox.information(self, "작업 시작", f"유의어 변환 횟수를 입력해주세요.")
-            return
+            synonym_convert_limit = "10"
+        else:
+            synonym_convert_limit = self.synonym_convert_limit.text()
 
         # 파일 목록
         selected_file_list = []
@@ -127,7 +128,7 @@ class SynonymMultipleConvertTab(QWidget):
 
         # GUIDto
         guiDto = GUIDto()
-        guiDto.synonym_convert_limit = self.synonym_convert_limit.text()
+        guiDto.synonym_convert_limit = synonym_convert_limit
         guiDto.convert_path = self.convert_path.text()
         guiDto.convert_list = selected_file_list
         guiDto.shuffle_paragraphs_check = self.shuffle_paragraphs_checkbox.isChecked()
@@ -183,6 +184,7 @@ class SynonymMultipleConvertTab(QWidget):
         self.synonym_convert_limit_label = QLabel("유의어 변환 횟수")
         self.synonym_convert_limit = QLineEdit()
         self.synonym_convert_limit.setValidator(QIntValidator())
+        self.synonym_convert_limit.setPlaceholderText("10")
 
         synonym_convert_limit_inner_layout = QHBoxLayout()
         synonym_convert_limit_inner_layout.addWidget(self.synonym_convert_limit_label)
