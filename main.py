@@ -35,7 +35,7 @@ def my_exception_hook(exctype, value, traceback):
 
 sys.excepthook = my_exception_hook
 
-# pyinstaller -n "tistory sample v0.0.4 (변환 에디터 적용)" -w --onefile --clean "main.py" --icon "assets\tistory.ico" --add-data "venv/Lib/site-packages/newspaper;newspaper"
+# pyinstaller -n "tistory sample v0.0.5 (파일 변환 완료)" -w --onefile --clean "main.py" --icon "assets\tistory.ico" --add-data "venv/Lib/site-packages/newspaper;newspaper"
 
 
 class MainUI(QWidget):
@@ -111,7 +111,7 @@ class MainUI(QWidget):
         self.setLayout(vbox)
 
         # 앱 기본 설정
-        self.setWindowTitle("tistory")
+        self.setWindowTitle("tistory convert")
         self.resize(1200, 800)
         self.center()
         self.show()
