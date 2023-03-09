@@ -38,20 +38,14 @@ def convert_one_way_sentence(sentence: str, before_word: str, synonym_list: list
 
 
 # 양방향, 일방향 dataframe을 적용합니다.
-def convert_from_db(
-    original_sentence: str,
-    ban_synonym: str,
-    df_two_way: pd.DataFrame,
-    df_one_way: pd.DataFrame,
-    synonym_convert_limit: int = None,
-):
+def convert_from_db(original_sentence: str, ban_synonym: str, df_two_way: pd.DataFrame, df_one_way: pd.DataFrame):
     if ban_synonym == "":
         ban_synonym_list = []
     else:
         ban_synonym_list = ban_synonym.split(",")
 
     sentence = original_sentence
-    for i, row in df_two_way[:synonym_convert_limit].iterrows():
+    for i, row in df_two_way[:].iterrows():
         try:
             data = str(row["data"])
 
@@ -65,7 +59,7 @@ def convert_from_db(
             print(e)
             continue
 
-    for j, row in df_one_way[:synonym_convert_limit].iterrows():
+    for j, row in df_one_way[:].iterrows():
         try:
             before = str(row["before"])
             after = str(row["after"])

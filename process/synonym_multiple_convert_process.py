@@ -97,9 +97,7 @@ class SynonymMultipleConvert:
             original_sentence = self.get_sentence_from_file(file_path)
 
             # 문자열 변환
-            sentence = convert_from_db(
-                original_sentence, "", self.guiDto.df_two_way, self.guiDto.df_one_way, self.guiDto.synonym_convert_limit
-            )
+            sentence = convert_from_db(original_sentence, "", self.guiDto.df_two_way, self.guiDto.df_one_way)
 
             # 문단 랜덤 섞기 체크 시
             if self.guiDto.shuffle_paragraphs_check:
