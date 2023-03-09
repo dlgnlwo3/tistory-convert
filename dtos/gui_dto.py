@@ -40,6 +40,9 @@ class GUIDto:
 
         self.__df_two_way = ""
 
+        # 파일 변환
+        self.__convert_format = ""
+
     @property
     def daum_keyword_list(self):  # getter
         return self.__daum_keyword_list
@@ -211,3 +214,13 @@ class GUIDto:
     @df_two_way.setter
     def df_two_way(self, value):  # setter
         self.__df_two_way = value
+
+    # 파일 변환
+
+    @property
+    def convert_format(self):  # getter
+        return self.__convert_format
+
+    @convert_format.setter
+    def convert_format(self, value):  # setter
+        self.__convert_format = value

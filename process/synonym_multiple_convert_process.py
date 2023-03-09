@@ -77,7 +77,7 @@ class SynonymMultipleConvert:
 
         # txt 파일인 경우
         elif file_path.rfind(".txt") > -1:
-            with open(file_path, "r") as f:
+            with open(file_path, "r", encoding="UTF8") as f:
                 text = f.read()
                 sentence = text
 
