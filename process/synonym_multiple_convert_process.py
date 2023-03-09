@@ -33,7 +33,7 @@ class SynonymMultipleConvert:
         self.log_msg = log_msg
 
     # 워드 저장
-    def sentence_to_docx(self, file_name: str, sentence: str):
+    def sentence_to_docx(self, file_name: str, sentence: str, limit=""):
         save_path = os.path.join(self.guiDto.convert_path, f"유의어 변환 ({self.run_time})")
 
         if os.path.isdir(save_path) == False:
@@ -41,7 +41,11 @@ class SynonymMultipleConvert:
         else:
             pass
 
-        sentence_docx = os.path.join(save_path, f"{file_name}.docx")
+        if limit == "":
+            sentence_docx = os.path.join(save_path, f"{file_name}.docx")
+        else:
+            limit = str(limit)
+            sentence_docx = os.path.join(save_path, f"{file_name}_{limit.zfill(2)}.docx")
 
         doc = Document()
 
@@ -49,7 +53,11 @@ class SynonymMultipleConvert:
 
         doc.save(sentence_docx)
 
-        self.log_msg.emit(f"{file_name}.docx 저장 완료")
+        if limit == "":
+            self.log_msg.emit(f"{file_name}.docx 저장 완료")
+        else:
+            limit = str(limit)
+            self.log_msg.emit(f"{file_name}_{limit.zfill(2)}.docx 저장 완료")
 
     def get_sentence_from_file(self, file_path: str):
         sentence = ""
@@ -96,33 +104,37 @@ class SynonymMultipleConvert:
             # 파일에서 문자열 획득
             original_sentence = self.get_sentence_from_file(file_path)
 
-            # 문자열 변환
-            sentence = convert_from_db(original_sentence, "", self.guiDto.df_two_way, self.guiDto.df_one_way)
+            # 횟수 제한 기능
+            for limit in range(1, self.guiDto.synonym_convert_limit + 1):
+                print(limit)
 
-            # 문단 랜덤 섞기 체크 시
-            if self.guiDto.shuffle_paragraphs_check:
-                sentence = shuffle_sentence(sentence)
+                # 문자열 변환
+                sentence = convert_from_db(original_sentence, "", self.guiDto.df_two_way, self.guiDto.df_one_way)
 
-            # 머리글 삽입
-            if self.guiDto.header_check:
-                header_topic = self.guiDto.header_topic
-                saved_data_header = get_save_data_HEADER()
-                sentence = insert_header_to_sentence(
-                    sentence, header_topic, saved_data_header, convert_keyword=file.rstrip(file_format)
-                )
+                # 문단 랜덤 섞기 체크 시
+                if self.guiDto.shuffle_paragraphs_check:
+                    sentence = shuffle_sentence(sentence)
 
-            # 맺음말 삽입
-            if self.guiDto.footer_check:
-                footer_topic = self.guiDto.footer_topic
-                saved_data_footer = get_save_data_FOOTER()
-                sentence = insert_footer_to_sentence(
-                    sentence, footer_topic, saved_data_footer, convert_keyword=file.rstrip(file_format)
-                )
+                # 머리글 삽입
+                if self.guiDto.header_check:
+                    header_topic = self.guiDto.header_topic
+                    saved_data_header = get_save_data_HEADER()
+                    sentence = insert_header_to_sentence(
+                        sentence, header_topic, saved_data_header, convert_keyword=file.rstrip(file_format)
+                    )
 
-            print(sentence)
+                # 맺음말 삽입
+                if self.guiDto.footer_check:
+                    footer_topic = self.guiDto.footer_topic
+                    saved_data_footer = get_save_data_FOOTER()
+                    sentence = insert_footer_to_sentence(
+                        sentence, footer_topic, saved_data_footer, convert_keyword=file.rstrip(file_format)
+                    )
 
-            # 문자열 파일 저장
-            self.sentence_to_docx(file.rstrip(file_format), sentence)
+                # print(sentence)
+
+                # 문자열 파일 저장
+                self.sentence_to_docx(file.rstrip(file_format), sentence, limit)
 
 
 if __name__ == "__main__":
