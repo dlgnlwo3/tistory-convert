@@ -13,6 +13,9 @@ def synonym_random_select(synonym_list: list, word: str):
 def convert_sentence(sentence: str, synonym_list: list):
     for word in synonym_list:
         if word in sentence:
+            if word == "":
+                print(f"유의어DB에 빈칸이 포함되어있습니다.")
+                break
             print(f"'{word}'가 포함되어있습니다.")
             break
 
@@ -56,7 +59,8 @@ def convert_from_db(original_sentence: str, ban_synonym: str, df_two_way: pd.Dat
             sentence = convert_sentence(sentence, synonym_list)
 
         except Exception as e:
-            print(e)
+            print(f"{data}: {e}")
+            raise Exception(f"{data}: {e}")
             continue
 
     for j, row in df_one_way[:].iterrows():

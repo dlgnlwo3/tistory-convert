@@ -56,7 +56,7 @@ class FileConvert:
 
         sentence_txt = os.path.join(save_path, f"{file_name}.txt")
 
-        with open(sentence_txt, "w", encoding="UTF8") as f:
+        with open(sentence_txt, "w", encoding="utf-8") as f:
             f.write(sentence)
 
         self.log_msg.emit(f"{file_name}.txt 저장 완료")
@@ -79,7 +79,7 @@ class FileConvert:
 
         # txt 파일인 경우
         elif file_path.rfind(".txt") > -1:
-            with open(file_path, "r", encoding="UTF8") as f:
+            with open(file_path, "r", encoding="utf-8") as f:
                 text = f.read()
                 sentence = text
 
