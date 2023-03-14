@@ -13,10 +13,8 @@ from config import *
 
 
 class TopicTab(QWidget):
-
     # 초기화
     def __init__(self):
-
         self.saved_data_topic = get_save_data_topic()
         print(self.saved_data_topic)
 
@@ -38,7 +36,6 @@ class TopicTab(QWidget):
         print(self.saved_data_footer)
 
     def set_topic_list_tablewidget(self):
-
         self.topic_list_tablewidget.setColumnCount(1)
         self.topic_list_tablewidget.setHorizontalHeaderLabels(["주제"])
         self.topic_list_tablewidget.setRowCount(len(self.saved_data_topic[SaveFileTopic.TOPIC.value]))
@@ -50,7 +47,6 @@ class TopicTab(QWidget):
         self.topic_list_tablewidget.setSelectionMode(QAbstractItemView.MultiSelection)
 
     def topic_save_button_clicked(self):
-
         if self.topic_input.text() == "":
             print(f"주제를 입력해주세요.")
             QMessageBox.information(self, "주제 추가", f"주제를 입력해주세요.")
@@ -72,8 +68,9 @@ class TopicTab(QWidget):
 
         self.set_combobox()
 
-    def topic_remove_button_clicked(self):
+        self.topic_input.clear()
 
+    def topic_remove_button_clicked(self):
         items = self.topic_list_tablewidget.selectedItems()
         if len(items) <= 0:
             print(f"선택된 주제가 없습니다.")
@@ -85,7 +82,6 @@ class TopicTab(QWidget):
         reply = QMessageBox.question(self, "삭제", question_msg, QMessageBox.Yes, QMessageBox.No)
 
         if reply == QMessageBox.Yes:
-
             # 테이블에서 제거
             for item in items:
                 row = item.row()
@@ -117,7 +113,6 @@ class TopicTab(QWidget):
 
     # 콤보박스 세팅
     def set_combobox(self):
-
         self.header_topic_combobox.clear()
         self.footer_topic_combobox.clear()
 
@@ -126,7 +121,6 @@ class TopicTab(QWidget):
             self.footer_topic_combobox.addItem(f"{topic}")
 
     def header_save_button_clicked(self):
-
         if self.header_input.text() == "":
             QMessageBox.information(self, "머리글 저장", f"머리글을 입력해주세요.")
             return
@@ -151,8 +145,9 @@ class TopicTab(QWidget):
 
         self.set_header_list_tablewidget()
 
-    def footer_save_button_clicked(self):
+        self.header_input.clear()
 
+    def footer_save_button_clicked(self):
         if self.footer_input.text() == "":
             QMessageBox.information(self, "맺음말 저장", f"맺음말을 입력해주세요.")
             return
@@ -177,8 +172,9 @@ class TopicTab(QWidget):
 
         self.set_footer_list_tablewidget()
 
-    def header_remove_button_clicked(self):
+        self.footer_input.clear()
 
+    def header_remove_button_clicked(self):
         items = self.header_list_tablewidget.selectedItems()
         if len(items) <= 0:
             print(f"선택된 머리글이 없습니다.")
@@ -189,7 +185,6 @@ class TopicTab(QWidget):
         reply = QMessageBox.question(self, "삭제", question_msg, QMessageBox.Yes, QMessageBox.No)
 
         if reply == QMessageBox.Yes:
-
             # 테이블에서 제거
             for item in items:
                 row = item.row()
@@ -228,7 +223,6 @@ class TopicTab(QWidget):
         self.set_header_list_tablewidget()
 
     def footer_remove_button_clicked(self):
-
         items = self.footer_list_tablewidget.selectedItems()
         if len(items) <= 0:
             print(f"선택된 머리글이 없습니다.")
@@ -239,7 +233,6 @@ class TopicTab(QWidget):
         reply = QMessageBox.question(self, "삭제", question_msg, QMessageBox.Yes, QMessageBox.No)
 
         if reply == QMessageBox.Yes:
-
             # 테이블에서 제거
             for item in items:
                 row = item.row()
@@ -278,7 +271,6 @@ class TopicTab(QWidget):
         self.set_footer_list_tablewidget()
 
     def set_header_list_tablewidget(self):
-
         self.header_list_tablewidget.clear()
         self.header_list_tablewidget.setRowCount(0)
 
@@ -298,7 +290,6 @@ class TopicTab(QWidget):
         self.header_list_tablewidget.setSelectionMode(QAbstractItemView.MultiSelection)
 
     def set_footer_list_tablewidget(self):
-
         self.footer_list_tablewidget.clear()
         self.footer_list_tablewidget.setRowCount(0)
 
@@ -319,7 +310,6 @@ class TopicTab(QWidget):
 
     # 메인 UI
     def initUI(self):
-
         # 주제 관리
         topic_groupbox = QGroupBox("주제 관리")
         self.topic_input_label = QLabel("주제 관리")

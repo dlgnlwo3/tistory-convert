@@ -231,6 +231,8 @@ class SearchTab(QWidget):
 
         self.set_daum_keyword_list_tablewidget()
 
+        self.daum_input.clear()
+
     def google_save_button_clicked(self):
         if self.google_input.text() == "":
             print(f"이미지 수집 키워드를 입력해주세요.")
@@ -249,6 +251,8 @@ class SearchTab(QWidget):
         self.refresh_save_file()
 
         self.set_google_keyword_list_tablewidget()
+
+        self.google_input.clear()
 
     def daum_remove_button_clicked(self):
         items = self.daum_keyword_list_tablewidget.selectedItems()
@@ -448,7 +452,7 @@ class SearchTab(QWidget):
 
         # 키워드별로 수집할 이미지 개수
         google_search_count_groupbox = QGroupBox("키워드별로 수집할 이미지 개수")
-        self.google_search_count = QLineEdit("400")
+        self.google_search_count = QLineEdit()
         self.google_search_count.setPlaceholderText("10")
         self.google_search_count.setValidator(QIntValidator())
         self.google_search_count_label = QLabel("개")
