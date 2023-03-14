@@ -29,7 +29,7 @@ class DaumSearch:
         # 현재 로컬에 저장된 크롬 기준으로 오픈한다.
         # open_browser()
         self.default_wait = 10
-        self.driver = get_chrome_driver_new(is_headless=False, is_scret=True, move_to_corner=False)
+        self.driver = get_chrome_driver_new(is_headless=True, is_scret=True, move_to_corner=False)
         self.driver.implicitly_wait(self.default_wait)
         self.run_time = str(datetime.now())[0:-10].replace(":", "")
         self.top_blog_detail_dtos = []
@@ -47,7 +47,7 @@ class DaumSearch:
         time.sleep(1)
 
     # 워드 저장
-    def blog_detail_to_docx(self, article_title: str, article_text: str):
+    def blog_detail_to_docx(self, article_title: str, article_text: str, keyword: str):
         article_path = os.path.join(self.guiDto.search_file_save_path, f"글수집 {self.run_time}")
 
         if os.path.isdir(article_path) == False:
@@ -55,13 +55,19 @@ class DaumSearch:
         else:
             pass
 
-        article_docx = os.path.join(article_path, f"{article_title} {self.run_time[:-5]}.docx")
+        keyword_img_path = os.path.join(article_path, f"{keyword}")
+        if not os.path.isdir(keyword_img_path):
+            os.mkdir(keyword_img_path)
+
+        article_docx = os.path.join(keyword_img_path, f"{article_title}.docx")
 
         doc = Document()
 
         doc.add_paragraph(article_text)
 
         doc.save(article_docx)
+
+        self.log_msg.emit(f"{article_title}.docx 저장 완료")
 
         time.sleep(1)
 
@@ -71,9 +77,13 @@ class DaumSearch:
             f"https://search.daum.net/search?w=blog&nil_search=btn&enc=utf8&q={daum_keyword}&f=section&SA=tistory&p=1"
         )
 
-        WebDriverWait(driver, 10).until(
-            EC.element_to_be_clickable((By.XPATH, '//li[contains(@id, "br_tstory")]//a[contains(@class, "f_url")]'))
-        )
+        try:
+            WebDriverWait(driver, 10).until(
+                EC.element_to_be_clickable((By.XPATH, '//li[contains(@id, "br_tstory")]//a[contains(@class, "f_url")]'))
+            )
+        except Exception as e:
+            print(e)
+            raise Exception(f"{daum_keyword}: 다음 검색 결과가 없습니다.")
 
         # 현재 페이지의 블로그 검색 결과
         # $x('//li[contains(@id, "br_tstory")]//a[contains(@class, "f_url")]')
@@ -84,8 +94,31 @@ class DaumSearch:
         for blog_link in blog_links:
             blog_url = blog_link.get_attribute("href")
 
-            # newspaper3k로 진행
-            top_blog_detail_dto: TopBlogDetailDto = TistoryNewsPaper().get_article_from_blog_url(blog_url, daum_keyword)
+            try:
+                # newspaper3k로 진행
+                top_blog_detail_dto: TopBlogDetailDto = TistoryNewsPaper().get_article_from_blog_url(
+                    blog_url, daum_keyword
+                )
+            except Exception as e:
+                print(e)
+                top_blog_detail_dto = TopBlogDetailDto()
+                top_blog_detail_dto.keyword = daum_keyword
+                top_blog_detail_dto.article_title = driver.find_element(
+                    By.XPATH,
+                    f'//li[contains(@id, "br_tstory")]//a[contains(@class, "f_link_b")][contains(@href, "{blog_url}")]',
+                ).get_attribute("textContent")
+                top_blog_detail_dto.article_text = "사이트 연결 오류"
+                top_blog_detail_dto.article_url = blog_url
+
+            try:
+                img_count = driver.find_element(
+                    By.XPATH, f'//a[contains(@href, "{blog_url}")]//span[@class="num_count"]'
+                ).get_attribute("textContent")
+                img_count = int(img_count)
+                top_blog_detail_dto.img_count = img_count
+            except Exception as e:
+                print(e)
+
             self.top_blog_detail_dtos.append(top_blog_detail_dto.get_dict())
             self.blog_detail_to_excel(self.top_blog_detail_dtos)
 
@@ -127,25 +160,36 @@ class DaumSearch:
 
                 if search_date > blog_date:
                     blog_url = blog.find_element(By.CSS_SELECTOR, 'a[class*="f_url"]').get_attribute("href")
-                    top_blog_detail_dto: TopBlogDetailDto = TistoryNewsPaper().get_article_from_blog_url(
-                        blog_url, daum_keyword
-                    )
-                    top_blog_detail_dict = top_blog_detail_dto.get_dict()
-                    article_text = top_blog_detail_dict["내용"]
-                    article_title = top_blog_detail_dict["제목"]
-                    article_title = re.sub('[\/:*?"<>|.]', "", article_title)
+
+                    try:
+                        top_blog_detail_dto: TopBlogDetailDto = TistoryNewsPaper().get_article_from_blog_url(
+                            blog_url, daum_keyword
+                        )
+                        top_blog_detail_dict = top_blog_detail_dto.get_dict()
+                        article_text = top_blog_detail_dict["내용"]
+                        article_title = f'{top_blog_detail_dict["제목"]} {str(blog_date)[:10]}'
+                        article_title = re.sub('[\/:*?"<>|]', "", article_title)
+
+                    except Exception as e:
+                        print(e)
+                        continue
 
                     # 워드 저장
-                    self.blog_detail_to_docx(article_title, article_text)
+                    self.blog_detail_to_docx(article_title, article_text, daum_keyword)
 
                     search_blog_list.append(article_title)
+
+                    if len(search_blog_list) >= self.guiDto.daum_search_count:
+                        print(f"{daum_keyword}: 수집할 글 개수에 도달했습니다.")
+                        break
 
                 else:
                     print(f"({search_date}) 보다 이후에 작성된 글입니다. ({blog_date})")
                     continue
 
             if len(search_blog_list) >= self.guiDto.daum_search_count:
-                print(f"수집할 글 개수에 도달했습니다.")
+                print(f"{daum_keyword}: 수집할 글 개수에 도달했습니다.")
+                self.log_msg.emit(f"{daum_keyword}: 수집할 글 개수에 도달했습니다.")
                 break
 
         time.sleep(1)

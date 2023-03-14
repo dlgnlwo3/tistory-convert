@@ -34,7 +34,7 @@ class SynonymMultipleConvert:
 
     # 워드 저장
     def sentence_to_docx(self, file_name: str, sentence: str, limit=""):
-        save_path = os.path.join(self.guiDto.convert_path, f"유의어 변환 ({self.run_time})")
+        save_path = os.path.join(self.guiDto.convert_path, f"유의어 변환 {self.run_time}")
 
         if os.path.isdir(save_path) == False:
             os.mkdir(save_path)

@@ -8,10 +8,12 @@ if 1 == 1:
     sys.coinit_flags = 2
 
 from newspaper import Article
+from newspaper import Config
 import os
 import clipboard
 from bs4 import BeautifulSoup
 from dtos.top_blog_detail_dto import *
+from selenium import webdriver
 
 
 class TistoryNewsPaper:
@@ -24,7 +26,15 @@ class TistoryNewsPaper:
 
         print(f"{blog_url} {keyword}")
 
-        article = Article(blog_url, language="ko")
+        # raise Exception("테스트")
+
+        user_agent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0) Gecko/20100101 Firefox/78.0"
+
+        config = Config()
+        config.browser_user_agent = user_agent
+        config.request_timeout = 15
+
+        article = Article(blog_url, language="ko", config=config)
         article.download()
         article.parse()
 
@@ -33,19 +43,22 @@ class TistoryNewsPaper:
         article_text = article.text
         article_html = article.html
 
+        article_length = len(article_text)
+
         keyword_count = article_text.count(keyword)
         # print(f"키워드 반복 횟수: {keyword_count}")
 
-        soup = BeautifulSoup(article_html, "html.parser")
-        img_tags = soup.find_all("img")
-        img_count = len(img_tags)
+        # soup = BeautifulSoup(article_html, "html.parser")
+        # img_tags = soup.find_all("img")
+        # img_count = len(img_tags)
         # print(f"이미지 태그 개수: {img_count}")
 
         top_blog_detail_dto.keyword = keyword
         top_blog_detail_dto.article_url = article_url
         top_blog_detail_dto.article_title = article_title
         top_blog_detail_dto.article_text = article_text
+        top_blog_detail_dto.article_length = article_length
         top_blog_detail_dto.keyword_count = keyword_count
-        top_blog_detail_dto.img_count = img_count
+        # top_blog_detail_dto.img_count = img_count
 
         return top_blog_detail_dto

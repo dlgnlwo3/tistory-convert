@@ -52,11 +52,12 @@ class GoogleSearch:
         if format in ("jpg", "JPG", "jpeg", "JPEG", "png", "PNG", "gif", "GIF"):
             img_format = format
 
-        img_file = os.path.join(keyword_img_path, f"{keyword}{i.zfill(2)}.{img_format}")
+        img_file = os.path.join(keyword_img_path, f"{keyword}_{i.zfill(2)}.{img_format}")
         print(img_file)
 
         try:
             urllib.request.urlretrieve(url, img_file)
+            self.log_msg.emit(f"{keyword}{i.zfill(2)}.{img_format} 저장 완료")
 
         except Exception as e:
             print(f"이미지 생성 실패 {e}")

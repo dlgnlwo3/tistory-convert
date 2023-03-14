@@ -15,9 +15,8 @@ from datetime import timedelta
 from timeit import default_timer as timer
 
 from process.daum_search_process import DaumSearch
-from process.google_search_process import GoogleSearch
 
-# import debugpy
+import debugpy
 
 
 class DaumSearchThread(QThread):
@@ -34,7 +33,7 @@ class DaumSearchThread(QThread):
 
     def run(self):
         try:
-            # debugpy.debug_this_thread()
+            debugpy.debug_this_thread()
 
             self.log_msg.emit(f"작업 시작")
 

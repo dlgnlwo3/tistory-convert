@@ -1,5 +1,4 @@
 class TopBlogDetailDto:
-
     # keyword, article_url, article_title, article_text, keyword_count, len(img_tags)
 
     def __init__(self):
@@ -7,6 +6,7 @@ class TopBlogDetailDto:
         self.__article_url = ""
         self.__article_title = ""
         self.__article_text = ""
+        self.__article_length = ""
         self.__keyword_count = ""
         self.__img_count = ""
 
@@ -43,6 +43,14 @@ class TopBlogDetailDto:
         self.__article_text = value
 
     @property
+    def article_length(self):  # getter
+        return self.__article_length
+
+    @article_length.setter
+    def article_length(self, value: str):  # setter
+        self.__article_length = value
+
+    @property
     def keyword_count(self):  # getter
         return self.__keyword_count
 
@@ -63,6 +71,7 @@ class TopBlogDetailDto:
         print("article_url", self.article_url)
         print("article_title", self.article_title)
         print("article_text", self.article_text)
+        print("article_length", self.article_length)
         print("keyword_count", self.keyword_count)
         print("img_count", self.img_count)
 
@@ -72,6 +81,7 @@ class TopBlogDetailDto:
             "url": self.article_url,
             "제목": self.article_title,
             "내용": self.article_text,
+            "글길이": self.article_length,
             "키워드반복횟수": self.keyword_count,
             "이미지개수": self.img_count,
         }
