@@ -18,6 +18,7 @@ from selenium import webdriver
 from timeit import default_timer as timer
 from datetime import timedelta
 import urllib.request
+from selenium.webdriver import ActionChains
 
 
 class GoogleSearch:
@@ -25,7 +26,7 @@ class GoogleSearch:
         # 현재 로컬에 저장된 크롬 기준으로 오픈한다.
         # open_browser()
         self.default_wait = 10
-        self.driver = get_chrome_driver_new(is_headless=False, is_scret=True, move_to_corner=False)
+        self.driver = get_chrome_driver_new(is_headless=True, is_scret=True, move_to_corner=False)
         self.driver.implicitly_wait(self.default_wait)
         self.run_time = str(datetime.now())[0:-10].replace(":", "")
 
@@ -59,7 +60,6 @@ class GoogleSearch:
 
         except Exception as e:
             print(f"이미지 생성 실패 {e}")
-            self.log_msg.emit(f"이미지 생성 실패")
 
         finally:
             time.sleep(0.2)
@@ -86,10 +86,10 @@ class GoogleSearch:
 
             last_height = new_height
 
-            img_links = driver.find_elements(By.XPATH, "//div/h3/following-sibling::a[1]//img")
+            # img_links = driver.find_elements(By.XPATH, "//div/h3/following-sibling::a[1]//img")
 
-            if len(img_links) >= self.guiDto.google_search_count:
-                break
+            # if len(img_links) >= self.guiDto.google_search_count:
+            #     break
 
         driver.implicitly_wait(self.default_wait)
 
@@ -112,8 +112,11 @@ class GoogleSearch:
 
         img_links = driver.find_elements(By.XPATH, "//div/h3/following-sibling::a[1]//img")
 
+        self.log_msg.emit(f"{google_keyword}: {len(img_links)}개의 이미지를 발견했습니다.")
+
         for i, img_link in enumerate(img_links):
-            img_link.click()
+            action = ActionChains(driver)
+            action.move_to_element(img_link).click().perform()
             time.sleep(0.5)
 
             # $x('//c-wiz//a[@rel="noopener"][@role="link"][@target="_blank"]/img[contains(@class, "iPVvYb")]')
@@ -122,8 +125,13 @@ class GoogleSearch:
             try:
                 driver.implicitly_wait(1)
 
+                # img_url = driver.find_element(
+                #     By.XPATH, '//c-wiz//div[@role="region"]//img[contains(@src, "http")]'
+                # ).get_attribute("src")
+
                 img_url = driver.find_element(
-                    By.XPATH, '//c-wiz//div[@role="region"]//img[contains(@src, "http")]'
+                    By.XPATH,
+                    "/html/body/div[2]/c-wiz/div[3]/div[2]/div[3]/div[2]/div/div[2]/div[2]/div[2]/c-wiz/div/div[1]/div[2]/div[2]/div/a/img",
                 ).get_attribute("src")
 
             except Exception as e:
@@ -141,6 +149,7 @@ class GoogleSearch:
                 print("수집할 이미지 개수에 도달했습니다.")
                 break
 
+        self.log_msg.emit(f"{google_keyword}: {len(img_links)} 중 {len(img_list)}개의 이미지를 수집했습니다.")
         time.sleep(1)
 
     # 전체작업 시작

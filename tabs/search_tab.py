@@ -448,7 +448,7 @@ class SearchTab(QWidget):
 
         # 키워드별로 수집할 이미지 개수
         google_search_count_groupbox = QGroupBox("키워드별로 수집할 이미지 개수")
-        self.google_search_count = QLineEdit()
+        self.google_search_count = QLineEdit("400")
         self.google_search_count.setPlaceholderText("10")
         self.google_search_count.setValidator(QIntValidator())
         self.google_search_count_label = QLabel("개")
