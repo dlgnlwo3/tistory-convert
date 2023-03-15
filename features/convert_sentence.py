@@ -75,7 +75,8 @@ def convert_from_db(original_sentence: str, ban_synonym: str, df_two_way: pd.Dat
             sentence = convert_one_way_sentence(sentence, before, synonym_list)
 
         except Exception as e:
-            print(e)
+            print(f"{before} -> {after}: {e}")
+            raise Exception(f"{before} -> {after}: {e}")
             continue
 
     return sentence

@@ -221,6 +221,16 @@ class SearchTab(QWidget):
         keyword = self.daum_input.text()
         print(keyword)
 
+        self.daum_keyword_list_tablewidget.selectAll()
+        daum_items = self.daum_keyword_list_tablewidget.selectedItems()
+
+        for daum_item in daum_items:
+            row = daum_item.row()
+            daum = QTableWidgetItem(self.daum_keyword_list_tablewidget.item(row, 0)).text()
+            if daum == keyword:
+                self.log_append(f"{daum}: 이미 등록된 키워드 입니다.")
+                return
+
         self.saved_data_daum[SaveFileDaum.DAUM.value].append(keyword)
 
         dict_save = {SaveFileDaum.DAUM.value: self.saved_data_daum[SaveFileDaum.DAUM.value]}
@@ -241,6 +251,16 @@ class SearchTab(QWidget):
 
         keyword = self.google_input.text()
         print(keyword)
+
+        self.google_keyword_list_tablewidget.selectAll()
+        google_items = self.google_keyword_list_tablewidget.selectedItems()
+
+        for google_item in google_items:
+            row = google_item.row()
+            google = QTableWidgetItem(self.google_keyword_list_tablewidget.item(row, 0)).text()
+            if google == keyword:
+                self.log_append(f"{google}: 이미 등록된 키워드 입니다.")
+                return
 
         self.saved_data_google[SaveFileGoogle.GOOGLE.value].append(keyword)
 

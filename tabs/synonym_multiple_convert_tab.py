@@ -204,6 +204,7 @@ class SynonymMultipleConvertTab(QWidget):
         guiDto.google_keyword_list = selected_google_keyword_list
         guiDto.google_search_count = google_search_count
         guiDto.search_file_save_path = search_file_save_path
+        guiDto.from_convert_tab = True
 
         print(f"작업을 시작합니다.")
 

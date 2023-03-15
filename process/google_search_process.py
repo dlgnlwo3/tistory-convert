@@ -39,6 +39,9 @@ class GoogleSearch:
     # 이미지 저장
     def save_img_from_url(self, url: str, keyword: str, i: str):
         img_path = os.path.join(self.guiDto.search_file_save_path, f"이미지수집 {self.run_time}")
+        if self.guiDto.from_convert_tab == True:
+            img_path = os.path.join(self.guiDto.search_file_save_path)
+
         if not os.path.isdir(img_path):
             os.mkdir(img_path)
 

@@ -43,6 +43,9 @@ class GUIDto:
         # 파일 변환
         self.__convert_format = ""
 
+        # 변환탭에서 이미지 수집
+        self.__from_convert_tab = False
+
     @property
     def daum_keyword_list(self):  # getter
         return self.__daum_keyword_list
@@ -224,3 +227,11 @@ class GUIDto:
     @convert_format.setter
     def convert_format(self, value):  # setter
         self.__convert_format = value
+
+    @property
+    def from_convert_tab(self):  # getter
+        return self.__from_convert_tab
+
+    @from_convert_tab.setter
+    def from_convert_tab(self, value):  # setter
+        self.__from_convert_tab = value

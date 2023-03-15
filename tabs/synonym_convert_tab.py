@@ -80,7 +80,7 @@ class SynonymConvertTab(QWidget):
             sentence = convert_from_db(original_sentence, ban_synonym, df_two_way, df_one_way)
         except Exception as e:
             if str(e).find("Cannot choose from an empty sequence") > -1:
-                QMessageBox.information(self, "오류 발생", f"{str(e)[:str(e).find(':')]} 유의어 데이터를 확인해주세요. \n{e}")
+                QMessageBox.information(self, "오류 발생", f"[{str(e)[:str(e).find(':')]}] 유의어 데이터를 확인해주세요. \n{e}")
                 return
 
         # 문단 랜덤 섞기 체크 시

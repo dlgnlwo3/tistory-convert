@@ -56,6 +56,16 @@ class TopicTab(QWidget):
         topic = self.topic_input.text()
         print(topic)
 
+        self.topic_list_tablewidget.selectAll()
+        topic_items = self.topic_list_tablewidget.selectedItems()
+
+        for topic_item in topic_items:
+            row = topic_item.row()
+            topic_str = QTableWidgetItem(self.topic_list_tablewidget.item(row, 0)).text()
+            if topic_str == topic:
+                QMessageBox.information(self, "주제 삭제", f"{topic}: 이미 등록된 주제 입니다.")
+                return
+
         self.saved_data_topic[SaveFileTopic.TOPIC.value].append(topic)
 
         dict_save = {SaveFileTopic.TOPIC.value: self.saved_data_topic[SaveFileTopic.TOPIC.value]}
@@ -125,13 +135,26 @@ class TopicTab(QWidget):
             QMessageBox.information(self, "머리글 저장", f"머리글을 입력해주세요.")
             return
 
+        header = self.header_input.text()
+        print(header)
+
+        self.header_list_tablewidget.selectAll()
+        header_items = self.header_list_tablewidget.selectedItems()
+
+        for header_item in header_items:
+            row = header_item.row()
+            header_str = QTableWidgetItem(self.header_list_tablewidget.item(row, 0)).text()
+            if header_str == header:
+                QMessageBox.information(self, "주제 삭제", f"{header}: 이미 등록된 머리글 입니다.")
+                return
+
         try:
             saved_topic_header = self.saved_data_header[self.header_topic_combobox.currentText()]
 
         except Exception as e:
             saved_topic_header = []
 
-        saved_topic_header.append(self.header_input.text())
+        saved_topic_header.append(header)
 
         save_topic_header = {self.header_topic_combobox.currentText(): saved_topic_header}
 
@@ -152,13 +175,26 @@ class TopicTab(QWidget):
             QMessageBox.information(self, "맺음말 저장", f"맺음말을 입력해주세요.")
             return
 
+        footer = self.footer_input.text()
+        print(footer)
+
+        self.footer_list_tablewidget.selectAll()
+        footer_items = self.footer_list_tablewidget.selectedItems()
+
+        for footer_item in footer_items:
+            row = footer_item.row()
+            footer_str = QTableWidgetItem(self.footer_list_tablewidget.item(row, 0)).text()
+            if footer_str == footer:
+                QMessageBox.information(self, "주제 삭제", f"{footer}: 이미 등록된 머리글 입니다.")
+                return
+
         try:
             saved_topic_footer = self.saved_data_footer[self.footer_topic_combobox.currentText()]
 
         except Exception as e:
             saved_topic_footer = []
 
-        saved_topic_footer.append(self.footer_input.text())
+        saved_topic_footer.append(footer)
 
         save_topic_footer = {self.footer_topic_combobox.currentText(): saved_topic_footer}
 
