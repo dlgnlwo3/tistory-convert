@@ -45,7 +45,8 @@ def convert_from_db(original_sentence: str, ban_synonym: str, df_two_way: pd.Dat
     if ban_synonym == "":
         ban_synonym_list = []
     else:
-        ban_synonym_list = ban_synonym.split(",")
+        ban_synonym_list = ban_synonym.split("=")
+        ban_synonym_list = [x for x in ban_synonym_list if x != ""]
 
     sentence = original_sentence
     for i, row in df_two_way[:].iterrows():
@@ -55,7 +56,15 @@ def convert_from_db(original_sentence: str, ban_synonym: str, df_two_way: pd.Dat
             if any(s in data for s in ban_synonym_list):
                 continue
 
-            synonym_list = data.split(",")
+            synonym_list = data.split("=")
+
+            # 빈 값 제거
+            synonym_list = [x for x in synonym_list if x != ""]
+
+            # 구분자만 입력한 배열은 넘김
+            if len(synonym_list) <= 0:
+                continue
+
             sentence = convert_sentence(sentence, synonym_list)
 
         except Exception as e:
@@ -71,7 +80,15 @@ def convert_from_db(original_sentence: str, ban_synonym: str, df_two_way: pd.Dat
             if any(s in before for s in ban_synonym_list):
                 continue
 
-            synonym_list = after.split(",")
+            synonym_list = after.split("=")
+
+            # 빈 값 제거
+            synonym_list = [x for x in synonym_list if x != ""]
+
+            # 구분자만 입력한 배열은 넘김
+            if len(synonym_list) <= 0:
+                continue
+
             sentence = convert_one_way_sentence(sentence, before, synonym_list)
 
         except Exception as e:
