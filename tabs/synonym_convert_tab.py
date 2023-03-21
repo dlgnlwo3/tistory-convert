@@ -202,9 +202,7 @@ class SynonymConvertTab(QWidget):
         # 변환할 문장
         input_sentence_groupbox = QGroupBox("문장 입력")
         self.input_sentence_textedit = QTextEdit()
-        self.input_sentence_textedit.setPlainText(
-            f"폐어망·폐생수통이 '갤럭시 S23'으로 화려하게 변신\n\n'전자팔찌 끊고 도주' 김봉현 도운 친구 등 3명 기소\n\n결국 소비자들에게 돌아가는 혜택이 축소되는 결과로 이어질 수 있다고 예상했다.\n\n강남 땅속에 축구장 2개 크기…'은밀한 공간'이 있다. 고 알고있다."
-        )
+        self.input_sentence_textedit.setPlainText(f"그럼 이쯤에서 마치겠습니다. 감사합니다.")
         self.convert_sentence_button = QPushButton("변환하기")
 
         self.convert_sentence_button.clicked.connect(self.convert_sentence_button_clicked)

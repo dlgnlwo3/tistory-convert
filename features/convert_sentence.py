@@ -20,8 +20,14 @@ def convert_sentence(sentence: str, synonym_list: list):
             break
 
     synonym = synonym_random_select(synonym_list, word)
-    sentence = sentence.replace(word, synonym)
-    return sentence
+    converted_sentence = sentence.replace(word, synonym)
+    is_converted = True
+
+    if sentence == converted_sentence:
+        is_converted = False
+
+    # 변환된 문장, 변환에 사용된 단어, 변환 성공 여부
+    return converted_sentence, synonym, is_converted
 
 
 # 일방향 문장을 변환합니다.
@@ -47,6 +53,7 @@ def convert_from_db(original_sentence: str, ban_synonym: str, df_two_way: pd.Dat
     else:
         ban_synonym_list = ban_synonym.split("=")
         ban_synonym_list = [x for x in ban_synonym_list if x != ""]
+        ban_synonym_list = [x for x in ban_synonym_list if x != " "]
 
     sentence = original_sentence
     for i, row in df_two_way[:].iterrows():
@@ -66,7 +73,18 @@ def convert_from_db(original_sentence: str, ban_synonym: str, df_two_way: pd.Dat
             if len(synonym_list) <= 0:
                 continue
 
-            sentence = convert_sentence(sentence, synonym_list)
+            sentence, synonym, is_converted = convert_sentence(sentence, synonym_list)
+
+            is_converted: bool
+            if is_converted:
+                # 변환에 사용된 단어를 금지어 리스트에 추가한다.
+                synonym: str
+                synonym_list = synonym.split(" ")
+                for syn in synonym_list:
+                    ban_synonym_list.append(syn)
+                    print(f"금지어 추가: {syn}")
+
+                print(f"금지어리스트: {ban_synonym_list}")
 
         except Exception as e:
             print(f"{data}: {e}")
