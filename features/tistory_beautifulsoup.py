@@ -7,24 +7,23 @@ if 1 == 1:
     warnings.simplefilter("ignore", UserWarning)
     sys.coinit_flags = 2
 
-from newspaper import Article
-from newspaper import Config
 import os
 import clipboard
-from bs4 import BeautifulSoup
 from dtos.top_blog_detail_dto import *
 from selenium import webdriver
+from newspaper import Article
+from newspaper import Config
+from bs4 import BeautifulSoup
+import requests
 
 
-class TistoryNewsPaper:
+class TistoryBeautifulsoup:
     def __init__(self):
         pass
 
     # 입력받은 url에서 이미지태그 개수와 키워드 반복횟수를 파악합니다.
     def get_article_from_blog_url(self, blog_url: str, keyword: str):
         top_blog_detail_dto = TopBlogDetailDto()
-
-        blog_url = blog_url.replace(".com/", ".com/m/")
 
         print(f"{blog_url} {keyword}")
 
@@ -64,3 +63,13 @@ class TistoryNewsPaper:
         # top_blog_detail_dto.img_count = img_count
 
         return top_blog_detail_dto
+
+
+if __name__ == "__main__":
+    bs = TistoryBeautifulsoup
+    top_blog_detail_dto = bs.get_article_from_blog_url(
+        bs,
+        f"https://velog.io/@gywlsp/Medium-Velog-Tistory-%EA%B8%80-%ED%81%AC%EB%A1%A4%EB%A7%81-%EB%B0%A9%EB%B2%95",
+        "크롤링",
+    )
+    top_blog_detail_dto.to_print()
