@@ -60,6 +60,7 @@ def convert_from_db(original_sentence: str, ban_synonym: str, df_two_way: pd.Dat
 
             # 빈 값 제거
             synonym_list = [x for x in synonym_list if x != ""]
+            synonym_list = [x for x in synonym_list if x != " "]
 
             # 구분자만 입력한 배열은 넘김
             if len(synonym_list) <= 0:
@@ -84,6 +85,7 @@ def convert_from_db(original_sentence: str, ban_synonym: str, df_two_way: pd.Dat
 
             # 빈 값 제거
             synonym_list = [x for x in synonym_list if x != ""]
+            synonym_list = [x for x in synonym_list if x != " "]
 
             # 구분자만 입력한 배열은 넘김
             if len(synonym_list) <= 0:
