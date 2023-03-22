@@ -88,6 +88,8 @@ class SynonymConvertTab(QWidget):
                 QMessageBox.information(self, "오류 발생", f"[{str(e)[:str(e).find(':')]}] 유의어 데이터를 확인해주세요. \n{e}")
                 return
 
+        sentence = self.compare_text(sentence, used_synonym_list)
+
         # 문단 랜덤 섞기 체크 시
         if self.shuffle_paragraphs_checkbox.isChecked():
             sentence = shuffle_sentence(sentence)
@@ -96,15 +98,18 @@ class SynonymConvertTab(QWidget):
         if self.header_select_checkbox.isChecked():
             header_topic = self.header_topic_combobox.currentText()
             self.saved_data_header = get_save_data_HEADER()
-            sentence = insert_header_to_sentence(sentence, header_topic, self.saved_data_header, convert_keyword)
+            header: str = random.choice(self.saved_data_header[header_topic])
+            header = f'<span style="color : blue">{header}</span>'
+            sentence = insert_header_to_sentence(sentence, header, convert_keyword)
 
         # 맺음말 삽입
         if self.footer_select_checkbox.isChecked():
             footer_topic = self.footer_topic_combobox.currentText()
             self.saved_data_footer = get_save_data_FOOTER()
-            sentence = insert_footer_to_sentence(sentence, footer_topic, self.saved_data_footer, convert_keyword)
+            footer: str = random.choice(self.saved_data_footer[footer_topic])
+            footer = f'<span style="color : blue">{footer}</span>'
+            sentence = insert_footer_to_sentence(sentence, footer, convert_keyword)
 
-        sentence = self.compare_text(sentence, used_synonym_list)
         sentence = sentence.replace(f"\n", "<br />")
         print(sentence)
         self.result_sentence_textedit.clear()

@@ -135,9 +135,7 @@ def shuffle_sentence(sentence: str):
     return sentence
 
 
-def insert_header_to_sentence(sentence: str, header_topic: str, saved_data_header: dict, convert_keyword: str):
-    header: str = random.choice(saved_data_header[header_topic])
-
+def insert_header_to_sentence(sentence: str, header: str, convert_keyword: str):
     header = header.replace("$키워드$", convert_keyword)
     header += f"\n\n"
 
@@ -146,9 +144,7 @@ def insert_header_to_sentence(sentence: str, header_topic: str, saved_data_heade
     return sentence
 
 
-def insert_footer_to_sentence(sentence: str, footer_topic: str, saved_data_footer: dict, convert_keyword: str):
-    footer: str = random.choice(saved_data_footer[footer_topic])
-
+def insert_footer_to_sentence(sentence: str, footer: str, convert_keyword: str):
     footer = footer.replace("$키워드$", convert_keyword)
     footer = f"\n\n" + footer
 

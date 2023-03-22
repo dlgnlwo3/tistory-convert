@@ -20,6 +20,7 @@ from features.convert_sentence import (
     insert_header_to_sentence,
     insert_footer_to_sentence,
 )
+import random
 
 
 class SynonymMultipleConvert:
@@ -121,17 +122,15 @@ class SynonymMultipleConvert:
                 if self.guiDto.header_check:
                     header_topic = self.guiDto.header_topic
                     saved_data_header = get_save_data_HEADER()
-                    sentence = insert_header_to_sentence(
-                        sentence, header_topic, saved_data_header, convert_keyword=file.rstrip(file_format)
-                    )
+                    header: str = random.choice(saved_data_header[header_topic])
+                    sentence = insert_header_to_sentence(sentence, header, convert_keyword=file.rstrip(file_format))
 
                 # 맺음말 삽입
                 if self.guiDto.footer_check:
                     footer_topic = self.guiDto.footer_topic
                     saved_data_footer = get_save_data_FOOTER()
-                    sentence = insert_footer_to_sentence(
-                        sentence, footer_topic, saved_data_footer, convert_keyword=file.rstrip(file_format)
-                    )
+                    footer: str = random.choice(saved_data_footer[footer_topic])
+                    sentence = insert_footer_to_sentence(sentence, footer, convert_keyword=file.rstrip(file_format))
 
                 # print(sentence)
 
