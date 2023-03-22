@@ -72,11 +72,6 @@ class SynonymConvertTab(QWidget):
         # 변환 금지어
         ban_synonym = self.ban_synonym_input.text()
 
-        # 테스트용
-        test_html = self.input_sentence_textedit.toHtml()
-
-        test_markdown = self.input_sentence_textedit.toMarkdown()
-
         # 원본 텍스트
         original_sentence = self.input_sentence_textedit.toPlainText()
 
@@ -223,11 +218,22 @@ class SynonymConvertTab(QWidget):
 
         # 변환할 문장
         input_sentence_groupbox = QGroupBox("문장 입력")
-        self.input_sentence_textedit = QTextEdit()
+        self.input_sentence_textedit = QPlainTextEdit()
         # self.input_sentence_textedit.setText(f'<span style="color : red">[RED]</span>')
         # self.input_sentence_textedit.setText(f"그럼 이쯤에서 마치겠습니다. 감사합니다.")
-        self.convert_sentence_button = QPushButton("변환하기")
+        self.input_sentence_textedit.setPlainText(
+            f"""윤석열 대통령은 21일 근로시간 제도 개편안과 관련해 “저는 주당 60시간 이상 근무는 건강보호 차원에서 무리라고 하는 생각에는 변함이 없다”고 밝혔다. 윤 대통령은 이날 용산 대통령실에서 주재한 국무회의 모두발언에서 “최근 주당 최대 근로시간에 관해 다소 논란이 있다”며 이같이 말했다.
 
+윤 대통령은 “이에 대해 근로시간 유연화 정책의 후퇴라는 의견도 있지만 주당 근로시간의 상한을 정해 놓지 않으면 현실적으로 노동 약자들의 건강권을 지키기 어렵다”고 했다. 그러면서 근로시간 합의구간을 주 단위에서 월·분기·반기·연 단위로 자유롭게 설정하도록 함으로써 노사 간 선택권을 넓히고 노동수요에 유연하게 대응하려는 취지라고 설명했다.
+
+윤 대통령은 “임금·휴가 등 근로 보상체계에 대해 근로자들이 불안해하지 않도록, 특히 노동시장의 이중구조가 만연한 우리 사회에서 노동 약자들이 불안해하지 않도록 확실한 담보책을 강구할 것”이라고 약속했다.
+
+이어 “근로자들의 건강권, 휴식권 보장과 포괄임금제 악용 방지를 통한 정당한 보상에 조금의 의혹과 불안이 있어서는 안 된다”고 거듭 강조했다. 아울러 “MZ 근로자, 노조 미가입 근로자, 중소기업 근로자 등 노동 약자와 폭넓게 소통할 것”이라며 “조급하게 서두르지 않고 충분히 숙의하고 민의를 반영하겠다”고 덧붙였다.
+
+그럼 이쯤에서 마치겠습니다. 감사합니다."""
+        )
+
+        self.convert_sentence_button = QPushButton("변환하기")
         self.convert_sentence_button.clicked.connect(self.convert_sentence_button_clicked)
 
         input_sentence_inner_layout = QGridLayout()
