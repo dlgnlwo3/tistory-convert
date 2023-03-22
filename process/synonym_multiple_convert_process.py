@@ -109,7 +109,9 @@ class SynonymMultipleConvert:
                 print(limit)
 
                 # 문자열 변환
-                sentence = convert_from_db(original_sentence, "", self.guiDto.df_two_way, self.guiDto.df_one_way)
+                sentence, used_synonym_list = convert_from_db(
+                    original_sentence, "", self.guiDto.df_two_way, self.guiDto.df_one_way
+                )
 
                 # 문단 랜덤 섞기 체크 시
                 if self.guiDto.shuffle_paragraphs_check:

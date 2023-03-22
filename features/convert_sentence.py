@@ -31,7 +31,7 @@ def convert_sentence(sentence: str, synonym_list: list):
 
 
 # 일방향 문장을 변환합니다.
-def convert_one_way_sentence(sentence: str, before_word: str, synonym_list: list):
+def convert_one_way_sentence(sentence: str, before_word: str, synonym_list: list, used_synonym_list: list):
     before_word_count = sentence.count(before_word)
     before_synonym = ""
 
@@ -40,10 +40,11 @@ def convert_one_way_sentence(sentence: str, before_word: str, synonym_list: list
         index = sentence.find(before_word)
         if index >= 0:
             sentence = sentence[:index] + sentence[index:].replace(before_word, synonym, 1)
+            used_synonym_list.append(synonym)
         # sentence = sentence.replace(before_word, synonym)
         before_synonym = synonym
 
-    return sentence
+    return sentence, used_synonym_list
 
 
 # 양방향, 일방향 dataframe을 적용합니다.
@@ -56,6 +57,7 @@ def convert_from_db(original_sentence: str, ban_synonym: str, df_two_way: pd.Dat
         ban_synonym_list = [x for x in ban_synonym_list if x != " "]
 
     sentence = original_sentence
+    used_synonym_list = []
     for i, row in df_two_way[:].iterrows():
         try:
             data = str(row["data"])
@@ -79,11 +81,11 @@ def convert_from_db(original_sentence: str, ban_synonym: str, df_two_way: pd.Dat
             if is_converted:
                 # 변환에 사용된 단어를 금지어 리스트에 추가한다.
                 synonym: str
+                used_synonym_list.append(synonym)
                 synonym_list = synonym.split(" ")
                 for syn in synonym_list:
                     ban_synonym_list.append(syn)
                     print(f"금지어 추가: {syn}")
-
                 print(f"금지어리스트: {ban_synonym_list}")
 
         except Exception as e:
@@ -109,14 +111,14 @@ def convert_from_db(original_sentence: str, ban_synonym: str, df_two_way: pd.Dat
             if len(synonym_list) <= 0:
                 continue
 
-            sentence = convert_one_way_sentence(sentence, before, synonym_list)
+            sentence, used_synonym_list = convert_one_way_sentence(sentence, before, synonym_list, used_synonym_list)
 
         except Exception as e:
             print(f"{before} -> {after}: {e}")
             raise Exception(f"{before} -> {after}: {e}")
             continue
 
-    return sentence
+    return sentence, used_synonym_list
 
 
 # 문단을 랜덤하게 섞습니다.

@@ -72,12 +72,17 @@ class SynonymConvertTab(QWidget):
         # 변환 금지어
         ban_synonym = self.ban_synonym_input.text()
 
+        # 테스트용
+        test_html = self.input_sentence_textedit.toHtml()
+
+        test_markdown = self.input_sentence_textedit.toMarkdown()
+
         # 원본 텍스트
         original_sentence = self.input_sentence_textedit.toPlainText()
 
         # 양방향 작업
         try:
-            sentence = convert_from_db(original_sentence, ban_synonym, df_two_way, df_one_way)
+            sentence, used_synonym_list = convert_from_db(original_sentence, ban_synonym, df_two_way, df_one_way)
         except Exception as e:
             if str(e).find("Cannot choose from an empty sequence") > -1:
                 QMessageBox.information(self, "오류 발생", f"[{str(e)[:str(e).find(':')]}] 유의어 데이터를 확인해주세요. \n{e}")
@@ -99,7 +104,8 @@ class SynonymConvertTab(QWidget):
             self.saved_data_footer = get_save_data_FOOTER()
             sentence = insert_footer_to_sentence(sentence, footer_topic, self.saved_data_footer, convert_keyword)
 
-        print()
+        sentence = self.compare_text(sentence, used_synonym_list)
+        sentence = sentence.replace(f"\n", "<br />")
         print(sentence)
         self.result_sentence_textedit.clear()
         self.result_sentence_textedit.setText(sentence)
@@ -146,6 +152,17 @@ class SynonymConvertTab(QWidget):
 
         for i, topic in enumerate(self.saved_data_topic[SaveFileTopic.TOPIC.value]):
             self.footer_topic_combobox.addItem(f"{topic}")
+
+    # 문자 비교
+    def compare_text(self, sentence: str, used_synonym_list: list):
+        print(used_synonym_list)
+
+        print(sentence)
+
+        for used_synonym in used_synonym_list:
+            sentence = sentence.replace(used_synonym, f'<span style="color : red">{used_synonym}</span>')
+
+        return sentence
 
     # 메인 UI
     def initUI(self):
@@ -202,7 +219,8 @@ class SynonymConvertTab(QWidget):
         # 변환할 문장
         input_sentence_groupbox = QGroupBox("문장 입력")
         self.input_sentence_textedit = QTextEdit()
-        self.input_sentence_textedit.setPlainText(f"그럼 이쯤에서 마치겠습니다. 감사합니다.")
+        # self.input_sentence_textedit.setText(f'<span style="color : red">[RED]</span>')
+        # self.input_sentence_textedit.setText(f"그럼 이쯤에서 마치겠습니다. 감사합니다.")
         self.convert_sentence_button = QPushButton("변환하기")
 
         self.convert_sentence_button.clicked.connect(self.convert_sentence_button_clicked)

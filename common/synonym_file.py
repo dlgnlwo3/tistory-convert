@@ -47,6 +47,5 @@ class SynonymFile:
 
 
 if __name__ == "__main__":
-
     synonym_file = SynonymFile(r"D:\Consolework\tistory-convert\excel\유의어DB.xlsx")
     synonym_file.output()
