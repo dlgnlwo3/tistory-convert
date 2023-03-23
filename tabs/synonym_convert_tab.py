@@ -75,7 +75,7 @@ class SynonymConvertTab(QWidget):
         # 원본 텍스트
         original_sentence = self.input_sentence_textedit.toPlainText()
 
-        # 양방향 작업
+        # 변환 작업
         try:
             sentence, used_synonym_list = convert_from_db(original_sentence, ban_synonym, df_two_way, df_one_way)
         except Exception as e:

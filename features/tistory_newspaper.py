@@ -45,7 +45,10 @@ class TistoryNewsPaper:
         article_text = article.text
         article_html = article.html
 
-        article_length = len(article_text)
+        if article_title == "":
+            article_title = keyword
+
+        article_length = len(article_text.replace(" ", "").replace(f"\n", ""))
 
         keyword_count = article_text.count(keyword)
         # print(f"키워드 반복 횟수: {keyword_count}")
@@ -64,3 +67,11 @@ class TistoryNewsPaper:
         # top_blog_detail_dto.img_count = img_count
 
         return top_blog_detail_dto
+
+
+if __name__ == "__main__":
+    blog_url = f"http://kenunnni.tistory.com/6"
+    keyword = "글루타치온효능"
+
+    newspaper = TistoryNewsPaper()
+    my_dto = newspaper.get_article_from_blog_url(blog_url, keyword)
