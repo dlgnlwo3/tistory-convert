@@ -50,6 +50,7 @@ def convert_one_way_sentence(sentence: str, before_word: str, synonym_list: list
 
 # 양방향, 일방향 dataframe을 적용합니다.
 def convert_from_db(original_sentence: str, ban_synonym: str, df_two_way: pd.DataFrame, df_one_way: pd.DataFrame):
+
     if ban_synonym == "":
         ban_synonym_list = []
     else:
@@ -59,48 +60,52 @@ def convert_from_db(original_sentence: str, ban_synonym: str, df_two_way: pd.Dat
 
     sentence = original_sentence
     used_synonym_list = []
-    for i, row in df_two_way[:].iterrows():
-        try:
-            data = str(row["data"])
+    two_way_column_list= df_two_way.columns
 
-            synonym_list = data.split("=")
+    for two_way_column in two_way_column_list:
+        data_list = df_two_way[str(two_way_column)].to_list()
 
-            # 빈 값 제거
-            synonym_list = [x for x in synonym_list if x != ""]
-            synonym_list = [x for x in synonym_list if x != " "]
+        for data in data_list:
+            try:
+                # data = str(row["data"])
+                data = str(data)
+                synonym_list = data.split("=")
 
-            # 기존 금지어 로직 -> 문장에 금지어가 한글자라도 포함되어있다면 생략함
-            # if any(s in data for s in ban_synonym_list):
-            #     continue
+                # 빈 값 제거
+                synonym_list = [x for x in synonym_list if x != ""]
+                synonym_list = [x for x in synonym_list if x != " "]
 
-            # 신규 금지어 로직 -> 변환 리스트에서 금지어 리스트를 빼는 차집합 방식
-            # 너무 많이 빼다보니 유의어 리스트가 없어서 오류가 발생할 수 있음.
-            # Cannot choose from an empty sequence
-            synonym_list = list(set(synonym_list) - set(ban_synonym_list))
+                # 기존 금지어 로직 -> 문장에 금지어가 한글자라도 포함되어있다면 생략함
+                # if any(s in data for s in ban_synonym_list):
+                #     continue
 
-            # 구분자만 입력한 배열은 넘김
-            # 리스트가 1개만 있다면 넘김 (변환 할 필요가 없음)
-            if len(synonym_list) <= 1:
-                continue
+                # 신규 금지어 로직 -> 변환 리스트에서 금지어 리스트를 빼는 차집합 방식
+                # 너무 많이 빼다보니 유의어 리스트가 없어서 오류가 발생할 수 있음.
+                # Cannot choose from an empty sequence
+                synonym_list = list(set(synonym_list) - set(ban_synonym_list))
 
-            sentence, synonym, is_converted = convert_sentence(sentence, synonym_list)
+                # 구분자만 입력한 배열은 넘김
+                # 리스트가 1개만 있다면 넘김 (변환 할 필요가 없음)
+                if len(synonym_list) <= 1:
+                    continue
 
-            is_converted: bool
-            if is_converted:
-                # 변환에 사용된 단어를 금지어 리스트에 추가한다.
-                synonym: str
-                used_synonym_list.append(synonym)
-                synonym_list = synonym.split(" ")
-                for syn in synonym_list:
-                    if syn:
-                        ban_synonym_list.append(syn)
-                        print(f"금지어 추가: {syn}")
-                print(f"금지어리스트: {ban_synonym_list}")
+                sentence, synonym, is_converted = convert_sentence(sentence, synonym_list)
 
-        except Exception as e:
-            print(f"{data}: {e}")
-            raise Exception(f"{data}: {e}")
-            continue
+                is_converted: bool
+                if is_converted:
+                    # 변환에 사용된 단어를 금지어 리스트에 추가한다.
+                    synonym: str
+                    used_synonym_list.append(synonym)
+                    synonym_list = synonym.split(" ")
+                    for syn in synonym_list:
+                        if syn:
+                            ban_synonym_list.append(syn)
+                            print(f"금지어 추가: {syn}")
+                    print(f"금지어리스트: {ban_synonym_list}")
+
+            except Exception as e:
+                print(f"{data}: {e}")
+                raise Exception(f"{data}: {e}")
 
     for j, row in df_one_way[:].iterrows():
         try:
