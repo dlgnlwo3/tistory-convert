@@ -50,7 +50,6 @@ def convert_one_way_sentence(sentence: str, before_word: str, synonym_list: list
 
 # 양방향, 일방향 dataframe을 적용합니다.
 def convert_from_db(original_sentence: str, ban_synonym: str, df_two_way: pd.DataFrame, df_one_way: pd.DataFrame):
-
     if ban_synonym == "":
         ban_synonym_list = []
     else:
@@ -60,7 +59,7 @@ def convert_from_db(original_sentence: str, ban_synonym: str, df_two_way: pd.Dat
 
     sentence = original_sentence
     used_synonym_list = []
-    two_way_column_list= df_two_way.columns
+    two_way_column_list = df_two_way.columns
 
     for two_way_column in two_way_column_list:
         data_list = df_two_way[str(two_way_column)].to_list()

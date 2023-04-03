@@ -14,6 +14,7 @@ from config import *
 import pandas as pd
 import re
 from docx import Document
+from docx.shared import RGBColor
 from features.convert_sentence import (
     convert_from_db,
     shuffle_sentence,
@@ -34,7 +35,7 @@ class SynonymMultipleConvert:
         self.log_msg = log_msg
 
     # 워드 저장
-    def sentence_to_docx(self, file_name: str, sentence: str, limit=""):
+    def sentence_to_docx(self, file_name: str, sentence: str, used_synonym_list: list, limit=""):
         save_path = os.path.join(self.guiDto.convert_path, f"유의어 변환 {self.run_time}")
 
         if os.path.isdir(save_path) == False:
@@ -50,7 +51,20 @@ class SynonymMultipleConvert:
 
         doc = Document()
 
-        doc.add_paragraph(sentence)
+        paragraph = doc.add_paragraph()
+
+        runs = []
+        for one_line in sentence.split("\n"):
+            for word in one_line.split():
+                run = paragraph.add_run(word + " ")
+                for used_synonym in used_synonym_list:
+                    if used_synonym in word:
+                        font = run.font
+                        font.color.rgb = RGBColor(255, 0, 0)  # 빨간색으로 설정
+                runs.append(run)
+            run = paragraph.add_run("\n")
+
+        # doc.add_paragraph(sentence)
 
         doc.save(sentence_docx)
 
@@ -119,6 +133,7 @@ class SynonymMultipleConvert:
                     sentence = shuffle_sentence(sentence)
 
                 # 머리글 삽입
+                header = ""
                 if self.guiDto.header_check:
                     header_topic = self.guiDto.header_topic
                     saved_data_header = get_save_data_HEADER()
@@ -126,6 +141,7 @@ class SynonymMultipleConvert:
                     sentence = insert_header_to_sentence(sentence, header, convert_keyword=file.rstrip(file_format))
 
                 # 맺음말 삽입
+                footer = ""
                 if self.guiDto.footer_check:
                     footer_topic = self.guiDto.footer_topic
                     saved_data_footer = get_save_data_FOOTER()
@@ -135,7 +151,7 @@ class SynonymMultipleConvert:
                 # print(sentence)
 
                 # 문자열 파일 저장
-                self.sentence_to_docx(file.rstrip(file_format), sentence, limit)
+                self.sentence_to_docx(file.rstrip(file_format), sentence, used_synonym_list, limit)
 
 
 if __name__ == "__main__":
