@@ -112,11 +112,7 @@ def convert_from_db(
                     # 변환에 사용된 단어를 금지어 리스트에 추가한다.
                     synonym: str
                     used_synonym_list.append(synonym)
-                    synonym_list = synonym.split(" ")
-                    for syn in synonym_list:
-                        if syn:
-                            ban_synonym_list.append(syn)
-                            print(f"금지어 추가: {syn}")
+                    ban_synonym_list.append(synonym)
                     print(f"금지어리스트: {ban_synonym_list}")
 
             except Exception as e:

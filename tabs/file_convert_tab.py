@@ -19,7 +19,6 @@ import random
 from dtos.gui_dto import GUIDto
 
 from threads.file_convert_thread import FileConvertThread
-from playsound import playsound
 
 
 class FileConvertTab(QWidget):
@@ -98,6 +97,7 @@ class FileConvertTab(QWidget):
         guiDto.convert_list = selected_file_list
         guiDto.convert_format = convert_format
         guiDto.convert_path = self.convert_path.text()
+        guiDto.system_sound_checkbox = self.system_sound_checkbox.isChecked()
 
         print(f"작업을 시작합니다.")
 
@@ -125,9 +125,6 @@ class FileConvertTab(QWidget):
         self.convert_start_button.setDisabled(False)
         self.convert_stop_button.setDisabled(True)
         print(f"thread_is_running: {self.convert_thread.isRunning()}")
-        if self.system_sound_checkbox.isChecked():
-            print("알림음")
-            playsound(r"D:\Consolework\tistory-convert-new\assets\thread_finished_sound.mp3")
 
     # 메인 UI
     def initUI(self):

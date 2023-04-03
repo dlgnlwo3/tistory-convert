@@ -19,7 +19,6 @@ import random
 from threads.synonym_multiple_convert_thread import ConvertThread
 from threads.google_search_thread import GoogleSearchThread
 from dtos.gui_dto import GUIDto
-from playsound import playsound
 
 
 class SynonymMultipleConvertTab(QWidget):
@@ -141,6 +140,7 @@ class SynonymMultipleConvertTab(QWidget):
         guiDto.df_two_way = df_two_way
         guiDto.header_dict = get_save_data_HEADER()
         guiDto.footer_dict = get_save_data_FOOTER()
+        guiDto.system_sound_checkbox = self.system_sound_checkbox.isChecked()
 
         print(f"작업을 시작합니다.")
 
@@ -168,9 +168,6 @@ class SynonymMultipleConvertTab(QWidget):
         self.convert_start_button.setDisabled(False)
         self.convert_stop_button.setDisabled(True)
         print(f"thread_is_running: {self.convert_thread.isRunning()}")
-        if self.system_sound_checkbox.isChecked():
-            print("알림음")
-            playsound(r"D:\Consolework\tistory-convert-new\assets\thread_finished_sound.mp3")
 
     def open_save_path_button_clicked(self):
         if self.convert_path.text() == "":
@@ -209,6 +206,7 @@ class SynonymMultipleConvertTab(QWidget):
         guiDto.google_search_count = google_search_count
         guiDto.search_file_save_path = search_file_save_path
         guiDto.from_convert_tab = True
+        guiDto.system_sound_checkbox = self.system_sound_checkbox.isChecked()
 
         print(f"작업을 시작합니다.")
 
@@ -237,9 +235,6 @@ class SynonymMultipleConvertTab(QWidget):
         self.google_search_start_button.setDisabled(False)
         self.google_search_stop_button.setDisabled(True)
         print(f"thread_is_running: {self.google_search_thread.isRunning()}")
-        if self.system_sound_checkbox.isChecked():
-            print("알림음")
-            playsound(r"D:\Consolework\tistory-convert-new\assets\thread_finished_sound.mp3")
 
     # 메인 UI
     def initUI(self):

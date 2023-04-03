@@ -15,6 +15,8 @@ from datetime import timedelta
 from timeit import default_timer as timer
 
 from process.daum_search_process import DaumSearch
+from playsound import playsound
+
 
 # import debugpy
 
@@ -56,6 +58,10 @@ class DaumSearchThread(QThread):
         except Exception as e:
             print(f"작업 중 오류가 발생했습니다. {str(e)}")
             self.log_msg.emit(f"작업 중 오류가 발생했습니다. {str(e)}")
+
+        if self.guiDto.system_sound_checkbox:
+            print("알림음")
+            playsound(r"D:\Consolework\tistory-convert-new\assets\thread_finished_sound.mp3")
 
         self.search_finished.emit()
 

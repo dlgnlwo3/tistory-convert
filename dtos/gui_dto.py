@@ -46,6 +46,9 @@ class GUIDto:
         # 변환탭에서 이미지 수집
         self.__from_convert_tab = False
 
+        # 작업 완료 시 설정
+        self.__system_sound_checkbox = bool
+
     @property
     def daum_keyword_list(self):  # getter
         return self.__daum_keyword_list
@@ -219,7 +222,6 @@ class GUIDto:
         self.__df_two_way = value
 
     # 파일 변환
-
     @property
     def convert_format(self):  # getter
         return self.__convert_format
@@ -235,3 +237,12 @@ class GUIDto:
     @from_convert_tab.setter
     def from_convert_tab(self, value):  # setter
         self.__from_convert_tab = value
+
+    # 작업 완료 시 설정
+    @property
+    def system_sound_checkbox(self):  # getter
+        return self.__system_sound_checkbox
+
+    @system_sound_checkbox.setter
+    def system_sound_checkbox(self, value):  # setter
+        self.__system_sound_checkbox = value

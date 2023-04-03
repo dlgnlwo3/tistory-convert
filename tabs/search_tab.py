@@ -14,7 +14,6 @@ from threads.google_search_thread import GoogleSearchThread
 from common.utils import *
 from config import *
 import collections
-from playsound import playsound
 
 
 class SearchTab(QWidget):
@@ -88,6 +87,7 @@ class SearchTab(QWidget):
         guiDto.daum_search_count = daum_search_count
         guiDto.daum_search_date = self.daum_search_date.text()
         guiDto.search_file_save_path = search_file_save_path
+        guiDto.system_sound_checkbox = self.system_sound_checkbox.isChecked()
 
         print(f"작업을 시작합니다.")
 
@@ -116,9 +116,6 @@ class SearchTab(QWidget):
         self.daum_search_start_button.setDisabled(False)
         self.daum_search_stop_button.setDisabled(True)
         print(f"thread_is_running: {self.daum_search_thread.isRunning()}")
-        if self.system_sound_checkbox.isChecked():
-            print("알림음")
-            playsound(r"D:\Consolework\tistory-convert-new\assets\thread_finished_sound.mp3")
 
     # 검색 시작 클릭
     def google_search_start_button_clicked(self):
@@ -157,6 +154,7 @@ class SearchTab(QWidget):
         guiDto.google_keyword_list = selected_google_keyword_list
         guiDto.google_search_count = google_search_count
         guiDto.search_file_save_path = search_file_save_path
+        guiDto.system_sound_checkbox = self.system_sound_checkbox.isChecked()
 
         print(f"작업을 시작합니다.")
 
@@ -185,9 +183,6 @@ class SearchTab(QWidget):
         self.google_search_start_button.setDisabled(False)
         self.google_search_stop_button.setDisabled(True)
         print(f"thread_is_running: {self.google_search_thread.isRunning()}")
-        if self.system_sound_checkbox.isChecked():
-            print("알림음")
-            playsound(r"D:\Consolework\tistory-convert-new\assets\thread_finished_sound.mp3")
 
     def set_daum_keyword_list_tablewidget(self):
         self.daum_keyword_list_tablewidget.setColumnCount(1)
