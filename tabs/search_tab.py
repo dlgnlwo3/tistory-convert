@@ -14,6 +14,7 @@ from threads.google_search_thread import GoogleSearchThread
 from common.utils import *
 from config import *
 import collections
+from playsound import playsound
 
 
 class SearchTab(QWidget):
@@ -115,6 +116,9 @@ class SearchTab(QWidget):
         self.daum_search_start_button.setDisabled(False)
         self.daum_search_stop_button.setDisabled(True)
         print(f"thread_is_running: {self.daum_search_thread.isRunning()}")
+        if self.system_sound_checkbox.isChecked():
+            print("알림음")
+            playsound(r"D:\Consolework\tistory-convert-new\assets\thread_finished_sound.mp3")
 
     # 검색 시작 클릭
     def google_search_start_button_clicked(self):
@@ -181,6 +185,9 @@ class SearchTab(QWidget):
         self.google_search_start_button.setDisabled(False)
         self.google_search_stop_button.setDisabled(True)
         print(f"thread_is_running: {self.google_search_thread.isRunning()}")
+        if self.system_sound_checkbox.isChecked():
+            print("알림음")
+            playsound(r"D:\Consolework\tistory-convert-new\assets\thread_finished_sound.mp3")
 
     def set_daum_keyword_list_tablewidget(self):
         self.daum_keyword_list_tablewidget.setColumnCount(1)
@@ -516,6 +523,14 @@ class SearchTab(QWidget):
         google_search_start_stop_inner_layout.addWidget(self.open_save_path_button)
         google_search_start_stop_groupbox.setLayout(google_search_start_stop_inner_layout)
 
+        # 작업 완료 시 작동하는 그룹박스
+        system_down_groupbox = QGroupBox("작업 완료 시 설정")
+        self.system_sound_checkbox = QCheckBox("작업 완료 시 알림")
+
+        system_down_inner_layout = QHBoxLayout()
+        system_down_inner_layout.addWidget(self.system_sound_checkbox)
+        system_down_groupbox.setLayout(system_down_inner_layout)
+
         # 로그 그룹박스
         log_groupbox = QGroupBox("로그")
         self.browser = QTextBrowser()
@@ -542,6 +557,7 @@ class SearchTab(QWidget):
         right_layout.addWidget(google_search_count_groupbox)
         right_layout.addWidget(daum_search_start_stop_groupbox)
         right_layout.addWidget(google_search_start_stop_groupbox)
+        right_layout.addWidget(system_down_groupbox)
         right_layout.addWidget(log_groupbox)
 
         layout = QHBoxLayout()

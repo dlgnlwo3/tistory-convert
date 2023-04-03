@@ -19,6 +19,7 @@ import random
 from dtos.gui_dto import GUIDto
 
 from threads.file_convert_thread import FileConvertThread
+from playsound import playsound
 
 
 class FileConvertTab(QWidget):
@@ -124,6 +125,9 @@ class FileConvertTab(QWidget):
         self.convert_start_button.setDisabled(False)
         self.convert_stop_button.setDisabled(True)
         print(f"thread_is_running: {self.convert_thread.isRunning()}")
+        if self.system_sound_checkbox.isChecked():
+            print("알림음")
+            playsound(r"D:\Consolework\tistory-convert-new\assets\thread_finished_sound.mp3")
 
     # 메인 UI
     def initUI(self):
@@ -163,6 +167,14 @@ class FileConvertTab(QWidget):
         convert_list_inner_layout.addWidget(self.convert_listwidget)
         convert_list_groupbox.setLayout(convert_list_inner_layout)
 
+        # 작업 완료 시 작동하는 그룹박스
+        system_down_groupbox = QGroupBox("작업 완료 시 설정")
+        self.system_sound_checkbox = QCheckBox("작업 완료 시 알림")
+
+        system_down_inner_layout = QHBoxLayout()
+        system_down_inner_layout.addWidget(self.system_sound_checkbox)
+        system_down_groupbox.setLayout(system_down_inner_layout)
+
         # 변환 시작 중지 그룹박스
         convert_start_stop_groupbox = QGroupBox("변환하기")
         self.convert_start_button = QPushButton("시작")
@@ -199,8 +211,8 @@ class FileConvertTab(QWidget):
         bottom_layout = QHBoxLayout()
 
         lowest_layout = QHBoxLayout()
-        lowest_layout.addStretch(1)
-        lowest_layout.addWidget(convert_start_stop_groupbox, 1)
+        lowest_layout.addWidget(system_down_groupbox)
+        lowest_layout.addWidget(convert_start_stop_groupbox)
 
         log_layout = QHBoxLayout()
         log_layout.addWidget(log_groupbox)

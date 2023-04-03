@@ -32,9 +32,7 @@ def convert_sentence(sentence: str, synonym_list: list):
 
 
 # 일방향 문장을 변환합니다.
-def convert_one_way_sentence(
-    sentence: str, before_word: str, synonym_list: list, used_synonym_list: list
-):
+def convert_one_way_sentence(sentence: str, before_word: str, synonym_list: list, used_synonym_list: list):
     before_word_count = sentence.count(before_word)
     before_synonym = ""
 
@@ -42,9 +40,7 @@ def convert_one_way_sentence(
         synonym = synonym_random_select(synonym_list, before_synonym)
         index = sentence.find(before_word)
         if index >= 0:
-            sentence = sentence[:index] + sentence[index:].replace(
-                before_word, synonym, 1
-            )
+            sentence = sentence[:index] + sentence[index:].replace(before_word, synonym, 1)
             used_synonym_list.append(synonym)
         # sentence = sentence.replace(before_word, synonym)
         before_synonym = synonym
@@ -109,9 +105,7 @@ def convert_from_db(
                 if len(synonym_list) <= 1:
                     continue
 
-                sentence, synonym, is_converted = convert_sentence(
-                    sentence, synonym_list
-                )
+                sentence, synonym, is_converted = convert_sentence(sentence, synonym_list)
 
                 is_converted: bool
                 if is_converted:
@@ -154,9 +148,7 @@ def convert_from_db(
             if len(synonym_list) <= 1:
                 continue
 
-            sentence, used_synonym_list = convert_one_way_sentence(
-                sentence, before, synonym_list, used_synonym_list
-            )
+            sentence, used_synonym_list = convert_one_way_sentence(sentence, before, synonym_list, used_synonym_list)
 
         except Exception as e:
             print(f"{before} -> {after}: {e}")

@@ -19,6 +19,7 @@ import random
 from threads.synonym_multiple_convert_thread import ConvertThread
 from threads.google_search_thread import GoogleSearchThread
 from dtos.gui_dto import GUIDto
+from playsound import playsound
 
 
 class SynonymMultipleConvertTab(QWidget):
@@ -167,6 +168,9 @@ class SynonymMultipleConvertTab(QWidget):
         self.convert_start_button.setDisabled(False)
         self.convert_stop_button.setDisabled(True)
         print(f"thread_is_running: {self.convert_thread.isRunning()}")
+        if self.system_sound_checkbox.isChecked():
+            print("알림음")
+            playsound(r"D:\Consolework\tistory-convert-new\assets\thread_finished_sound.mp3")
 
     def open_save_path_button_clicked(self):
         if self.convert_path.text() == "":
@@ -233,6 +237,9 @@ class SynonymMultipleConvertTab(QWidget):
         self.google_search_start_button.setDisabled(False)
         self.google_search_stop_button.setDisabled(True)
         print(f"thread_is_running: {self.google_search_thread.isRunning()}")
+        if self.system_sound_checkbox.isChecked():
+            print("알림음")
+            playsound(r"D:\Consolework\tistory-convert-new\assets\thread_finished_sound.mp3")
 
     # 메인 UI
     def initUI(self):
@@ -336,6 +343,14 @@ class SynonymMultipleConvertTab(QWidget):
         google_search_start_stop_inner_layout.addWidget(self.open_save_path_button)
         google_search_start_stop_groupbox.setLayout(google_search_start_stop_inner_layout)
 
+        # 작업 완료 시 작동하는 그룹박스
+        system_down_groupbox = QGroupBox("작업 완료 시 설정")
+        self.system_sound_checkbox = QCheckBox("작업 완료 시 알림")
+
+        system_down_inner_layout = QHBoxLayout()
+        system_down_inner_layout.addWidget(self.system_sound_checkbox)
+        system_down_groupbox.setLayout(system_down_inner_layout)
+
         # 로그 그룹박스
         log_groupbox = QGroupBox("로그")
         self.browser = QTextBrowser()
@@ -361,6 +376,10 @@ class SynonymMultipleConvertTab(QWidget):
         lowest_layout.addWidget(convert_start_stop_groupbox)
         lowest_layout.addWidget(google_search_start_stop_groupbox)
 
+        system_down_layout = QHBoxLayout()
+        system_down_layout.addWidget(system_down_groupbox, 5)
+        system_down_layout.addStretch(5)
+
         log_layout = QHBoxLayout()
         log_layout.addWidget(log_groupbox)
 
@@ -368,6 +387,7 @@ class SynonymMultipleConvertTab(QWidget):
         left_layout.addLayout(top_layout)
         left_layout.addLayout(mid_layout)
         left_layout.addLayout(bottom_layout)
+        left_layout.addLayout(system_down_layout)
         left_layout.addLayout(lowest_layout)
 
         right_layout = QVBoxLayout()
