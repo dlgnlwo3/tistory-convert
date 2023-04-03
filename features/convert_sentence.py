@@ -32,7 +32,9 @@ def convert_sentence(sentence: str, synonym_list: list):
 
 
 # 일방향 문장을 변환합니다.
-def convert_one_way_sentence(sentence: str, before_word: str, synonym_list: list, used_synonym_list: list):
+def convert_one_way_sentence(
+    sentence: str, before_word: str, synonym_list: list, used_synonym_list: list
+):
     before_word_count = sentence.count(before_word)
     before_synonym = ""
 
@@ -40,7 +42,9 @@ def convert_one_way_sentence(sentence: str, before_word: str, synonym_list: list
         synonym = synonym_random_select(synonym_list, before_synonym)
         index = sentence.find(before_word)
         if index >= 0:
-            sentence = sentence[:index] + sentence[index:].replace(before_word, synonym, 1)
+            sentence = sentence[:index] + sentence[index:].replace(
+                before_word, synonym, 1
+            )
             used_synonym_list.append(synonym)
         # sentence = sentence.replace(before_word, synonym)
         before_synonym = synonym
@@ -49,7 +53,12 @@ def convert_one_way_sentence(sentence: str, before_word: str, synonym_list: list
 
 
 # 양방향, 일방향 dataframe을 적용합니다.
-def convert_from_db(original_sentence: str, ban_synonym: str, df_two_way: pd.DataFrame, df_one_way: pd.DataFrame):
+def convert_from_db(
+    original_sentence: str,
+    ban_synonym: str,
+    df_two_way: pd.DataFrame,
+    df_one_way: pd.DataFrame,
+):
     if ban_synonym == "":
         ban_synonym_list = []
     else:
@@ -75,6 +84,18 @@ def convert_from_db(original_sentence: str, ban_synonym: str, df_two_way: pd.Dat
                 synonym_list = [x for x in synonym_list if x != " "]
 
                 # 기존 금지어 로직 -> 문장에 금지어가 한글자라도 포함되어있다면 생략함
+                is_contain_ban_synonym = False
+                for ban_synonym in ban_synonym_list:
+                    for syn in synonym_list:
+                        if ban_synonym.find(syn) > -1:
+                            is_contain_ban_synonym = True
+                            break
+
+                    if is_contain_ban_synonym:
+                        break
+
+                if is_contain_ban_synonym:
+                    continue
                 # if any(s in data for s in ban_synonym_list):
                 #     continue
 
@@ -88,7 +109,9 @@ def convert_from_db(original_sentence: str, ban_synonym: str, df_two_way: pd.Dat
                 if len(synonym_list) <= 1:
                     continue
 
-                sentence, synonym, is_converted = convert_sentence(sentence, synonym_list)
+                sentence, synonym, is_converted = convert_sentence(
+                    sentence, synonym_list
+                )
 
                 is_converted: bool
                 if is_converted:
@@ -131,7 +154,9 @@ def convert_from_db(original_sentence: str, ban_synonym: str, df_two_way: pd.Dat
             if len(synonym_list) <= 1:
                 continue
 
-            sentence, used_synonym_list = convert_one_way_sentence(sentence, before, synonym_list, used_synonym_list)
+            sentence, used_synonym_list = convert_one_way_sentence(
+                sentence, before, synonym_list, used_synonym_list
+            )
 
         except Exception as e:
             print(f"{before} -> {after}: {e}")
