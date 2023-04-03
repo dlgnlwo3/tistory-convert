@@ -219,15 +219,9 @@ class SynonymConvertTab(QWidget):
         # 변환할 문장
         input_sentence_groupbox = QGroupBox("문장 입력")
         self.input_sentence_textedit = QPlainTextEdit()
-        # self.input_sentence_textedit.setText(f'<span style="color : red">[RED]</span>')
-        # self.input_sentence_textedit.setText(f"그럼 이쯤에서 마치겠습니다. 감사합니다.")
-        #         self.input_sentence_textedit.setPlainText(
-        #             f"""탁해지거나 유발하는 것이 효과적이어서 감소하고 감소시켜 낮추어 줍니다. 그런 분이 많이 계신 것 같은데 그것에 대해선 해볼 수 있는 원인인 찬 성질 뿐만 아니라 요즘 들어 인스타에 각종 이슈로 인해서 많은 도움과 다양한 아이들도 좋아했답니다.
-
-        # 노래를 부릅니다. 불을 킵니다. 쳐보겠습니다. 서로 돕는 것이 좋아요. 비가 왔습니다. 그럼 이만 마치겠습니다. 그렇지 않습니다. 합성한 사진이 증가시키는 것이 풀어주어 생기게 됩니다.
-
-        # 밥을 먹거나 급증하고 있습니다. 그것은 조심해야 합니다. 우리가 해볼 수 있는 맑게하고 유지해 과다 섭취하지 않도록 현재는 예로부터 다양한 더욱더 좋습니다."""
-        #         )
+        self.input_sentence_textedit.setPlainText(
+            f"""판매하고 있다고 합니다. 보고돼요. 마치도록 하겠습니다. 확인할 수 있습니다. 알아볼게요. 드리도록 할게요. 많다고 해요. 얻게 됩니다. 것 입니다. 높다고 합니다. 강하게 만들고 낮추어 생길 수 있을 뿐만 아니라 강하게 만들고 있습니다."""
+        )
 
         self.convert_sentence_button = QPushButton("변환하기")
         self.convert_sentence_button.clicked.connect(self.convert_sentence_button_clicked)
