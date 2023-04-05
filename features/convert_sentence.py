@@ -71,7 +71,6 @@ def convert_from_db(
 
         for data in data_list:
             try:
-                # data = str(row["data"])
                 data = str(data)
                 synonym_list = data.split("=")
 
@@ -79,11 +78,17 @@ def convert_from_db(
                 synonym_list = [x for x in synonym_list if x != ""]
                 synonym_list = [x for x in synonym_list if x != " "]
 
-                # 기존 금지어 로직 -> 문장에 금지어가 한글자라도 포함되어있다면 생략함
+                # 금지어 로직
                 is_contain_ban_synonym = False
                 for ban_synonym in ban_synonym_list:
                     for syn in synonym_list:
-                        if ban_synonym.find(syn) > -1:
+                        # 변환할 문장/단어에 금지어가 한글자라도 포함되어있다면 생략함
+                        # if ban_synonym.find(syn) > -1:
+                        #     is_contain_ban_synonym = True
+                        #     break
+
+                        # 변환할 문장/단어가 금지어와 완전히 일치하면 생략함
+                        if ban_synonym == syn:
                             is_contain_ban_synonym = True
                             break
 
@@ -92,16 +97,13 @@ def convert_from_db(
 
                 if is_contain_ban_synonym:
                     continue
-                # if any(s in data for s in ban_synonym_list):
-                #     continue
 
                 # 신규 금지어 로직 -> 변환 리스트에서 금지어 리스트를 빼는 차집합 방식
                 # 너무 많이 빼다보니 유의어 리스트가 없어서 오류가 발생할 수 있음.
                 # Cannot choose from an empty sequence
                 synonym_list = list(set(synonym_list) - set(ban_synonym_list))
 
-                # 구분자만 입력한 배열은 넘김
-                # 리스트가 1개만 있다면 넘김 (변환 할 필요가 없음)
+                # 리스트가 1개 이하라면 넘김 (변환 할 필요가 없음)
                 if len(synonym_list) <= 1:
                     continue
 
@@ -139,9 +141,8 @@ def convert_from_db(
             # Cannot choose from an empty sequence
             synonym_list = list(set(synonym_list) - set(ban_synonym_list))
 
-            # 구분자만 입력한 배열은 넘김
-            # 리스트가 1개만 있다면 넘김 (변환 할 필요가 없음)
-            if len(synonym_list) <= 1:
+            # 리스트에 아무것도 없다면 생략함
+            if len(synonym_list) <= 0:
                 continue
 
             sentence, used_synonym_list = convert_one_way_sentence(sentence, before, synonym_list, used_synonym_list)
@@ -150,6 +151,9 @@ def convert_from_db(
             print(f"{before} -> {after}: {e}")
             raise Exception(f"{before} -> {after}: {e}")
             continue
+
+    # 유의어 리스트 중 단어의 길이가 긴 순서부터 차례로 앞쪽에 정렬
+    used_synonym_list = sorted(used_synonym_list, key=len, reverse=True)
 
     return sentence, used_synonym_list
 

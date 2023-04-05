@@ -17,7 +17,7 @@ class SynonymFile:
         return {"before": str, "after": str}
 
     def two_way_data_type(self):
-        return {"data": str}
+        return {"data1": str, "data2": str}
 
     def initData(self):
         self.filepath = os.path.normpath(self.filepath)

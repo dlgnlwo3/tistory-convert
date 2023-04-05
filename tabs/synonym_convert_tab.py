@@ -219,9 +219,23 @@ class SynonymConvertTab(QWidget):
         # 변환할 문장
         input_sentence_groupbox = QGroupBox("문장 입력")
         self.input_sentence_textedit = QPlainTextEdit()
-        self.input_sentence_textedit.setPlainText(
-            f"""판매하고 있다고 합니다. 보고돼요. 마치도록 하겠습니다. 확인할 수 있습니다. 알아볼게요. 드리도록 할게요. 많다고 해요. 얻게 됩니다. 것 입니다. 높다고 합니다. 강하게 만들고 낮추어 생길 수 있을 뿐만 아니라 강하게 만들고 있습니다."""
-        )
+        #         self.input_sentence_textedit.setPlainText(
+        #             f"""덕분에 사과 효과가 있고 건강에도 좋습니다.사과 효능 기사를 차근차근 읽어보면서 건강한 정보를 얻을 수 있기를 바랍니다.
+
+        # 사과란?
+        # 새콤 달콤하고 상큼한 맛과 향이 일품인 사과는 하루에 사과 한 개면 의사가 필요 없다 라는 영국 속담이 있을 만큼 영양성분이 풍부하며 많은 사람에게 널리 알려진 인기 있는 과일입니다.
+
+        # 서양인들은 ”사과가 익는 계절이면 사람이 건강해진다“ 고 믿어 ‘하루에 사과 하나 먹기’를 권장합니다.
+
+        # 아침에 먹는 사과는 금사과라는 말이 있듯이 아침에 먹는 사과는 사과의 유기산 성분이 위의 활동을 촉진해 위액 분비와 소화흡수를 도와주기 때문에 활기찬 하루를 시작할 수 있도록 도와줍니다.
+
+        # 특히 사과 껍질에는 식이섬유인 펙틴을 비롯하여 각종 영양소가 풍부하기 때문에 사과를 깎지 않고 껍질째 먹는 것이 건강에 더욱 효과적입니다.
+
+        # 1.사과 효능 - 폐암 예방
+        # 사과의 비타민과 파이토케미컬(phytochemical) 성분은 폐에 쌓인 독성 물질을 분해해서 몸 밖으로 배출해주는 사과 효능이 있다.
+
+        # 사과의 플라보노이드(flavonoid ) 성분이 활성산소(reactive oxygen species)를 제거해 세포의 손상을 막고 재생을 빠르게 도와 폐암(lung cancer)을 예방하는 사과 효능이 이다."""
+        #         )
 
         self.convert_sentence_button = QPushButton("변환하기")
         self.convert_sentence_button.clicked.connect(self.convert_sentence_button_clicked)
