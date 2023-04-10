@@ -91,6 +91,7 @@ class FileConvert:
     # 전체작업 시작
     def work_start(self):
         print(f"file converter: work_start {self.run_time}")
+        print(f"poster_option: {self.guiDto.poster_option}")
 
         file: str
         for i, file in enumerate(self.guiDto.convert_list):
@@ -108,11 +109,14 @@ class FileConvert:
 
             print(original_sentence)
 
-            # 파일 저장
-            if self.guiDto.convert_format == "txt":
-                self.sentence_to_txt(file.rstrip(file_format), original_sentence)
-            elif self.guiDto.convert_format == "docx":
-                self.sentence_to_docx(file.rstrip(file_format), original_sentence)
+            if not self.guiDto.poster_option:
+                # 파일 저장
+                if self.guiDto.convert_format == "txt":
+                    self.sentence_to_txt(file.rstrip(file_format), original_sentence)
+                elif self.guiDto.convert_format == "docx":
+                    self.sentence_to_docx(file.rstrip(file_format), original_sentence)
+            elif self.guiDto.poster_option:
+                print("포스터용")
 
 
 if __name__ == "__main__":

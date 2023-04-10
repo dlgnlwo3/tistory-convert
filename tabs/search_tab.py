@@ -387,7 +387,7 @@ class SearchTab(QWidget):
         self.daum_remove_button.clicked.connect(self.daum_remove_button_clicked)
 
         daum_button_inner_layout = QHBoxLayout()
-        daum_button_inner_layout.addWidget(self.refresh_daum_button)
+        # daum_button_inner_layout.addWidget(self.refresh_daum_button)
         daum_button_inner_layout.addWidget(self.daum_save_button)
         daum_button_inner_layout.addWidget(self.daum_remove_button)
         daum_button_groupbox.setLayout(daum_button_inner_layout)
@@ -420,7 +420,7 @@ class SearchTab(QWidget):
         self.remove_google_button.clicked.connect(self.google_remove_button_clicked)
 
         google_button_inner_layout = QHBoxLayout()
-        google_button_inner_layout.addWidget(self.refresh_google_button)
+        # google_button_inner_layout.addWidget(self.refresh_google_button)
         google_button_inner_layout.addWidget(self.add_google_button)
         google_button_inner_layout.addWidget(self.remove_google_button)
         google_button_groupbox.setLayout(google_button_inner_layout)

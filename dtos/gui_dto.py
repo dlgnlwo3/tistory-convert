@@ -49,6 +49,9 @@ class GUIDto:
         # 작업 완료 시 설정
         self.__system_sound_checkbox = bool
 
+        # 포스터용으로 변환하기
+        self.__poster_option = bool
+
     @property
     def daum_keyword_list(self):  # getter
         return self.__daum_keyword_list
@@ -246,3 +249,12 @@ class GUIDto:
     @system_sound_checkbox.setter
     def system_sound_checkbox(self, value):  # setter
         self.__system_sound_checkbox = value
+
+    # 포스터용으로 변환하기
+    @property
+    def poster_option(self):  # getter
+        return self.__poster_option
+
+    @poster_option.setter
+    def poster_option(self, value):  # setter
+        self.__poster_option = value

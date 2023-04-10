@@ -145,6 +145,17 @@ def convert_from_db(
             if len(synonym_list) <= 0:
                 continue
 
+            # 리스트에 1개만 있다면 그 단어로 치환함
+            elif len(synonym_list) == 1:
+                synonym = random.choice(synonym_list)
+                before_word_count = sentence.count(before)
+                for i in range(before_word_count):
+                    index = sentence.find(before)
+                    if index >= 0:
+                        sentence = sentence[:index] + sentence[index:].replace(before, synonym, 1)
+                        used_synonym_list.append(synonym)
+                continue
+
             sentence, used_synonym_list = convert_one_way_sentence(sentence, before, synonym_list, used_synonym_list)
 
         except Exception as e:
