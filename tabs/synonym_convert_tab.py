@@ -83,6 +83,7 @@ class SynonymConvertTab(QWidget):
                 QMessageBox.information(self, "오류 발생", f"[{str(e)[:str(e).find(':')]}] 유의어 데이터를 확인해주세요. \n{e}")
                 return
 
+        # 문장 색상 적용
         sentence = self.compare_text(sentence, used_synonym_list)
 
         # 문단 랜덤 섞기 체크 시
@@ -109,6 +110,23 @@ class SynonymConvertTab(QWidget):
         print(sentence)
         self.result_sentence_textedit.clear()
         self.result_sentence_textedit.setText(sentence)
+
+        # # 배경색 적용
+        # # 문단 섞기, 머리글 등 위치가 바뀌기 때문에 사용이 불가능함
+        # # QTextCharFormat 생성 및 설정
+        # highlight_format = QTextCharFormat()
+        # highlight_format.setBackground(Qt.yellow)
+
+        # # 단어별로 QTextCharFormat 적용
+        # cursor = self.result_sentence_textedit.textCursor()
+        # document = self.result_sentence_textedit.document()
+        # for word in used_synonym_list:
+        #     index = sentence.find(word)
+        #     while index >= 0:
+        #         cursor.setPosition(index)
+        #         cursor.movePosition(QTextCursor.EndOfWord, 1)
+        #         cursor.mergeCharFormat(highlight_format)
+        #         index = sentence.find(word, index + 1)
 
     def retry_sentence_button_clicked(self):
         print("retry_sentence_button_clicked")
@@ -158,6 +176,9 @@ class SynonymConvertTab(QWidget):
         print(used_synonym_list)
 
         print(sentence)
+
+        # 태그를 제외한 문장을 추출하는 정규식 (사용x)
+        # sentence = re.sub("<[^<]+?>", "", sentence)
 
         for used_synonym in used_synonym_list:
             sentence = sentence.replace(used_synonym, f'<span style="color : red">{used_synonym}</span>')

@@ -101,7 +101,7 @@ def convert_from_db(
                 # 신규 금지어 로직 -> 변환 리스트에서 금지어 리스트를 빼는 차집합 방식
                 # 너무 많이 빼다보니 유의어 리스트가 없어서 오류가 발생할 수 있음.
                 # Cannot choose from an empty sequence
-                synonym_list = list(set(synonym_list) - set(ban_synonym_list))
+                # synonym_list = list(set(synonym_list) - set(ban_synonym_list))
 
                 # 리스트가 1개 이하라면 넘김 (변환 할 필요가 없음)
                 if len(synonym_list) <= 1:
@@ -139,7 +139,7 @@ def convert_from_db(
             # 신규 금지어 로직 -> 변환 리스트에서 금지어 리스트를 빼는 차집합 방식
             # 너무 많이 빼다보니 유의어 리스트가 없어서 오류가 발생할 수 있음.
             # Cannot choose from an empty sequence
-            synonym_list = list(set(synonym_list) - set(ban_synonym_list))
+            # synonym_list = list(set(synonym_list) - set(ban_synonym_list))
 
             # 리스트에 아무것도 없다면 생략함
             if len(synonym_list) <= 0:
@@ -203,14 +203,10 @@ def insert_footer_to_sentence(sentence: str, footer: str, convert_keyword: str):
 
 # 테스트용 코드
 
-# sentence = "폐어망·폐생수통이 '갤럭시 S23'으로 화려하게 변신"
+origin_sentence = "이걸 어케 만드노"
 
-# ban_synonym = '화려하게'
+origin_sentence_list = list(origin_sentence)
 
-# synonym_data = "수려하게,유려하게,아름답게,화려하게"
+origin_sentence_dict = {i + 1: word for i, word in enumerate(origin_sentence_list)}
 
-# synonym_list = synonym_data.split(",")
-
-# sentence = convert_sentence(sentence, synonym_list)
-
-# print(sentence)
+print(origin_sentence_dict)
