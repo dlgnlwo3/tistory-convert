@@ -83,14 +83,14 @@ def convert_from_db(
                 for ban_synonym in ban_synonym_list:
                     for syn in synonym_list:
                         # 변환할 문장/단어에 금지어가 한글자라도 포함되어있다면 생략함
-                        # if ban_synonym.find(syn) > -1:
-                        #     is_contain_ban_synonym = True
-                        #     break
-
-                        # 변환할 문장/단어가 금지어와 완전히 일치하면 생략함
-                        if ban_synonym == syn:
+                        if ban_synonym.find(syn) > -1:
                             is_contain_ban_synonym = True
                             break
+
+                        # 변환할 문장/단어가 금지어와 완전히 일치하면 생략함
+                        # if ban_synonym == syn:
+                        #     is_contain_ban_synonym = True
+                        #     break
 
                     if is_contain_ban_synonym:
                         break
