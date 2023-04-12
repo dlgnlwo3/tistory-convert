@@ -61,6 +61,41 @@ class FileConvert:
 
         self.log_msg.emit(f"{file_name}.txt 저장 완료")
 
+    # 포스터 워드 저장
+    def poster_sentence_to_docx(self, file_name: str, sentence: str):
+        save_path = os.path.join(self.guiDto.convert_path, f"파일 변환 {self.run_time}")
+
+        if os.path.isdir(save_path) == False:
+            os.mkdir(save_path)
+        else:
+            pass
+
+        sentence_docx = os.path.join(save_path, f"{file_name}.docx")
+
+        doc = Document()
+
+        doc.add_paragraph(sentence)
+
+        doc.save(sentence_docx)
+
+        self.log_msg.emit(f"{file_name}.docx 저장 완료")
+
+    # 포스터 메모장 저장
+    def poster_sentence_to_txt(self, file_name: str, sentence: str):
+        save_path = os.path.join(self.guiDto.convert_path, f"파일 변환 {self.run_time}")
+
+        if os.path.isdir(save_path) == False:
+            os.mkdir(save_path)
+        else:
+            pass
+
+        sentence_txt = os.path.join(save_path, f"{file_name}.txt")
+
+        with open(sentence_txt, "w", encoding="utf-8") as f:
+            f.write(sentence)
+
+        self.log_msg.emit(f"{file_name}.txt 저장 완료")
+
     def get_sentence_from_file(self, file_path: str):
         sentence = ""
 
@@ -117,6 +152,11 @@ class FileConvert:
                     self.sentence_to_docx(file.rstrip(file_format), original_sentence)
             elif self.guiDto.poster_option:
                 print("포스터용")
+                # 티스토리 포스터용으로 변환하기
+                if self.guiDto.convert_format == "txt":
+                    self.poster_sentence_to_txt(file.rstrip(file_format), original_sentence)
+                elif self.guiDto.convert_format == "docx":
+                    self.poster_sentence_to_docx(file.rstrip(file_format), original_sentence)
 
 
 if __name__ == "__main__":

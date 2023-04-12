@@ -203,7 +203,7 @@ def insert_footer_to_sentence(sentence: str, footer: str, convert_keyword: str):
 
 # 테스트용 코드
 
-origin_sentence = "이걸 어케 만드노"
+origin_sentence = "예시문장"
 
 origin_sentence_list = list(origin_sentence)
 
