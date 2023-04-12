@@ -15,6 +15,11 @@ from common.utils import *
 from config import *
 import collections
 
+import pandas as pd
+import io
+import numpy as np
+import win32clipboard
+
 
 class SearchTab(QWidget):
     # 초기화
@@ -207,10 +212,32 @@ class SearchTab(QWidget):
         self.google_keyword_list_tablewidget.setSelectionMode(QAbstractItemView.MultiSelection)
 
     def refresh_daum_button_clicked(self):
+        # self.refresh_save_file()
+        # self.set_daum_keyword_list_tablewidget()
+        win32clipboard.OpenClipboard()
+        clipboard_data: str = win32clipboard.GetClipboardData()
+        win32clipboard.CloseClipboard()
+        df_clipboard = pd.read_csv(io.StringIO(clipboard_data), delimiter="\t", header=None)
+        clipboard_list = df_clipboard[0].values
+        print(clipboard_list)
+        self.saved_data_daum[SaveFileDaum.DAUM.value].extend(clipboard_list)
+        dict_save = {SaveFileDaum.DAUM.value: self.saved_data_daum[SaveFileDaum.DAUM.value]}
+        write_save_data_daum(dict_save)
         self.refresh_save_file()
         self.set_daum_keyword_list_tablewidget()
 
     def refresh_google_button_clicked(self):
+        # self.refresh_save_file()
+        # self.set_google_keyword_list_tablewidget()
+        win32clipboard.OpenClipboard()
+        clipboard_data: str = win32clipboard.GetClipboardData()
+        win32clipboard.CloseClipboard()
+        df_clipboard = pd.read_csv(io.StringIO(clipboard_data), delimiter="\t", header=None)
+        clipboard_list = df_clipboard[0].values
+        print(clipboard_list)
+        self.saved_data_google[SaveFileGoogle.GOOGLE.value].extend(clipboard_list)
+        dict_save = {SaveFileGoogle.GOOGLE.value: self.saved_data_google[SaveFileGoogle.GOOGLE.value]}
+        write_save_data_google(dict_save)
         self.refresh_save_file()
         self.set_google_keyword_list_tablewidget()
 
@@ -378,7 +405,7 @@ class SearchTab(QWidget):
 
         # 다음 버튼 그룹박스
         daum_button_groupbox = QGroupBox("글 수집 키워드 추가")
-        self.refresh_daum_button = QPushButton("목록 새로 고침")
+        self.refresh_daum_button = QPushButton("클립보드 내용 추가")
         self.daum_save_button = QPushButton("키워드 추가")
         self.daum_remove_button = QPushButton("키워드 제거")
 
@@ -387,7 +414,7 @@ class SearchTab(QWidget):
         self.daum_remove_button.clicked.connect(self.daum_remove_button_clicked)
 
         daum_button_inner_layout = QHBoxLayout()
-        # daum_button_inner_layout.addWidget(self.refresh_daum_button)
+        daum_button_inner_layout.addWidget(self.refresh_daum_button)
         daum_button_inner_layout.addWidget(self.daum_save_button)
         daum_button_inner_layout.addWidget(self.daum_remove_button)
         daum_button_groupbox.setLayout(daum_button_inner_layout)
@@ -411,7 +438,7 @@ class SearchTab(QWidget):
 
         # 구글 버튼 그룹박스
         google_button_groupbox = QGroupBox(f"이미지 수집 키워드 추가")
-        self.refresh_google_button = QPushButton("목록 새로 고침")
+        self.refresh_google_button = QPushButton("클립보드 내용 추가")
         self.add_google_button = QPushButton("키워드 추가")
         self.remove_google_button = QPushButton("키워드 제거")
 
@@ -420,7 +447,7 @@ class SearchTab(QWidget):
         self.remove_google_button.clicked.connect(self.google_remove_button_clicked)
 
         google_button_inner_layout = QHBoxLayout()
-        # google_button_inner_layout.addWidget(self.refresh_google_button)
+        google_button_inner_layout.addWidget(self.refresh_google_button)
         google_button_inner_layout.addWidget(self.add_google_button)
         google_button_inner_layout.addWidget(self.remove_google_button)
         google_button_groupbox.setLayout(google_button_inner_layout)
