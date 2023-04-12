@@ -220,6 +220,17 @@ class SearchTab(QWidget):
         df_clipboard = pd.read_csv(io.StringIO(clipboard_data), delimiter="\t", header=None)
         clipboard_list = df_clipboard[0].values
         print(clipboard_list)
+
+        quit_msg = f"클립보드에 있는 {len(clipboard_list)}개의 키워드를 추가하시겠습니까?"
+        reply = QMessageBox.question(self, "클립보드 내용 추가", quit_msg, QMessageBox.Yes, QMessageBox.No)
+
+        if reply == QMessageBox.Yes:
+            print(f"추가")
+
+        else:
+            print(f"취소")
+            return
+
         self.saved_data_daum[SaveFileDaum.DAUM.value].extend(clipboard_list)
         dict_save = {SaveFileDaum.DAUM.value: self.saved_data_daum[SaveFileDaum.DAUM.value]}
         write_save_data_daum(dict_save)
@@ -235,6 +246,17 @@ class SearchTab(QWidget):
         df_clipboard = pd.read_csv(io.StringIO(clipboard_data), delimiter="\t", header=None)
         clipboard_list = df_clipboard[0].values
         print(clipboard_list)
+
+        quit_msg = f"클립보드에 있는 {len(clipboard_list)}개의 키워드를 추가하시겠습니까?"
+        reply = QMessageBox.question(self, "클립보드 내용 추가", quit_msg, QMessageBox.Yes, QMessageBox.No)
+
+        if reply == QMessageBox.Yes:
+            print(f"추가")
+
+        else:
+            print(f"취소")
+            return
+
         self.saved_data_google[SaveFileGoogle.GOOGLE.value].extend(clipboard_list)
         dict_save = {SaveFileGoogle.GOOGLE.value: self.saved_data_google[SaveFileGoogle.GOOGLE.value]}
         write_save_data_google(dict_save)
