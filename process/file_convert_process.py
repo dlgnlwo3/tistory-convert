@@ -63,14 +63,21 @@ class FileConvert:
 
     # 포스터 워드 저장
     def poster_sentence_to_docx(self, file_name: str, sentence: str):
-        save_path = os.path.join(self.guiDto.convert_path, f"파일 변환 {self.run_time}")
+        save_path = os.path.join(self.guiDto.convert_path, f"포스터용 변환 {self.run_time}")
 
         if os.path.isdir(save_path) == False:
             os.mkdir(save_path)
         else:
             pass
 
-        sentence_docx = os.path.join(save_path, f"{file_name}.docx")
+        file_path = os.path.join(save_path, file_name)
+
+        if os.path.isdir(file_path) == False:
+            os.mkdir(file_path)
+        else:
+            pass
+
+        sentence_docx = os.path.join(file_path, f"{file_name}.docx")
 
         doc = Document()
 
@@ -82,14 +89,21 @@ class FileConvert:
 
     # 포스터 메모장 저장
     def poster_sentence_to_txt(self, file_name: str, sentence: str):
-        save_path = os.path.join(self.guiDto.convert_path, f"파일 변환 {self.run_time}")
+        save_path = os.path.join(self.guiDto.convert_path, f"포스터용 변환 {self.run_time}")
 
         if os.path.isdir(save_path) == False:
             os.mkdir(save_path)
         else:
             pass
 
-        sentence_txt = os.path.join(save_path, f"{file_name}.txt")
+        file_path = os.path.join(save_path, file_name)
+
+        if os.path.isdir(file_path) == False:
+            os.mkdir(file_path)
+        else:
+            pass
+
+        sentence_txt = os.path.join(file_path, f"{file_name}.txt")
 
         with open(sentence_txt, "w", encoding="utf-8") as f:
             f.write(sentence)
