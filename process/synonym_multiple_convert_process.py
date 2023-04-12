@@ -123,8 +123,6 @@ class SynonymMultipleConvert:
             # 파일에서 문자열 획득
             original_sentence = self.get_sentence_from_file(file_path)
 
-            print(original_sentence.find("\n"))
-
             # 횟수 제한 기능
             for limit in range(1, self.guiDto.synonym_convert_limit + 1):
                 print(limit)
@@ -161,8 +159,6 @@ class SynonymMultipleConvert:
                     sentence = insert_footer_to_sentence(
                         sentence, footer, convert_keyword=file.rstrip(file_format)
                     )
-
-                # print(sentence)
 
                 # 문자열 파일 저장
                 self.sentence_to_docx(

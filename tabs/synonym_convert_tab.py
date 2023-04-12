@@ -264,14 +264,14 @@ class SynonymConvertTab(QWidget):
         # 변환할 문장
         input_sentence_groupbox = QGroupBox("문장 입력")
         self.input_sentence_textedit = QPlainTextEdit()
-        self.input_sentence_textedit.setPlainText(
-            f"""그룹 BTS 정국이 3년 전 매입한 서울 이태원동 소재 2층짜리 단독 주택을 허물고 그 자리에 새 저택을 짓고 있다.
-5일 머니투데이에 따르면 정국은 지난해 7월 용산구청으로부터 이태원동에 있는 단독주택에 대한 신축 허가를 받았다. 정국은 지난 2020년 12월 이태원동에 위치한 주택을 76억3000만원에 매입했다.
-정국이 짓는 단독주택은 지하 2층-지상 3층 규모로 약 1160제곱미터(약 351평)에 달하는 대저택으로 알려졌다. 대지 면적은 633.05㎡(191평), 건축면적은 348.05㎡(105평)이다. 현재 기초 공사 중으로 완공 예정일은 오는 2024년 5월 31일이다.
-그가 짓고 있는 이태원동은 삼성그룹 오너, 최태원(SK그룹 회장), 이명희(신세계그룹 회장) 등이 살고 있는 곳으로 알려졌다."""
-        )
+        #         self.input_sentence_textedit.setPlainText(
+        #             f"""그룹 BTS 정국이 3년 전 매입한 서울 이태원동 소재 2층짜리 단독 주택을 허물고 그 자리에 새 저택을 짓고 있다.
+        # 5일 머니투데이에 따르면 정국은 지난해 7월 용산구청으로부터 이태원동에 있는 단독주택에 대한 신축 허가를 받았다. 정국은 지난 2020년 12월 이태원동에 위치한 주택을 76억3000만원에 매입했다.
+        # 정국이 짓는 단독주택은 지하 2층-지상 3층 규모로 약 1160제곱미터(약 351평)에 달하는 대저택으로 알려졌다. 대지 면적은 633.05㎡(191평), 건축면적은 348.05㎡(105평)이다. 현재 기초 공사 중으로 완공 예정일은 오는 2024년 5월 31일이다.
+        # 그가 짓고 있는 이태원동은 삼성그룹 오너, 최태원(SK그룹 회장), 이명희(신세계그룹 회장) 등이 살고 있는 곳으로 알려졌다."""
+        #         )
 
-        self.input_sentence_textedit.setPlainText("바나나 효능이 좋습니다.")
+        # self.input_sentence_textedit.setPlainText("바나나 효능이 좋습니다.")
 
         self.convert_sentence_button = QPushButton("변환하기")
         self.convert_sentence_button.clicked.connect(
