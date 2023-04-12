@@ -5,9 +5,9 @@ from datetime import datetime
 import os
 from config import LOG_FOLDER_PATH
 
+
 # 전역 로그
 def global_log_append(text):
-
     text = str(text)
 
     today = str(datetime.now())[0:10]
@@ -32,3 +32,10 @@ def global_log_append(text):
 def random_delay(start, end):
     x = random.randint(start, end)
     time.sleep(x)
+
+
+def check_common_element(list1, list2):
+    set1 = set(list1)
+    set2 = set(list2)
+    intersection = set1 & set2
+    return len(intersection) > 0

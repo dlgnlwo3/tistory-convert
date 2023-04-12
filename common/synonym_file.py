@@ -23,19 +23,23 @@ class SynonymFile:
         self.filepath = os.path.normpath(self.filepath)
         self.filename = os.path.basename(self.filepath)
 
-        two_way_columns = self.two_way_data_type()
+        # two_way_columns = self.two_way_data_type()
         try:
-            self.df_two_way = pd.read_excel(
-                self.filepath, converters=two_way_columns, sheet_name="양방향", keep_default_na=""
+            self.df_two_way: pd.DataFrame = pd.read_excel(
+                self.filepath, sheet_name="양방향", keep_default_na=""
             )
-            self.df_two_way = self.df_two_way.loc[:, list(two_way_columns.keys())]
+            self.df_two_way = self.df_two_way.astype(str)
+            # self.df_two_way = self.df_two_way.loc[:, list(two_way_columns.keys())]
         except Exception as e:
             print(e)
 
         one_way_columns = self.one_way_data_type()
         try:
             self.df_one_way = pd.read_excel(
-                self.filepath, converters=one_way_columns, sheet_name="일방향", keep_default_na=""
+                self.filepath,
+                converters=one_way_columns,
+                sheet_name="일방향",
+                keep_default_na="",
             )
             self.df_one_way = self.df_one_way.loc[:, list(one_way_columns.keys())]
         except Exception as e:

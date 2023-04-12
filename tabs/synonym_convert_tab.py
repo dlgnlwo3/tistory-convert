@@ -29,6 +29,14 @@ class SynonymConvertTab(QWidget):
         super().__init__()
         self.initUI()
 
+    def dict_sentence_to_red_sentence(self, dict_sentence: dict, used_idx_list: list):
+        for sentence_i in dict_sentence.keys():
+            to_sentence = dict_sentence[sentence_i]
+            if sentence_i in used_idx_list:
+                to_sentence = f'<span style="color : red">{to_sentence}</span>'
+            dict_sentence.update({sentence_i: to_sentence})
+        return "".join(dict_sentence.values())
+
     def convert_sentence_button_clicked(self):
         # 값이 입력되어있는지 확인
         if self.input_sentence_textedit.toPlainText() == "":
@@ -37,7 +45,10 @@ class SynonymConvertTab(QWidget):
 
         # 치환 키워드
         convert_keyword = self.convert_keyword_input.text()
-        if self.header_select_checkbox.isChecked() or self.footer_select_checkbox.isChecked():
+        if (
+            self.header_select_checkbox.isChecked()
+            or self.footer_select_checkbox.isChecked()
+        ):
             if self.convert_keyword_input.text() == "":
                 print("치환 키워드 필수 입력")
                 QMessageBox.information(self, "작업 시작", f"치환 키워드를 입력해주세요.")
@@ -52,7 +63,9 @@ class SynonymConvertTab(QWidget):
             QMessageBox.information(self, "작업 시작", f"엑셀DB 파일을 설정해주세요.")
             return
         else:
-            search_file_save_path = self.saved_data_synonym[SaveFileSYNONYM.SYNONYM_FILE_SAVE_PATH.value]
+            search_file_save_path = self.saved_data_synonym[
+                SaveFileSYNONYM.SYNONYM_FILE_SAVE_PATH.value
+            ]
 
         # 파일 유효성 검사
         if not os.path.isfile(search_file_save_path):
@@ -73,18 +86,23 @@ class SynonymConvertTab(QWidget):
         ban_synonym = self.ban_synonym_input.text()
 
         # 원본 텍스트
-        original_sentence = self.input_sentence_textedit.toPlainText()
+        sentence = self.input_sentence_textedit.toPlainText()
 
         # 변환 작업
         try:
-            sentence, used_synonym_list = convert_from_db(original_sentence, ban_synonym, df_two_way, df_one_way)
+            dict_sentence, used_idx_list = convert_from_db(
+                sentence, ban_synonym, df_two_way, df_one_way
+            )
+            sentence = self.dict_sentence_to_red_sentence(dict_sentence, used_idx_list)
+
         except Exception as e:
             if str(e).find("Cannot choose from an empty sequence") > -1:
-                QMessageBox.information(self, "오류 발생", f"[{str(e)[:str(e).find(':')]}] 유의어 데이터를 확인해주세요. \n{e}")
+                QMessageBox.information(
+                    self,
+                    "오류 발생",
+                    f"[{str(e)[:str(e).find(':')]}] 유의어 데이터를 확인해주세요. \n{e}",
+                )
                 return
-
-        # 문장 색상 적용
-        sentence = self.compare_text(sentence, used_synonym_list)
 
         # 문단 랜덤 섞기 체크 시
         if self.shuffle_paragraphs_checkbox.isChecked():
@@ -181,7 +199,9 @@ class SynonymConvertTab(QWidget):
         # sentence = re.sub("<[^<]+?>", "", sentence)
 
         for used_synonym in used_synonym_list:
-            sentence = sentence.replace(used_synonym, f'<span style="color : red">{used_synonym}</span>')
+            sentence = sentence.replace(
+                used_synonym, f'<span style="color : red">{used_synonym}</span>'
+            )
 
         return sentence
 
@@ -215,7 +235,9 @@ class SynonymConvertTab(QWidget):
         header_select_inner_layout.addWidget(self.header_topic_combobox)
         header_select_groupbox.setLayout(header_select_inner_layout)
 
-        self.header_select_checkbox.stateChanged.connect(self.header_select_checkbox_changed)
+        self.header_select_checkbox.stateChanged.connect(
+            self.header_select_checkbox_changed
+        )
 
         # 맺음말 삽입
         footer_select_groupbox = QGroupBox()
@@ -227,7 +249,9 @@ class SynonymConvertTab(QWidget):
         footer_select_inner_layout.addWidget(self.footer_topic_combobox)
         footer_select_groupbox.setLayout(footer_select_inner_layout)
 
-        self.footer_select_checkbox.stateChanged.connect(self.footer_select_checkbox_changed)
+        self.footer_select_checkbox.stateChanged.connect(
+            self.footer_select_checkbox_changed
+        )
 
         # 치환 키워드 입력
         convert_keyword_groupbox = QGroupBox("치환 키워드 입력")
@@ -247,8 +271,12 @@ class SynonymConvertTab(QWidget):
 그가 짓고 있는 이태원동은 삼성그룹 오너, 최태원(SK그룹 회장), 이명희(신세계그룹 회장) 등이 살고 있는 곳으로 알려졌다."""
         )
 
+        self.input_sentence_textedit.setPlainText("바나나 효능이 좋습니다.")
+
         self.convert_sentence_button = QPushButton("변환하기")
-        self.convert_sentence_button.clicked.connect(self.convert_sentence_button_clicked)
+        self.convert_sentence_button.clicked.connect(
+            self.convert_sentence_button_clicked
+        )
 
         input_sentence_inner_layout = QGridLayout()
         input_sentence_inner_layout.addWidget(self.input_sentence_textedit, 0, 1, 1, 2)
@@ -265,7 +293,9 @@ class SynonymConvertTab(QWidget):
         self.copy_sentence_button.clicked.connect(self.copy_sentence_button_clicked)
 
         result_sentence_inner_layout = QGridLayout()
-        result_sentence_inner_layout.addWidget(self.result_sentence_textedit, 0, 0, 1, 2)
+        result_sentence_inner_layout.addWidget(
+            self.result_sentence_textedit, 0, 0, 1, 2
+        )
         # result_sentence_inner_layout.addWidget(self.retry_sentence_button, 1, 0, 1, 1)
         result_sentence_inner_layout.addWidget(self.copy_sentence_button, 1, 1, 1, 1)
         result_sentence_groupbox.setLayout(result_sentence_inner_layout)

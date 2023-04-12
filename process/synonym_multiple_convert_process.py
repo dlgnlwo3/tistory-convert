@@ -35,7 +35,9 @@ class SynonymMultipleConvert:
         self.log_msg = log_msg
 
     # 워드 저장
-    def sentence_to_docx(self, file_name: str, sentence: str, used_synonym_list: list, limit=""):
+    def sentence_to_docx(
+        self, file_name: str, dict_sentence: dict, used_idx_list: list, limit=""
+    ):
         save_path = os.path.join(self.guiDto.convert_path, f"유의어 변환 {self.run_time}")
 
         if os.path.isdir(save_path) == False:
@@ -47,22 +49,25 @@ class SynonymMultipleConvert:
             sentence_docx = os.path.join(save_path, f"{file_name}.docx")
         else:
             limit = str(limit)
-            sentence_docx = os.path.join(save_path, f"{file_name}_{limit.zfill(2)}.docx")
+            sentence_docx = os.path.join(
+                save_path, f"{file_name}_{limit.zfill(2)}.docx"
+            )
 
         doc = Document()
 
         paragraph = doc.add_paragraph()
 
         runs = []
-        for one_line in sentence.split("\n"):
-            for word in one_line.split():
-                run = paragraph.add_run(word + " ")
-                for used_synonym in used_synonym_list:
-                    if used_synonym in word:
-                        font = run.font
-                        font.color.rgb = RGBColor(255, 0, 0)  # 빨간색으로 설정
-                runs.append(run)
-            run = paragraph.add_run("\n")
+
+        for sentence_i in dict_sentence.keys():
+            word = dict_sentence[sentence_i]
+            run = paragraph.add_run(word)
+            if sentence_i in used_idx_list:
+                font = run.font
+                font.color.rgb = RGBColor(255, 0, 0)  # 빨간색으로 설정
+            if word == "\n":
+                run = paragraph.add_run("\n")
+            runs.append(run)
 
         # doc.add_paragraph(sentence)
 
@@ -82,7 +87,7 @@ class SynonymMultipleConvert:
             doc = Document(file_path)
             all_text = []
             for para in doc.paragraphs:
-                all_text.append(para.text)
+                all_text.append(para.text + "\n")
             for table in doc.tables:
                 for row in table.rows:
                     for cell in row.cells:
@@ -95,7 +100,6 @@ class SynonymMultipleConvert:
             with open(file_path, "r", encoding="utf-8") as f:
                 text = f.read()
                 sentence = text
-
         else:
             pass
 
@@ -119,14 +123,20 @@ class SynonymMultipleConvert:
             # 파일에서 문자열 획득
             original_sentence = self.get_sentence_from_file(file_path)
 
+            print(original_sentence.find("\n"))
+
             # 횟수 제한 기능
             for limit in range(1, self.guiDto.synonym_convert_limit + 1):
                 print(limit)
 
                 # 문자열 변환
-                sentence, used_synonym_list = convert_from_db(
-                    original_sentence, "", self.guiDto.df_two_way, self.guiDto.df_one_way
+                dict_sentence, used_idx_list = convert_from_db(
+                    original_sentence,
+                    "",
+                    self.guiDto.df_two_way,
+                    self.guiDto.df_one_way,
                 )
+                sentence = "".join(dict_sentence.values())
 
                 # 문단 랜덤 섞기 체크 시
                 if self.guiDto.shuffle_paragraphs_check:
@@ -138,7 +148,9 @@ class SynonymMultipleConvert:
                     header_topic = self.guiDto.header_topic
                     saved_data_header = get_save_data_HEADER()
                     header: str = random.choice(saved_data_header[header_topic])
-                    sentence = insert_header_to_sentence(sentence, header, convert_keyword=file.rstrip(file_format))
+                    sentence = insert_header_to_sentence(
+                        sentence, header, convert_keyword=file.rstrip(file_format)
+                    )
 
                 # 맺음말 삽입
                 footer = ""
@@ -146,12 +158,16 @@ class SynonymMultipleConvert:
                     footer_topic = self.guiDto.footer_topic
                     saved_data_footer = get_save_data_FOOTER()
                     footer: str = random.choice(saved_data_footer[footer_topic])
-                    sentence = insert_footer_to_sentence(sentence, footer, convert_keyword=file.rstrip(file_format))
+                    sentence = insert_footer_to_sentence(
+                        sentence, footer, convert_keyword=file.rstrip(file_format)
+                    )
 
                 # print(sentence)
 
                 # 문자열 파일 저장
-                self.sentence_to_docx(file.rstrip(file_format), sentence, used_synonym_list, limit)
+                self.sentence_to_docx(
+                    file.rstrip(file_format), dict_sentence, used_idx_list, limit
+                )
 
 
 if __name__ == "__main__":

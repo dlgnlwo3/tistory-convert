@@ -109,7 +109,9 @@ class SynonymMultipleConvertTab(QWidget):
             QMessageBox.information(self, "작업 시작", f"엑셀DB 파일을 설정해주세요.")
             return
         else:
-            search_file_save_path = self.saved_data_synonym[SaveFileSYNONYM.SYNONYM_FILE_SAVE_PATH.value]
+            search_file_save_path = self.saved_data_synonym[
+                SaveFileSYNONYM.SYNONYM_FILE_SAVE_PATH.value
+            ]
 
         # 파일 유효성 검사
         if not os.path.isfile(search_file_save_path):
@@ -256,7 +258,9 @@ class SynonymMultipleConvertTab(QWidget):
         self.convert_path.setDisabled(True)
         self.convert_path_select_button = QPushButton("변환할 폴더 선택")
 
-        self.convert_path_select_button.clicked.connect(self.convert_path_select_button_clicked)
+        self.convert_path_select_button.clicked.connect(
+            self.convert_path_select_button_clicked
+        )
 
         convert_path_inner_layout = QHBoxLayout()
         convert_path_inner_layout.addWidget(self.convert_path, 4)
@@ -290,7 +294,9 @@ class SynonymMultipleConvertTab(QWidget):
         header_select_inner_layout.addWidget(self.header_topic_combobox)
         header_select_groupbox.setLayout(header_select_inner_layout)
 
-        self.header_select_checkbox.stateChanged.connect(self.header_select_checkbox_changed)
+        self.header_select_checkbox.stateChanged.connect(
+            self.header_select_checkbox_changed
+        )
 
         # 맺음말 삽입
         footer_select_groupbox = QGroupBox()
@@ -302,7 +308,9 @@ class SynonymMultipleConvertTab(QWidget):
         footer_select_inner_layout.addWidget(self.footer_topic_combobox)
         footer_select_groupbox.setLayout(footer_select_inner_layout)
 
-        self.footer_select_checkbox.stateChanged.connect(self.footer_select_checkbox_changed)
+        self.footer_select_checkbox.stateChanged.connect(
+            self.footer_select_checkbox_changed
+        )
 
         # 변환 시작 중지 그룹박스
         convert_start_stop_groupbox = QGroupBox("변환하기")
@@ -313,7 +321,9 @@ class SynonymMultipleConvertTab(QWidget):
 
         self.convert_start_button.clicked.connect(self.convert_start_button_clicked)
         self.convert_stop_button.clicked.connect(self.convert_stop_button_clicked)
-        self.convert_open_save_path_button.clicked.connect(self.open_save_path_button_clicked)
+        self.convert_open_save_path_button.clicked.connect(
+            self.open_save_path_button_clicked
+        )
 
         convert_start_stop_inner_layout = QHBoxLayout()
         convert_start_stop_inner_layout.addWidget(self.convert_start_button)
@@ -328,15 +338,21 @@ class SynonymMultipleConvertTab(QWidget):
         self.google_search_stop_button.setDisabled(True)
         self.open_save_path_button = QPushButton("저장된 경로 열기")
 
-        self.google_search_start_button.clicked.connect(self.google_search_start_button_clicked)
-        self.google_search_stop_button.clicked.connect(self.google_search_stop_button_clicked)
+        self.google_search_start_button.clicked.connect(
+            self.google_search_start_button_clicked
+        )
+        self.google_search_stop_button.clicked.connect(
+            self.google_search_stop_button_clicked
+        )
         self.open_save_path_button.clicked.connect(self.open_save_path_button_clicked)
 
         google_search_start_stop_inner_layout = QHBoxLayout()
         google_search_start_stop_inner_layout.addWidget(self.google_search_start_button)
         google_search_start_stop_inner_layout.addWidget(self.google_search_stop_button)
         google_search_start_stop_inner_layout.addWidget(self.open_save_path_button)
-        google_search_start_stop_groupbox.setLayout(google_search_start_stop_inner_layout)
+        google_search_start_stop_groupbox.setLayout(
+            google_search_start_stop_inner_layout
+        )
 
         # 작업 완료 시 작동하는 그룹박스
         system_down_groupbox = QGroupBox("작업 완료 시 설정")
