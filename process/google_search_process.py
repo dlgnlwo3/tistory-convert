@@ -133,9 +133,20 @@ class GoogleSearch:
                 #     By.XPATH, '//c-wiz//div[@role="region"]//img[contains(@src, "http")]'
                 # ).get_attribute("src")
 
+                # img_url = driver.find_element(
+                #     By.XPATH,
+                #     "/html/body/div[2]/c-wiz/div[3]/div[2]/div[3]/div[2]/div/div[2]/div[2]/div[2]/c-wiz/div/div[1]/div[2]/div[2]/div/a/img",
+                # ).get_attribute("src")
+
+                # $x('//img[contains(@src, "http")][@jsname="kn3ccd"]')
+                # img_url = driver.find_element(
+                #     By.XPATH, '//img[contains(@src, "http")][@jsname="kn3ccd"]'
+                # ).get_attribute("src")
+
+                # Copy full Xpath
                 img_url = driver.find_element(
                     By.XPATH,
-                    "/html/body/div[2]/c-wiz/div[3]/div[2]/div[3]/div[2]/div/div[2]/div[2]/div[2]/c-wiz/div/div[1]/div[2]/div[2]/div/a/img",
+                    "/html/body/div[2]/c-wiz/div[3]/div[2]/div[3]/div[2]/div/div[2]/div[2]/div[2]/c-wiz/div/div[2]/div[1]/a/img[1]",
                 ).get_attribute("src")
 
             except Exception as e:
