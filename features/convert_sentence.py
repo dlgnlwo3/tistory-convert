@@ -33,9 +33,7 @@ def convert_sentence(sentence: str, synonym_list: list):
 
 
 # 일방향 문장을 변환합니다.
-def convert_one_way_sentence(
-    sentence: str, before_word: str, synonym_list: list, used_synonym_list: list
-):
+def convert_one_way_sentence(sentence: str, before_word: str, synonym_list: list, used_synonym_list: list):
     before_word_count = sentence.count(before_word)
     before_synonym = ""
 
@@ -43,9 +41,7 @@ def convert_one_way_sentence(
         synonym = synonym_random_select(synonym_list, before_synonym)
         index = sentence.find(before_word)
         if index >= 0:
-            sentence = sentence[:index] + sentence[index:].replace(
-                before_word, synonym, 1
-            )
+            sentence = sentence[:index] + sentence[index:].replace(before_word, synonym, 1)
             used_synonym_list.append(synonym)
         before_synonym = synonym
 
@@ -59,11 +55,7 @@ def append_no_changed_idx_list(
     no_change_idx_list = []
     for word in ban_synonym_list:
         # 1. word가 포함된 문장 위치를 가져옴
-        start_idx_list = [
-            i
-            for i in range(len(origin_sentence))
-            if origin_sentence.startswith(word, i)
-        ]
+        start_idx_list = [i for i in range(len(origin_sentence)) if origin_sentence.startswith(word, i)]
 
         len_word = len(word)  # 변환대상 단어 길이
         for start_i in start_idx_list:
@@ -87,11 +79,7 @@ def update_dict_sentence(
     origin_sentence: str,
 ):
     # 1. before_word가 포함된 문장 위치를 가져옴
-    start_idx_list = [
-        i
-        for i in range(len(origin_sentence))
-        if origin_sentence.startswith(before_word, i)
-    ]
+    start_idx_list = [i for i in range(len(origin_sentence)) if origin_sentence.startswith(before_word, i)]
 
     len_before_word = len(before_word)  # 변환대상 단어 길이
     len_after_word = len(after_word)  # 변환할 유의어 길이
@@ -108,10 +96,7 @@ def update_dict_sentence(
 
             try:
                 value = after_word[include_i]
-                if (
-                    include_i == (len_before_word - 1)
-                    and len_before_word < len_after_word
-                ):
+                if include_i == (len_before_word - 1) and len_before_word < len_after_word:
                     # after_word가 더 긴 경우
                     value = after_word[include_i:len_after_word]
             except:
