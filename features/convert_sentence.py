@@ -11,45 +11,45 @@ def synonym_random_select(synonym_list: list, word: str):
 
 
 # 문장을 변환합니다.
-def convert_sentence(sentence: str, synonym_list: list):
-    include_word = ""
-    for word in synonym_list:
-        if word in sentence:
-            print(f"'{word}'가 포함되어있습니다.")
-            include_word = word
-            break
+# def convert_sentence(sentence: str, synonym_list: list):
+#     include_word = ""
+#     for word in synonym_list:
+#         if word in sentence:
+#             print(f"'{word}'가 포함되어있습니다.")
+#             include_word = word
+#             break
 
-    synonym = synonym_random_select(synonym_list, include_word)
-    converted_sentence = sentence
-    if include_word:
-        converted_sentence = sentence.replace(include_word, synonym)
-    is_converted = True
+#     synonym = synonym_random_select(synonym_list, include_word)
+#     converted_sentence = sentence
+#     if include_word:
+#         converted_sentence = sentence.replace(include_word, synonym)
+#     is_converted = True
 
-    if sentence == converted_sentence:
-        is_converted = False
+#     if sentence == converted_sentence:
+#         is_converted = False
 
-    # 변환된 문장, 변환에 사용된 단어, 변환 성공 여부
-    return converted_sentence, synonym, is_converted
+#     # 변환된 문장, 변환에 사용된 단어, 변환 성공 여부
+#     return converted_sentence, synonym, is_converted
 
 
 # 일방향 문장을 변환합니다.
-def convert_one_way_sentence(
-    sentence: str, before_word: str, synonym_list: list, used_synonym_list: list
-):
-    before_word_count = sentence.count(before_word)
-    before_synonym = ""
+# def convert_one_way_sentence(
+#     sentence: str, before_word: str, synonym_list: list, used_synonym_list: list
+# ):
+#     before_word_count = sentence.count(before_word)
+#     before_synonym = ""
 
-    for i in range(before_word_count):
-        synonym = synonym_random_select(synonym_list, before_synonym)
-        index = sentence.find(before_word)
-        if index >= 0:
-            sentence = sentence[:index] + sentence[index:].replace(
-                before_word, synonym, 1
-            )
-            used_synonym_list.append(synonym)
-        before_synonym = synonym
+#     for i in range(before_word_count):
+#         synonym = synonym_random_select(synonym_list, before_synonym)
+#         index = sentence.find(before_word)
+#         if index >= 0:
+#             sentence = sentence[:index] + sentence[index:].replace(
+#                 before_word, synonym, 1
+#             )
+#             used_synonym_list.append(synonym)
+#         before_synonym = synonym
 
-    return sentence, used_synonym_list
+#     return sentence, used_synonym_list
 
 
 def append_no_changed_idx_list(
@@ -203,13 +203,8 @@ def convert_from_db(
             synonym_list = get_split_and_remove_empty_list(str_after)
             random.shuffle(synonym_list)  # 유의어 DB 위치 섞기
 
-            before_word = ""
-            for synonym in synonym_list:
-                if synonym in sentence:
-                    print(f"'{synonym}'이 유의어 DB에 포함되어있습니다.")
-                    before_word = synonym
-                    break
-            if not before_word:
+            # Before 워드에 해당하는게 없으면 넘긴다.
+            if sentence.find(before_word) == -1:
                 continue
 
             # 리스트에 아무것도 없다면 생략함
