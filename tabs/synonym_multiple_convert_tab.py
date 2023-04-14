@@ -10,11 +10,8 @@ from datetime import *
 
 from common.utils import *
 from config import *
-from features.convert_sentence import convert_sentence
 from common.synonym_file import SynonymFile
 import pandas as pd
-import clipboard
-import random
 
 from threads.synonym_multiple_convert_thread import ConvertThread
 from threads.google_search_thread import GoogleSearchThread

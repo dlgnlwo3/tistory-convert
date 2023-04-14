@@ -472,12 +472,15 @@ class SearchTab(QWidget):
         if event.key() == Qt.Key_Delete:
             self.daum_remove_button_clicked()
 
+    def on_google_keyword_list_delete_pressed(self, event):
+        if event.key() == Qt.Key_Delete:
+            self.google_remove_button_clicked()
+
     # 메인 UI
     def initUI(self):
         # 다음 입력 그룹박스
         daum_input_groupbox = QGroupBox("글 수집 키워드")
         self.daum_input = QLineEdit()
-
         self.daum_input.returnPressed.connect(self.daum_save_button_clicked)
 
         daum_input_inner_layout = QHBoxLayout()
@@ -517,6 +520,7 @@ class SearchTab(QWidget):
         # 구글 입력 그룹박스
         google_input_groupbox = QGroupBox(f"이미지 수집 키워드")
         self.google_input = QLineEdit()
+        self.google_input.returnPressed.connect(self.google_save_button_clicked)
 
         google_input_inner_layout = QHBoxLayout()
         google_input_inner_layout.addWidget(self.google_input)
@@ -542,6 +546,9 @@ class SearchTab(QWidget):
         google_keyword_list_groupbox = QGroupBox("이미지 수집 키워드 목록")
         self.google_keyword_list_tablewidget = QTableWidget()
         self.set_google_keyword_list_tablewidget()
+        self.google_keyword_list_tablewidget.keyPressEvent = (
+            self.on_google_keyword_list_delete_pressed
+        )
 
         google_keyword_list_inner_layout = QVBoxLayout()
         google_keyword_list_inner_layout.addWidget(self.google_keyword_list_tablewidget)
