@@ -7,7 +7,6 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from datetime import *
-from common.custom_widgets import KeyLineEdit
 
 from dtos.gui_dto import GUIDto
 from threads.daum_search_thread import DaumSearchThread
