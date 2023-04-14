@@ -8,15 +8,11 @@ import time
 from common.chrome import *
 from dtos.gui_dto import GUIDto
 from datetime import datetime
-from common.utils import random_delay
-from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
-from common.utils import global_log_append
 from selenium import webdriver
 from timeit import default_timer as timer
-from datetime import timedelta
 import urllib.request
 from selenium.webdriver import ActionChains
 
@@ -26,7 +22,9 @@ class GoogleSearch:
         # 현재 로컬에 저장된 크롬 기준으로 오픈한다.
         # open_browser()
         self.default_wait = 10
-        self.driver = get_chrome_driver_new(is_headless=True, is_scret=True, move_to_corner=False)
+        self.driver = get_chrome_driver_new(
+            is_headless=True, is_scret=True, move_to_corner=False
+        )
         self.driver.implicitly_wait(self.default_wait)
         self.run_time = str(datetime.now())[0:-10].replace(":", "")
 
@@ -38,7 +36,9 @@ class GoogleSearch:
 
     # 이미지 저장
     def save_img_from_url(self, url: str, keyword: str, i: str):
-        img_path = os.path.join(self.guiDto.search_file_save_path, f"이미지수집 {self.run_time}")
+        img_path = os.path.join(
+            self.guiDto.search_file_save_path, f"이미지수집 {self.run_time}"
+        )
         if self.guiDto.from_convert_tab == True:
             img_path = os.path.join(self.guiDto.search_file_save_path)
 
@@ -55,7 +55,9 @@ class GoogleSearch:
         if format in ("jpg", "JPG", "jpeg", "JPEG", "png", "PNG", "gif", "GIF"):
             img_format = format
 
-        img_file = os.path.join(keyword_img_path, f"{keyword}_{i.zfill(2)}.{img_format}")
+        img_file = os.path.join(
+            keyword_img_path, f"{keyword}_{i.zfill(2)}.{img_format}"
+        )
         print(img_file)
 
         try:
@@ -107,14 +109,18 @@ class GoogleSearch:
         # 이미지가 있으면...
         # $x('//div/h3/following-sibling::a[1]//img')
         WebDriverWait(driver, 10).until(
-            EC.visibility_of_element_located((By.XPATH, "//div/h3/following-sibling::a[1]//img"))
+            EC.visibility_of_element_located(
+                (By.XPATH, "//div/h3/following-sibling::a[1]//img")
+            )
         )
 
         self.repeat_scroll(driver)
 
         time.sleep(1)
 
-        img_links = driver.find_elements(By.XPATH, "//div/h3/following-sibling::a[1]//img")
+        img_links = driver.find_elements(
+            By.XPATH, "//div/h3/following-sibling::a[1]//img"
+        )
 
         self.log_msg.emit(f"{google_keyword}: {len(img_links)}개의 이미지를 발견했습니다.")
 
@@ -133,9 +139,20 @@ class GoogleSearch:
                 #     By.XPATH, '//c-wiz//div[@role="region"]//img[contains(@src, "http")]'
                 # ).get_attribute("src")
 
+                # img_url = driver.find_element(
+                #     By.XPATH,
+                #     "/html/body/div[2]/c-wiz/div[3]/div[2]/div[3]/div[2]/div/div[2]/div[2]/div[2]/c-wiz/div/div[1]/div[2]/div[2]/div/a/img",
+                # ).get_attribute("src")
+
+                # $x('//img[contains(@src, "http")][@jsname="kn3ccd"]')
+                # img_url = driver.find_element(
+                #     By.XPATH, '//img[contains(@src, "http")][@jsname="kn3ccd"]'
+                # ).get_attribute("src")
+
+                # Copy full Xpath
                 img_url = driver.find_element(
                     By.XPATH,
-                    "/html/body/div[2]/c-wiz/div[3]/div[2]/div[3]/div[2]/div/div[2]/div[2]/div[2]/c-wiz/div/div[1]/div[2]/div[2]/div/a/img",
+                    "/html/body/div[2]/c-wiz/div[3]/div[2]/div[3]/div[2]/div/div[2]/div[2]/div[2]/c-wiz/div/div[2]/div[1]/a/img[1]",
                 ).get_attribute("src")
 
             except Exception as e:
@@ -153,7 +170,9 @@ class GoogleSearch:
                 print("수집할 이미지 개수에 도달했습니다.")
                 break
 
-        self.log_msg.emit(f"{google_keyword}: {len(img_links)} 중 {len(img_list)}개의 이미지를 수집했습니다.")
+        self.log_msg.emit(
+            f"{google_keyword}: {len(img_links)} 중 {len(img_list)}개의 이미지를 수집했습니다."
+        )
         time.sleep(1)
 
     # 전체작업 시작
