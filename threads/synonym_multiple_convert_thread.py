@@ -17,7 +17,7 @@ import time
 from playsound import playsound
 
 
-import debugpy
+# import debugpy
 
 from process.synonym_multiple_convert_process import SynonymMultipleConvert
 
@@ -36,7 +36,7 @@ class ConvertThread(QThread):
 
     def run(self):
         try:
-            debugpy.debug_this_thread()
+            # debugpy.debug_this_thread()
 
             self.log_msg.emit(f"유의어 변환 작업 시작")
 
@@ -63,9 +63,7 @@ class ConvertThread(QThread):
 
         if self.guiDto.system_sound_checkbox:
             print("알림음")
-            playsound(
-                r"D:\Consolework\tistory-convert-new\assets\thread_finished_sound.mp3"
-            )
+            playsound(r"D:\Consolework\tistory-convert-new\assets\thread_finished_sound.mp3")
 
         self.convert_finished.emit()
 

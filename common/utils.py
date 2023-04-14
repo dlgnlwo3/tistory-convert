@@ -39,3 +39,7 @@ def check_common_element(list1, list2):
     set2 = set(list2)
     intersection = set1 & set2
     return len(intersection) > 0
+
+
+def os_system_shutdown():
+    os.system("shutdown /s /t 5")

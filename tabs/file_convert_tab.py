@@ -98,6 +98,7 @@ class FileConvertTab(QWidget):
         guiDto.convert_format = convert_format
         guiDto.convert_path = self.convert_path.text()
         guiDto.system_sound_checkbox = self.system_sound_checkbox.isChecked()
+        guiDto.system_down_checkbox = self.system_down_checkbox.isChecked()
         guiDto.poster_option = poster_option
 
         print(f"작업을 시작합니다.")
@@ -130,6 +131,11 @@ class FileConvertTab(QWidget):
         self.poster_convert_start_button.setDisabled(False)
         self.poster_convert_stop_button.setDisabled(True)
         print(f"thread_is_running: {self.convert_thread.isRunning()}")
+        print(f"시스템 종료: {self.system_down_checkbox.isChecked()}")
+        if self.system_down_checkbox.isChecked():
+            self.log_append(f"5초 후 시스템이 종료됩니다.")
+            os_system_shutdown()
+            self.log_append(f"시스템 종료")
 
     # 메인 UI
     def initUI(self):
@@ -153,9 +159,7 @@ class FileConvertTab(QWidget):
         self.convert_path.setDisabled(True)
         self.convert_path_select_button = QPushButton("변환할 폴더 선택")
 
-        self.convert_path_select_button.clicked.connect(
-            self.convert_path_select_button_clicked
-        )
+        self.convert_path_select_button.clicked.connect(self.convert_path_select_button_clicked)
 
         convert_path_inner_layout = QHBoxLayout()
         convert_path_inner_layout.addWidget(self.convert_path, 4)
@@ -174,9 +178,11 @@ class FileConvertTab(QWidget):
         # 작업 완료 시 작동하는 그룹박스
         system_down_groupbox = QGroupBox("작업 완료 시 설정")
         self.system_sound_checkbox = QCheckBox("작업 완료 시 알림")
+        self.system_down_checkbox = QCheckBox("작업 완료 시 시스템 종료")
 
         system_down_inner_layout = QHBoxLayout()
         system_down_inner_layout.addWidget(self.system_sound_checkbox)
+        system_down_inner_layout.addWidget(self.system_down_checkbox)
         system_down_groupbox.setLayout(system_down_inner_layout)
 
         # 변환 시작 중지 그룹박스
@@ -188,9 +194,7 @@ class FileConvertTab(QWidget):
 
         self.convert_start_button.clicked.connect(self.convert_start_button_clicked)
         self.convert_stop_button.clicked.connect(self.convert_stop_button_clicked)
-        self.convert_open_save_path_button.clicked.connect(
-            self.open_save_path_button_clicked
-        )
+        self.convert_open_save_path_button.clicked.connect(self.open_save_path_button_clicked)
 
         convert_start_stop_inner_layout = QHBoxLayout()
         convert_start_stop_inner_layout.addWidget(self.convert_start_button)
@@ -205,29 +209,15 @@ class FileConvertTab(QWidget):
         self.poster_convert_stop_button.setDisabled(True)
         self.poster_convert_open_save_path_button = QPushButton("저장된 경로 열기")
 
-        self.poster_convert_start_button.clicked.connect(
-            self.convert_start_button_clicked
-        )
-        self.poster_convert_stop_button.clicked.connect(
-            self.convert_stop_button_clicked
-        )
-        self.poster_convert_open_save_path_button.clicked.connect(
-            self.open_save_path_button_clicked
-        )
+        self.poster_convert_start_button.clicked.connect(self.convert_start_button_clicked)
+        self.poster_convert_stop_button.clicked.connect(self.convert_stop_button_clicked)
+        self.poster_convert_open_save_path_button.clicked.connect(self.open_save_path_button_clicked)
 
         poster_convert_start_stop_inner_layout = QHBoxLayout()
-        poster_convert_start_stop_inner_layout.addWidget(
-            self.poster_convert_start_button
-        )
-        poster_convert_start_stop_inner_layout.addWidget(
-            self.poster_convert_stop_button
-        )
-        poster_convert_start_stop_inner_layout.addWidget(
-            self.poster_convert_open_save_path_button
-        )
-        poster_convert_start_stop_groupbox.setLayout(
-            poster_convert_start_stop_inner_layout
-        )
+        poster_convert_start_stop_inner_layout.addWidget(self.poster_convert_start_button)
+        poster_convert_start_stop_inner_layout.addWidget(self.poster_convert_stop_button)
+        poster_convert_start_stop_inner_layout.addWidget(self.poster_convert_open_save_path_button)
+        poster_convert_start_stop_groupbox.setLayout(poster_convert_start_stop_inner_layout)
 
         # 로그 그룹박스
         log_groupbox = QGroupBox("로그")

@@ -46,8 +46,11 @@ class GUIDto:
         # 변환탭에서 이미지 수집
         self.__from_convert_tab = False
 
-        # 작업 완료 시 설정
+        # 작업 완료 시 음성 설정
         self.__system_sound_checkbox = bool
+
+        # 작업 완료 시 시스템 종료
+        self.__system_down_checkbox = bool
 
         # 포스터용으로 변환하기
         self.__poster_option = bool
@@ -241,7 +244,7 @@ class GUIDto:
     def from_convert_tab(self, value):  # setter
         self.__from_convert_tab = value
 
-    # 작업 완료 시 설정
+    # 작업 완료 시 음성 설정
     @property
     def system_sound_checkbox(self):  # getter
         return self.__system_sound_checkbox
@@ -249,6 +252,15 @@ class GUIDto:
     @system_sound_checkbox.setter
     def system_sound_checkbox(self, value):  # setter
         self.__system_sound_checkbox = value
+
+    # 작업 완료 시 시스템 종료
+    @property
+    def system_down_checkbox(self):  # getter
+        return self.__system_down_checkbox
+
+    @system_down_checkbox.setter
+    def system_down_checkbox(self, value):  # setter
+        self.__system_down_checkbox = value
 
     # 포스터용으로 변환하기
     @property
