@@ -1,9 +1,17 @@
+if 1 == 1:
+    import sys
+    import os
+
+    sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
+
+
 import re
 import random
 import time
 from datetime import datetime
 import os
 from config import LOG_FOLDER_PATH
+import winsound as ws
 
 
 # 전역 로그
@@ -43,3 +51,13 @@ def check_common_element(list1, list2):
 
 def os_system_shutdown():
     os.system("shutdown /s /t 5")
+
+
+def beepsound():
+    freq = 500  # range : 37 ~ 32767
+    dur = 1500  # ms
+    ws.Beep(freq, dur)  # winsound.Beep(frequency, duration)
+
+
+if __name__ == "__main__":
+    beepsound()

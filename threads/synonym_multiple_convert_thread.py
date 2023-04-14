@@ -14,8 +14,7 @@ from dtos.gui_dto import *
 from datetime import timedelta
 from timeit import default_timer as timer
 import time
-from playsound import playsound
-
+from common.utils import beepsound
 
 # import debugpy
 
@@ -63,7 +62,10 @@ class ConvertThread(QThread):
 
         if self.guiDto.system_sound_checkbox:
             print("알림음")
-            playsound(r"D:\Consolework\tistory-convert-new\assets\thread_finished_sound.mp3")
+            beepsound()
+            # playsound(
+            #     r"D:\Consolework\tistory-convert-new\assets\thread_finished_sound.mp3"
+            # )
 
         self.convert_finished.emit()
 

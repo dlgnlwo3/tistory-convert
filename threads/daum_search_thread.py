@@ -15,7 +15,7 @@ from datetime import timedelta
 from timeit import default_timer as timer
 
 from process.daum_search_process import DaumSearch
-from playsound import playsound
+from common.utils import beepsound
 
 
 # import debugpy
@@ -61,7 +61,10 @@ class DaumSearchThread(QThread):
 
         if self.guiDto.system_sound_checkbox:
             print("알림음")
-            playsound(r"D:\Consolework\tistory-convert-new\assets\thread_finished_sound.mp3")
+            beepsound()
+            # playsound(
+            #     r"D:\Consolework\tistory-convert-new\assets\thread_finished_sound.mp3"
+            # )
 
         self.search_finished.emit()
 

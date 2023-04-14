@@ -15,7 +15,7 @@ from datetime import timedelta
 from timeit import default_timer as timer
 
 from process.google_search_process import GoogleSearch
-from playsound import playsound
+from common.utils import beepsound
 
 # import debugpy
 
@@ -60,7 +60,7 @@ class GoogleSearchThread(QThread):
 
         if self.guiDto.system_sound_checkbox:
             print("알림음")
-            playsound(r"D:\Consolework\tistory-convert-new\assets\thread_finished_sound.mp3")
+            beepsound()
 
         self.search_finished.emit()
 
