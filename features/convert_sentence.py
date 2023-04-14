@@ -197,7 +197,15 @@ def convert_from_db(
             if not before_word:
                 continue
 
-            after_word = synonym_random_select(synonym_list, before_word)
+            # 리스트에 아무것도 없다면 생략함
+            if len(synonym_list) <= 0:
+                continue
+
+            # 리스트에 1개만 있다면 그 단어로 치환함
+            elif len(synonym_list) == 1:
+                after_word = synonym_list[0]
+            else:
+                after_word = synonym_random_select(synonym_list, before_word)
             if not after_word:
                 continue
 
