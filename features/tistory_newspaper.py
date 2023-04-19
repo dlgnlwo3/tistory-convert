@@ -70,8 +70,9 @@ class TistoryNewsPaper:
 
 
 if __name__ == "__main__":
-    blog_url = f"http://kenunnni.tistory.com/6"
-    keyword = "글루타치온효능"
+    blog_url = f"https://hello-hi-hello.com/28"
+    keyword = "4월 축제"
 
     newspaper = TistoryNewsPaper()
-    my_dto = newspaper.get_article_from_blog_url(blog_url, keyword)
+    topBlogDetailDto = newspaper.get_article_from_blog_url(blog_url, keyword)
+    topBlogDetailDto.to_print()

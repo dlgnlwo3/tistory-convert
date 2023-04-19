@@ -35,7 +35,7 @@ def my_exception_hook(exctype, value, traceback):
 
 sys.excepthook = my_exception_hook
 
-# pyinstaller -n "tistory convert v1.0.1" -w --onefile --clean "main.py" --icon "assets\favicon.ico" --add-data "venv\Lib\site-packages\newspaper;newspaper"
+# pyinstaller -n "tistory convert v1.0.3" -w --onefile --clean "main.py" --icon "assets\favicon.ico" --add-data "venv\Lib\site-packages\newspaper;newspaper"
 
 
 class MainUI(QWidget):
@@ -85,7 +85,7 @@ class MainUI(QWidget):
     # 메인 UI
     def initUI(self):
         # 이미지 주소
-        ICON_IMAGE_URL = "https://i.imgur.com/vkYjunb.png"
+        ICON_IMAGE_URL = "https://i.imgur.com/yUWPOGp.png"
         self.icon = QNetworkAccessManager()
         self.icon.finished.connect(self.set_window_icon_from_response)
         self.icon.get(QNetworkRequest(QUrl(ICON_IMAGE_URL)))

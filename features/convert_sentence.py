@@ -10,48 +10,6 @@ def synonym_random_select(synonym_list: list, word: str):
     return synonym
 
 
-# 문장을 변환합니다.
-# def convert_sentence(sentence: str, synonym_list: list):
-#     include_word = ""
-#     for word in synonym_list:
-#         if word in sentence:
-#             print(f"'{word}'가 포함되어있습니다.")
-#             include_word = word
-#             break
-
-#     synonym = synonym_random_select(synonym_list, include_word)
-#     converted_sentence = sentence
-#     if include_word:
-#         converted_sentence = sentence.replace(include_word, synonym)
-#     is_converted = True
-
-#     if sentence == converted_sentence:
-#         is_converted = False
-
-#     # 변환된 문장, 변환에 사용된 단어, 변환 성공 여부
-#     return converted_sentence, synonym, is_converted
-
-
-# 일방향 문장을 변환합니다.
-# def convert_one_way_sentence(
-#     sentence: str, before_word: str, synonym_list: list, used_synonym_list: list
-# ):
-#     before_word_count = sentence.count(before_word)
-#     before_synonym = ""
-
-#     for i in range(before_word_count):
-#         synonym = synonym_random_select(synonym_list, before_synonym)
-#         index = sentence.find(before_word)
-#         if index >= 0:
-#             sentence = sentence[:index] + sentence[index:].replace(
-#                 before_word, synonym, 1
-#             )
-#             used_synonym_list.append(synonym)
-#         before_synonym = synonym
-
-#     return sentence, used_synonym_list
-
-
 def append_no_changed_idx_list(
     ban_synonym_list: list,
     origin_sentence: str,
@@ -59,7 +17,11 @@ def append_no_changed_idx_list(
     no_change_idx_list = []
     for word in ban_synonym_list:
         # 1. word가 포함된 문장 위치를 가져옴
-        start_idx_list = [i for i in range(len(origin_sentence)) if origin_sentence.startswith(word, i)]
+        start_idx_list = [
+            i
+            for i in range(len(origin_sentence))
+            if origin_sentence.startswith(word, i)
+        ]
 
         len_word = len(word)  # 변환대상 단어 길이
         for start_i in start_idx_list:
@@ -81,9 +43,14 @@ def update_dict_sentence(
     used_idx_list: list,
     ban_idx_list: list,
     origin_sentence: str,
+    is_convert_once: bool,  # 한번만 변환
 ):
     # 1. before_word가 포함된 문장 위치를 가져옴
-    start_idx_list = [i for i in range(len(origin_sentence)) if origin_sentence.startswith(before_word, i)]
+    start_idx_list = [
+        i
+        for i in range(len(origin_sentence))
+        if origin_sentence.startswith(before_word, i)
+    ]
 
     len_before_word = len(before_word)  # 변환대상 단어 길이
     len_after_word = len(after_word)  # 변환할 유의어 길이
@@ -95,12 +62,17 @@ def update_dict_sentence(
         if check_common_element(before_word_idx_list, ban_idx_list):
             continue
 
+        before_count = len(used_idx_list)
+
         for include_i in range(0, len_before_word):
             key = start_i + include_i  # sentence에 들어가야할 위치
 
             try:
                 value = after_word[include_i]
-                if include_i == (len_before_word - 1) and len_before_word < len_after_word:
+                if (
+                    include_i == (len_before_word - 1)
+                    and len_before_word < len_after_word
+                ):
                     # after_word가 더 긴 경우
                     value = after_word[include_i:len_after_word]
             except:
@@ -115,9 +87,14 @@ def update_dict_sentence(
                 dict_sentence.update({key: value})
                 used_idx_list.append(key)
 
+        after_count = len(used_idx_list)
+        if is_convert_once and before_count != after_count:
+            break
+
     if len(used_idx_list) > 0:
         used_idx_list = sorted(list(set(used_idx_list)))
 
+    print(used_idx_list)
     return dict_sentence, used_idx_list
 
 
@@ -147,41 +124,50 @@ def convert_from_db(
     ban_idx_list = append_no_changed_idx_list(ban_synonym_list, sentence)
 
     # 1. 양방향 변환 시작
-    two_way_column_list = df_two_way.columns
+    two_way_column_list = df_two_way.columns.to_list()
     for two_way_column in two_way_column_list:
+        print(two_way_column)
         synonym_dbs = df_two_way[str(two_way_column)].to_list()
 
         for synonym_db in synonym_dbs:
             try:
                 synonym_db = str(synonym_db)
                 synonym_list = get_split_and_remove_empty_list(synonym_db)
-                random.shuffle(synonym_list)  # 유의어 DB 위치 섞기
 
-                before_word = ""
+                to_change_list = []
                 for synonym in synonym_list:
-                    if synonym in sentence:
-                        print(f"'{synonym}'이 유의어 DB에 포함되어있습니다.")
-                        before_word = synonym
-                        break
-                if not before_word:
+                    if synonym == "을 만큼":
+                        print("")
+                    finded_count = sentence.count(synonym)
+                    print(synonym, finded_count)
+                    if finded_count > 0:
+                        for word_idx in range(finded_count + 1):
+                            after_word = synonym_random_select(synonym_list, synonym)
+                            if after_word:
+                                to_change_list.append(
+                                    {"Before": synonym, "After": after_word}
+                                )
+
+                # 유의어 대상에 하나도 포함되어 있지 않다면?
+                if len(to_change_list) == 0:
                     continue
 
-                after_word = synonym_random_select(synonym_list, before_word)
-                if not after_word:
-                    continue
+                print("to_change_list", to_change_list)
 
-                dict_sentence, used_idx_list = update_dict_sentence(
-                    before_word,
-                    after_word,
-                    dict_sentence,
-                    used_idx_list,
-                    ban_idx_list,
-                    sentence,
-                )
+                for dict_change in to_change_list:
+                    dict_sentence, used_idx_list = update_dict_sentence(
+                        dict_change["Before"],
+                        dict_change["After"],
+                        dict_sentence,
+                        used_idx_list,
+                        ban_idx_list,
+                        sentence,
+                        is_convert_once=True,
+                    )
 
             except Exception as e:
-                print(f"{before_word} -> {after_word}: {e}")
-                raise Exception(f"{before_word} -> {after_word}: {e}")
+                print(f"{to_change_list} -> {after_word}: {e}")
+                raise Exception(f"{to_change_list} -> {after_word}: {e}")
 
     # 2. 일방향 변환 시작
     for j, row in df_one_way[:].iterrows():
@@ -190,7 +176,6 @@ def convert_from_db(
             str_after = str(row["after"])
 
             synonym_list = get_split_and_remove_empty_list(str_after)
-            random.shuffle(synonym_list)  # 유의어 DB 위치 섞기
 
             # Before 워드에 해당하는게 없으면 넘긴다.
             if sentence.find(before_word) == -1:
@@ -215,6 +200,7 @@ def convert_from_db(
                 used_idx_list,
                 ban_idx_list,
                 sentence,
+                is_convert_once=False,
             )
 
         except Exception as e:
