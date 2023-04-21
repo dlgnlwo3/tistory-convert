@@ -29,7 +29,7 @@ class DaumSearch:
         # 현재 로컬에 저장된 크롬 기준으로 오픈한다.
         # open_browser()
         self.default_wait = 10
-        self.driver = get_chrome_driver_new(is_headless=True, is_scret=True, move_to_corner=False)
+        self.driver: webdriver.Chrome = get_chrome_driver_new(is_headless=True, is_secret=True, move_to_corner=False)
         self.driver.implicitly_wait(self.default_wait)
         self.run_time = str(datetime.now())[0:-10].replace(":", "")
         self.top_blog_detail_dtos = []
@@ -73,23 +73,17 @@ class DaumSearch:
 
     def search_top_blog(self, daum_keyword: str):
         driver = self.driver
-        driver.get(
-            f"https://search.daum.net/search?w=blog&nil_search=btn&enc=utf8&q={daum_keyword}&f=section&SA=tistory&p=1"
-        )
+        driver.get(f"https://search.daum.net/search?w=fusion&col=blog&q={daum_keyword}&p=2")
 
         try:
-            WebDriverWait(driver, 10).until(
-                EC.element_to_be_clickable((By.XPATH, '//li[contains(@id, "br_tstory")]//a[contains(@class, "f_url")]'))
-            )
+            WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//c-card//c-title//a")))
         except Exception as e:
             print(e)
             raise Exception(f"{daum_keyword}: 다음 검색 결과가 없습니다.")
 
         # 현재 페이지의 블로그 검색 결과
         # $x('//li[contains(@id, "br_tstory")]//a[contains(@class, "f_url")]')
-        blog_links = driver.find_elements(By.XPATH, '//li[contains(@id, "br_tstory")]//a[contains(@class, "f_url")]')[
-            :3
-        ]
+        blog_links = driver.find_elements(By.XPATH, "//c-card//c-title//a")[:3]
 
         for blog_link in blog_links:
             blog_url = blog_link.get_attribute("href")
@@ -105,19 +99,20 @@ class DaumSearch:
                 top_blog_detail_dto.keyword = daum_keyword
                 top_blog_detail_dto.article_title = driver.find_element(
                     By.XPATH,
-                    f'//li[contains(@id, "br_tstory")]//a[contains(@class, "f_link_b")][contains(@href, "{blog_url}")]',
+                    f'//c-card//c-title//a[contains(@href, "{blog_url}")]',
                 ).get_attribute("textContent")
                 top_blog_detail_dto.article_text = "사이트 연결 오류"
                 top_blog_detail_dto.article_url = blog_url
 
             try:
                 img_count = driver.find_element(
-                    By.XPATH, f'//a[contains(@href, "{blog_url}")]//span[@class="num_count"]'
+                    By.XPATH, f'//a[contains(@href, "{blog_url}")]//c-badge-text/span'
                 ).get_attribute("textContent")
                 img_count = int(img_count)
                 top_blog_detail_dto.img_count = img_count
             except Exception as e:
                 print(e)
+                print("이미지 개수 탐색 실패")
 
             self.top_blog_detail_dtos.append(top_blog_detail_dto.get_dict())
             self.blog_detail_to_excel(self.top_blog_detail_dtos)
@@ -130,17 +125,13 @@ class DaumSearch:
         search_blog_list = []
 
         for current_page in range(self.guiDto.daum_start_page, self.guiDto.daum_end_page + 1):
-            driver.get(
-                f"https://search.daum.net/search?w=blog&nil_search=btn&enc=utf8&q={daum_keyword}&f=section&SA=tistory&p={current_page}"
-            )
+            driver.get(f"https://search.daum.net/search?w=fusion&col=blog&q={daum_keyword}&p={current_page}")
 
-            WebDriverWait(driver, 10).until(
-                EC.element_to_be_clickable((By.XPATH, '//li[contains(@id, "br_tstory")]//a[contains(@class, "f_url")]'))
-            )
+            WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//c-card//c-title//a")))
 
             # 현재 페이지의 블로그 검색 결과
             # $x('//li[contains(@id, "br_tstory")]//a[contains(@class, "f_url")]')
-            blog_list = driver.find_elements(By.XPATH, '//li[contains(@id, "br_tstory")]')
+            blog_list = driver.find_elements(By.XPATH, "//c-card")
 
             # 입력받은 날짜와 블로그 날짜를 비교합니다.
             search_date = self.guiDto.daum_search_date
@@ -149,7 +140,9 @@ class DaumSearch:
 
             blog: webdriver.Chrome._web_element_cls
             for blog in blog_list:
-                blog_date = blog.find_element(By.CSS_SELECTOR, "span[class*='date']").get_attribute("textContent")
+                blog_date = blog.find_element(By.CSS_SELECTOR, 'span[class*="gem-subdesc"]').get_attribute(
+                    "textContent"
+                )
                 blog_date_format = f"%Y.%m.%d"
 
                 try:
@@ -158,8 +151,17 @@ class DaumSearch:
                     print(f"날짜 형식에 맞지 않습니다.")
                     blog_date = datetime.now()
 
+                try:
+                    is_naver_blog = blog.find_element(By.CSS_SELECTOR, "c-title a").get_attribute("href")
+                    if is_naver_blog.find("naver.com") > -1:
+                        raise Exception(f"네이버는 제외하고 진행합니다.")
+
+                except Exception as e:
+                    print(str(e))
+                    continue
+
                 if search_date > blog_date:
-                    blog_url = blog.find_element(By.CSS_SELECTOR, 'a[class*="f_url"]').get_attribute("href")
+                    blog_url = blog.find_element(By.CSS_SELECTOR, "c-title a").get_attribute("href")
 
                     try:
                         top_blog_detail_dto: TopBlogDetailDto = TistoryNewsPaper().get_article_from_blog_url(
@@ -202,8 +204,12 @@ class DaumSearch:
             for daum_keyword in self.guiDto.daum_keyword_list:
                 print(daum_keyword)
 
-                # 검색어 블로그 주소
+                # 구 블로그 검색 주소
                 # https://search.daum.net/search?w=blog&nil_search=btn&enc=utf8&q={검색어}&p=5
+
+                # 신 블로그 검색 주소
+                # https://search.daum.net/search?w=fusion&col=blog&q={검색어}&p=10
+
                 # 1. 다음 블로그 검색 후 최상단 3개의 글 수집
                 self.search_top_blog(daum_keyword)
 

@@ -29,7 +29,6 @@ def download_location(driver):
 
 
 def open_browser():
-
     # self.process = subprocess.Popen(cmd, env=self.env, close_fds=platform.system() != 'Windows', stdout=self.log_file, stderr=self.log_file, stdin=PIPE, creationflags=0x08000000 )
 
     browser = None
@@ -67,12 +66,12 @@ def chromedriver_install(options):
     return driver
 
 
-def get_chrome_driver(is_headless=False, is_scret=False):
+def get_chrome_driver(is_headless=False, is_secret=False):
     options = Options()
     options.add_experimental_option("debuggerAddress", "127.0.0.1:9222")
     if is_headless:
         options.add_argument("--headless")
-    if is_scret:
+    if is_secret:
         options.add_argument("incognito")  # 시크릿 모드
 
     # options.add_argument("start-maximized")
@@ -84,7 +83,7 @@ def get_chrome_driver(is_headless=False, is_scret=False):
     return driver
 
 
-def get_chrome_driver_new(is_headless=False, is_scret=False, tor=False, move_to_corner=False):
+def get_chrome_driver_new(is_headless=False, is_secret=False, tor=False, move_to_corner=False):
     options = Options()
 
     # options.add_experimental_option("debuggerAddress", "127.0.0.1:9222")
@@ -92,7 +91,7 @@ def get_chrome_driver_new(is_headless=False, is_scret=False, tor=False, move_to_
 
     if is_headless:
         options.add_argument("--headless")
-    if is_scret:
+    if is_secret:
         options.add_argument("-incognito")  # 시크릿 모드
     if tor:
         options.add_argument("--proxy-server=socks5://127.0.0.1:9150")  # 토르 적용
@@ -147,7 +146,6 @@ def quit_driver(driver):
 
 
 def accept_alert(browser):
-
     text = ""
     try:
         result = browser.switch_to.alert

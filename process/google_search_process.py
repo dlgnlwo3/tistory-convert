@@ -22,7 +22,7 @@ class GoogleSearch:
         # 현재 로컬에 저장된 크롬 기준으로 오픈한다.
         # open_browser()
         self.default_wait = 10
-        self.driver = get_chrome_driver_new(is_headless=True, is_scret=True, move_to_corner=False)
+        self.driver = get_chrome_driver_new(is_headless=True, is_secret=True, move_to_corner=False)
         self.driver.implicitly_wait(self.default_wait)
         self.run_time = str(datetime.now())[0:-10].replace(":", "")
 
