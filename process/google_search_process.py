@@ -139,10 +139,12 @@ class GoogleSearch:
                 #     By.XPATH, '//img[contains(@src, "http")][@jsname="kn3ccd"]'
                 # ).get_attribute("src")
 
-                # Copy full Xpath
+                # 어떻게든 겹치지 않는 XPATH를 골라봄
+                # 숨겨져있는 썸네일용 이미지와 같이 존재하는 이미지를 선택함
+                # $x('//div[contains(@jsaction, "trigger")][not(contains(@role, "listitem"))]/a[./img[contains(@style, "visibility: hidden")]]/img')
                 img_url = driver.find_element(
                     By.XPATH,
-                    "/html/body/div[2]/c-wiz/div[3]/div[2]/div[3]/div[2]/div/div[2]/div[2]/div[2]/c-wiz/div/div[2]/div[1]/a/img[1]",
+                    '//div[contains(@jsaction, "trigger")][not(contains(@role, "listitem"))]/a[./img[contains(@style, "visibility: hidden")]]/img',
                 ).get_attribute("src")
 
             except Exception as e:
