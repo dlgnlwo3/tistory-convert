@@ -60,6 +60,7 @@ class GoogleSearch:
 
         except Exception as e:
             print(f"이미지 생성 실패 {e}")
+            self.log_msg.emit(f"{keyword}{i.zfill(2)}.{img_format} 이미지 생성 실패 {e}")
 
         finally:
             time.sleep(0.2)
@@ -119,25 +120,8 @@ class GoogleSearch:
             action.move_to_element(img_link).click().perform()
             time.sleep(0.5)
 
-            # $x('//c-wiz//a[@rel="noopener"][@role="link"][@target="_blank"]/img[contains(@class, "iPVvYb")]')
-            # $x('//c-wiz//div[@role="region"]//img[contains(@src, "http")]')
-
             try:
                 driver.implicitly_wait(1)
-
-                # img_url = driver.find_element(
-                #     By.XPATH, '//c-wiz//div[@role="region"]//img[contains(@src, "http")]'
-                # ).get_attribute("src")
-
-                # img_url = driver.find_element(
-                #     By.XPATH,
-                #     "/html/body/div[2]/c-wiz/div[3]/div[2]/div[3]/div[2]/div/div[2]/div[2]/div[2]/c-wiz/div/div[1]/div[2]/div[2]/div/a/img",
-                # ).get_attribute("src")
-
-                # $x('//img[contains(@src, "http")][@jsname="kn3ccd"]')
-                # img_url = driver.find_element(
-                #     By.XPATH, '//img[contains(@src, "http")][@jsname="kn3ccd"]'
-                # ).get_attribute("src")
 
                 # 어떻게든 겹치지 않는 XPATH를 골라봄
                 # 숨겨져있는 썸네일용 이미지와 같이 존재하는 이미지를 선택함
