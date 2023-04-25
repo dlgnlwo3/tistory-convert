@@ -85,7 +85,7 @@ def get_dict_setting(url, sheetname):
     return dict_settings
 
 
-def login(login_id, login_pw):
+def login_sheet(login_id, login_pw):
     login_check = False
 
     try:
@@ -102,8 +102,3 @@ def login(login_id, login_pw):
         login_check = False
 
     return login_check
-
-
-if __name__ == "__main__":
-    print(login("asd", "123"))
-    print(login("a12", "1234"))
