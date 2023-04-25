@@ -280,6 +280,42 @@ if not get_save_data_FOOTER():
 # ------------- 맺음말 저장 파일 생성 종료 ------------- #
 
 
+# ------------- 아이디 저장 파일 생성 ------------- #
+USER_SAVE_PATH_ACCOUNT = os.path.join(PROGRAM_PATH, f"{PROGRAM_ID}_ACCOUNT.txt")
+
+
+def get_save_data_ACCOUNT():
+    saved_data = None
+    if os.path.isfile(USER_SAVE_PATH_ACCOUNT):
+        with open(USER_SAVE_PATH_ACCOUNT, "r", encoding="utf-8") as f:
+            saved_data = json.loads(f.read())
+    return saved_data
+
+
+def write_save_data_ACCOUNT(dict_save: dict):
+    if os.path.isfile(USER_SAVE_PATH_ACCOUNT):
+        os.remove(USER_SAVE_PATH_ACCOUNT)
+        with open(USER_SAVE_PATH_ACCOUNT, "w", encoding="utf-8") as f:
+            f.write(json.dumps((dict_save)))
+            f.close()
+    else:
+        with open(USER_SAVE_PATH_ACCOUNT, "w", encoding="utf-8") as f:
+            f.write(json.dumps((dict_save)))
+            f.close()
+
+    return dict_save
+
+
+class SaveFileACCOUNT(Enum):
+    ACCOUNT = "ACCOUNT"
+
+
+# 저장데이터 없는 경우 초기화
+if not get_save_data_ACCOUNT():
+    write_save_data_ACCOUNT({"id": "", "pw": ""})
+# ------------- 맺음말 저장 파일 생성 종료 ------------- #
+
+
 # ------------- 로그파일 경로 생성 시작 ------------- #
 
 LOG_FOLDER_NAME = "log"

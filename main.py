@@ -35,7 +35,7 @@ def my_exception_hook(exctype, value, traceback):
 
 sys.excepthook = my_exception_hook
 
-# pyinstaller -n "tistory convert v1.0.4" -w --onefile --clean "main.py" --icon "assets\favicon.ico" --add-data "venv\Lib\site-packages\newspaper;newspaper"
+# pyinstaller -n "tistory convert v1.0.4 일방향 우선" -w --onefile --clean "main.py" --icon "assets\favicon.ico" --add-data "venv\Lib\site-packages\newspaper;newspaper"
 
 
 class MainUI(QWidget):
@@ -65,7 +65,9 @@ class MainUI(QWidget):
     # 프로그램 닫기 클릭 시
     def closeEvent(self, event):
         quit_msg = "프로그램을 종료하시겠습니까?"
-        reply = QMessageBox.question(self, "프로그램 종료", quit_msg, QMessageBox.Yes, QMessageBox.No)
+        reply = QMessageBox.question(
+            self, "프로그램 종료", quit_msg, QMessageBox.Yes, QMessageBox.No
+        )
 
         if reply == QMessageBox.Yes:
             print(f"프로그램을 종료합니다.")
@@ -106,7 +108,6 @@ class MainUI(QWidget):
         tabs.addTab(self.topic_tab, "주제 설정")
 
         vbox = QVBoxLayout()
-
         vbox.addWidget(tabs)
         self.setLayout(vbox)
 

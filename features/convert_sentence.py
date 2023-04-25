@@ -17,7 +17,11 @@ def append_no_changed_idx_list(
     no_change_idx_list = []
     for word in ban_synonym_list:
         # 1. word가 포함된 문장 위치를 가져옴
-        start_idx_list = [i for i in range(len(origin_sentence)) if origin_sentence.startswith(word, i)]
+        start_idx_list = [
+            i
+            for i in range(len(origin_sentence))
+            if origin_sentence.startswith(word, i)
+        ]
 
         len_word = len(word)  # 변환대상 단어 길이
         for start_i in start_idx_list:
@@ -42,7 +46,11 @@ def update_dict_sentence(
     is_convert_once: bool,  # 한번만 변환
 ):
     # 1. before_word가 포함된 문장 위치를 가져옴
-    start_idx_list = [i for i in range(len(origin_sentence)) if origin_sentence.startswith(before_word, i)]
+    start_idx_list = [
+        i
+        for i in range(len(origin_sentence))
+        if origin_sentence.startswith(before_word, i)
+    ]
 
     len_before_word = len(before_word)  # 변환대상 단어 길이
     len_after_word = len(after_word)  # 변환할 유의어 길이
@@ -61,7 +69,10 @@ def update_dict_sentence(
 
             try:
                 value = after_word[include_i]
-                if include_i == (len_before_word - 1) and len_before_word < len_after_word:
+                if (
+                    include_i == (len_before_word - 1)
+                    and len_before_word < len_after_word
+                ):
                     # after_word가 더 긴 경우
                     value = after_word[include_i:len_after_word]
             except:
@@ -95,7 +106,7 @@ def get_split_and_remove_empty_list(text: str) -> list:
 
 
 # 양방향, 일방향 dataframe을 적용합니다.
-def convert_from_db(
+def convert_from_db_two_way(
     sentence: str,
     ban_synonym: str,
     df_two_way: pd.DataFrame,
@@ -133,7 +144,9 @@ def convert_from_db(
                         for word_idx in range(finded_count + 1):
                             after_word = synonym_random_select(synonym_list, synonym)
                             if after_word:
-                                to_change_list.append({"Before": synonym, "After": after_word})
+                                to_change_list.append(
+                                    {"Before": synonym, "After": after_word}
+                                )
 
                 # 유의어 대상에 하나도 포함되어 있지 않다면?
                 if len(to_change_list) == 0:
@@ -194,6 +207,110 @@ def convert_from_db(
             print(f"{before_word} -> {after_word}: {e}")
             raise Exception(f"{before_word} -> {after_word}: {e}")
 
+    return dict_sentence, used_idx_list
+
+
+# 일방향, 양방향 dataframe을 적용합니다.
+def convert_from_db(
+    sentence: str,
+    ban_synonym: str,
+    df_two_way: pd.DataFrame,
+    df_one_way: pd.DataFrame,
+):
+    if ban_synonym == "":
+        ban_synonym_list = []
+    else:
+        ban_synonym_list = get_split_and_remove_empty_list(ban_synonym)
+
+    sentence_list = list(sentence)
+    dict_sentence = {i: word for i, word in enumerate(sentence_list)}
+
+    used_idx_list = []
+    ban_idx_list = append_no_changed_idx_list(ban_synonym_list, sentence)
+
+    # 2. 일방향 변환 시작
+    for j, row in df_one_way[:].iterrows():
+        try:
+            before_word = str(row["before"])
+            str_after = str(row["after"])
+
+            synonym_list = get_split_and_remove_empty_list(str_after)
+
+            # Before 워드에 해당하는게 없으면 넘긴다.
+            if sentence.find(before_word) == -1:
+                continue
+
+            # 리스트에 아무것도 없다면 생략함
+            if len(synonym_list) <= 0:
+                continue
+
+            # 리스트에 1개만 있다면 그 단어로 치환함
+            elif len(synonym_list) == 1:
+                after_word = synonym_list[0]
+            else:
+                after_word = synonym_random_select(synonym_list, before_word)
+            if not after_word:
+                continue
+
+            dict_sentence, used_idx_list = update_dict_sentence(
+                before_word,
+                after_word,
+                dict_sentence,
+                used_idx_list,
+                ban_idx_list,
+                sentence,
+                is_convert_once=False,
+            )
+
+        except Exception as e:
+            print(f"{before_word} -> {after_word}: {e}")
+            raise Exception(f"{before_word} -> {after_word}: {e}")
+
+    # 1. 양방향 변환 시작
+    two_way_column_list = df_two_way.columns.to_list()
+    for two_way_column in two_way_column_list:
+        print(two_way_column)
+        synonym_dbs = df_two_way[str(two_way_column)].to_list()
+
+        for synonym_db in synonym_dbs:
+            try:
+                synonym_db = str(synonym_db)
+                synonym_list = get_split_and_remove_empty_list(synonym_db)
+
+                to_change_list = []
+                for synonym in synonym_list:
+                    if synonym == "을 만큼":
+                        print("")
+                    finded_count = sentence.count(synonym)
+                    print(synonym, finded_count)
+                    if finded_count > 0:
+                        for word_idx in range(finded_count + 1):
+                            after_word = synonym_random_select(synonym_list, synonym)
+                            if after_word:
+                                to_change_list.append(
+                                    {"Before": synonym, "After": after_word}
+                                )
+
+                # 유의어 대상에 하나도 포함되어 있지 않다면?
+                if len(to_change_list) == 0:
+                    continue
+
+                print("to_change_list", to_change_list)
+
+                for dict_change in to_change_list:
+                    dict_sentence, used_idx_list = update_dict_sentence(
+                        dict_change["Before"],
+                        dict_change["After"],
+                        dict_sentence,
+                        used_idx_list,
+                        ban_idx_list,
+                        sentence,
+                        is_convert_once=True,
+                    )
+
+            except Exception as e:
+                print(f"{to_change_list} -> {after_word}: {e}")
+                raise Exception(f"{to_change_list} -> {after_word}: {e}")
     return dict_sentence, used_idx_list
 
 
