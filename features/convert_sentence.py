@@ -36,26 +36,6 @@ def append_no_changed_idx_list(
     return no_change_idx_list
 
 
-# 바꾸기 전 대상의 단어가 다음 띄어쓰기를 만날 때까지 찾으면서 바꿀 대상의 before word의 길이를 찾는다.
-# 해당 단어가 몇개인지 찾는다.
-def get_word_length(start_idx: int, origin_sentence: str):
-    word_lenth = 1
-    for sentence_idx in range(len(origin_sentence)):
-        if start_idx == sentence_idx:
-            while True:
-                # 다음 문장이 띄어쓰기 인지 확인
-                try:
-                    next_word = origin_sentence[sentence_idx + word_lenth]
-                    if next_word == " " or next_word == "\n" or next_word == "\r\n":
-                        break
-                    else:
-                        word_lenth += 1
-                except:
-                    break
-
-    return word_lenth
-
-
 def update_dict_sentence(
     before_word: str,
     after_word: str,
@@ -72,19 +52,12 @@ def update_dict_sentence(
         if origin_sentence.startswith(before_word, i)
     ]
 
-    # len_before_word = len(before_word)  # 변환대상 단어 길이
+    len_before_word = len(before_word)  # 변환대상 단어 길이
     len_after_word = len(after_word)  # 변환할 유의어 길이
-
-    # len_before_word << 이거는 유의어 DB 기준이 아니라 바꿀 대상 sentence 기준으로 해야함
-    # 바꿀 대상의 len을 어떻게 가져오지?
 
     # 발견된 단어수 만큼 반복
     for start_i in start_idx_list:
         # 단어 전체중 밴 리스트와 겹치는게 하나라도 있으면 continue 해야함
-
-        # 다음 띄어쓰기를 만날 때까지의 길이를 찾는다.
-        len_before_word = get_word_length(start_i, origin_sentence)  #
-
         before_word_idx_list = list(range(start_i, start_i + len_before_word))
         if check_common_element(before_word_idx_list, ban_idx_list):
             continue
@@ -153,6 +126,7 @@ def convert_from_db_two_way(
     # 1. 양방향 변환 시작
     two_way_column_list = df_two_way.columns.to_list()
     for two_way_column in two_way_column_list:
+        print(two_way_column)
         synonym_dbs = df_two_way[str(two_way_column)].to_list()
 
         for synonym_db in synonym_dbs:
@@ -162,7 +136,10 @@ def convert_from_db_two_way(
 
                 to_change_list = []
                 for synonym in synonym_list:
+                    if synonym == "을 만큼":
+                        print("")
                     finded_count = sentence.count(synonym)
+                    print(synonym, finded_count)
                     if finded_count > 0:
                         for word_idx in range(finded_count + 1):
                             after_word = synonym_random_select(synonym_list, synonym)
@@ -174,6 +151,8 @@ def convert_from_db_two_way(
                 # 유의어 대상에 하나도 포함되어 있지 않다면?
                 if len(to_change_list) == 0:
                     continue
+
+                print("to_change_list", to_change_list)
 
                 for dict_change in to_change_list:
                     dict_sentence, used_idx_list = update_dict_sentence(
@@ -290,6 +269,7 @@ def convert_from_db(
     # 1. 양방향 변환 시작
     two_way_column_list = df_two_way.columns.to_list()
     for two_way_column in two_way_column_list:
+        print(two_way_column)
         synonym_dbs = df_two_way[str(two_way_column)].to_list()
 
         for synonym_db in synonym_dbs:
@@ -299,7 +279,10 @@ def convert_from_db(
 
                 to_change_list = []
                 for synonym in synonym_list:
+                    if synonym == "을 만큼":
+                        print("")
                     finded_count = sentence.count(synonym)
+                    print(synonym, finded_count)
                     if finded_count > 0:
                         for word_idx in range(finded_count + 1):
                             after_word = synonym_random_select(synonym_list, synonym)
@@ -311,6 +294,8 @@ def convert_from_db(
                 # 유의어 대상에 하나도 포함되어 있지 않다면?
                 if len(to_change_list) == 0:
                     continue
+
+                print("to_change_list", to_change_list)
 
                 for dict_change in to_change_list:
                     dict_sentence, used_idx_list = update_dict_sentence(
