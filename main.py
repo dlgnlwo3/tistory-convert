@@ -28,7 +28,7 @@ from config import get_save_data_ACCOUNT, write_save_data_ACCOUNT
 from common.utils import global_log_append
 
 
-# pyinstaller -n "tistory convert v1.1.0 구글로그인추가" -w --onefile --clean "main.py" --icon "assets\favicon.ico" --add-data "venv\Lib\site-packages\newspaper;newspaper"
+# pyinstaller -n "tistory convert v1.1.1 이중변환 로직수정" -w --onefile --clean "main.py" --icon "assets\favicon.ico" --add-data "venv\Lib\site-packages\newspaper;newspaper"
 def my_exception_hook(exctype, value, traceback):
     print(exctype, value, traceback)
     global_log_append(str(value))
