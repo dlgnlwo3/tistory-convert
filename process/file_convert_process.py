@@ -15,6 +15,8 @@ import pandas as pd
 import re
 from docx import Document
 
+# from docx.shared import Pt, RGBColor
+
 
 class FileConvert:
     def __init__(self):
@@ -38,11 +40,8 @@ class FileConvert:
         sentence_docx = os.path.join(save_path, f"{file_name}.docx")
 
         doc = Document()
-
         doc.add_paragraph(sentence)
-
         doc.save(sentence_docx)
-
         self.log_msg.emit(f"{file_name}.docx 저장 완료")
 
     # 메모장 저장
@@ -80,9 +79,7 @@ class FileConvert:
         sentence_docx = os.path.join(file_path, f"{file_name}.docx")
 
         doc = Document()
-
         doc.add_paragraph(sentence)
-
         doc.save(sentence_docx)
 
         self.log_msg.emit(f"{file_name}.docx 저장 완료")
@@ -131,11 +128,24 @@ class FileConvert:
             with open(file_path, "r", encoding="utf-8") as f:
                 text = f.read()
                 sentence = text
-
         else:
             pass
 
         return sentence
+
+    # 처음 발견되는 폰트만 가져옴.
+    # def get_font_from_file(self, file_path: str):
+    #     # 워드 파일 열기
+    #     doc = Document(file_path)
+    #     font = None
+
+    #     for paragraph in doc.paragraphs:
+    #         for run in paragraph.runs:
+    #             font = run.font
+    #             font_info = (font.name, font.size, font.bold, font.italic)
+    #             print(font_info)
+    #             break
+    #     return font
 
     # 전체작업 시작
     def work_start(self):
@@ -155,8 +165,7 @@ class FileConvert:
 
             # 파일에서 문자열 획득
             original_sentence = self.get_sentence_from_file(file_path)
-
-            print(original_sentence)
+            # original_font = self.get_font_from_file(file_path)
 
             if not self.guiDto.poster_option:
                 # 파일 저장
@@ -164,13 +173,18 @@ class FileConvert:
                     self.sentence_to_txt(file.rstrip(file_format), original_sentence)
                 elif self.guiDto.convert_format == "docx":
                     self.sentence_to_docx(file.rstrip(file_format), original_sentence)
+
             elif self.guiDto.poster_option:
                 print("포스터용")
                 # 티스토리 포스터용으로 변환하기
                 if self.guiDto.convert_format == "txt":
-                    self.poster_sentence_to_txt(file.rstrip(file_format), original_sentence)
+                    self.poster_sentence_to_txt(
+                        file.rstrip(file_format), original_sentence
+                    )
                 elif self.guiDto.convert_format == "docx":
-                    self.poster_sentence_to_docx(file.rstrip(file_format), original_sentence)
+                    self.poster_sentence_to_docx(
+                        file.rstrip(file_format), original_sentence
+                    )
 
 
 if __name__ == "__main__":

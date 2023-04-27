@@ -15,6 +15,7 @@ import pandas as pd
 import re
 from docx import Document
 from docx.shared import RGBColor
+from docx.enum import text
 from features.convert_sentence import (
     convert_from_db,
     shuffle_sentence,
@@ -35,7 +36,9 @@ class SynonymMultipleConvert:
         self.log_msg = log_msg
 
     # 워드 저장
-    def sentence_to_docx(self, file_name: str, dict_sentence: dict, used_idx_list: list, limit=""):
+    def sentence_to_docx(
+        self, file_name: str, dict_sentence: dict, used_idx_list: list, limit=""
+    ):
         save_path = os.path.join(self.guiDto.convert_path, f"유의어 변환 {self.run_time}")
 
         if os.path.isdir(save_path) == False:
@@ -47,7 +50,9 @@ class SynonymMultipleConvert:
             sentence_docx = os.path.join(save_path, f"{file_name}.docx")
         else:
             limit = str(limit)
-            sentence_docx = os.path.join(save_path, f"{file_name}_{limit.zfill(2)}.docx")
+            sentence_docx = os.path.join(
+                save_path, f"{file_name}_{limit.zfill(2)}.docx"
+            )
 
         doc = Document()
 
@@ -57,12 +62,16 @@ class SynonymMultipleConvert:
 
         for sentence_i in dict_sentence.keys():
             word = dict_sentence[sentence_i]
-            run = paragraph.add_run(word)
+            run = paragraph.add_run()
             # if sentence_i in used_idx_list:
             #     font = run.font
             #     font.color.rgb = RGBColor(255, 0, 0)  # 빨간색으로 설정
             if word == "\n":
-                run = paragraph.add_run("\n")
+                run = paragraph.add_run()
+                run.add_break(text.WD_BREAK.LINE)  # 줄바꿈 추가
+            else:
+                run = paragraph.add_run(word)
+
             runs.append(run)
 
         doc.save(sentence_docx)
@@ -140,7 +149,9 @@ class SynonymMultipleConvert:
                     header_topic = self.guiDto.header_topic
                     saved_data_header = get_save_data_HEADER()
                     header: str = random.choice(saved_data_header[header_topic])
-                    sentence = insert_header_to_sentence(sentence, header, convert_keyword=file.rstrip(file_format))
+                    sentence = insert_header_to_sentence(
+                        sentence, header, convert_keyword=file.rstrip(file_format)
+                    )
 
                 # 맺음말 삽입
                 footer = ""
@@ -148,14 +159,18 @@ class SynonymMultipleConvert:
                     footer_topic = self.guiDto.footer_topic
                     saved_data_footer = get_save_data_FOOTER()
                     footer: str = random.choice(saved_data_footer[footer_topic])
-                    sentence = insert_footer_to_sentence(sentence, footer, convert_keyword=file.rstrip(file_format))
+                    sentence = insert_footer_to_sentence(
+                        sentence, footer, convert_keyword=file.rstrip(file_format)
+                    )
 
                 # 누락 수정 -> 이걸 추가하면 문장의 위치가 변경돼서 색깔 적용 부분이 고장남
                 sentence_list = list(sentence)
                 dict_sentence = {i: word for i, word in enumerate(sentence_list)}
 
                 # 문자열 파일 저장
-                self.sentence_to_docx(file.rstrip(file_format), dict_sentence, used_idx_list, limit)
+                self.sentence_to_docx(
+                    file.rstrip(file_format), dict_sentence, used_idx_list, limit
+                )
 
 
 if __name__ == "__main__":
