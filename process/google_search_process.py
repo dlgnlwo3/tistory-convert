@@ -74,9 +74,9 @@ class GoogleSearch:
         return img_file
 
     def repeat_scroll(self, driver: webdriver.Chrome):
-        driver.implicitly_wait(1)
+        driver.implicitly_wait(3)
 
-        SCROLL_PAUSE_TIME = 1
+        SCROLL_PAUSE_TIME = 5
 
         last_height = driver.execute_script("return document.body.scrollHeight")
 
@@ -157,7 +157,6 @@ class GoogleSearch:
 
             img_file = self.save_img_from_url(img_url, google_keyword, str(image_count))
             img_list.append(img_file)
-
             image_count += 1
 
             if len(img_list) >= self.guiDto.google_search_count:
