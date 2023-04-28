@@ -311,6 +311,7 @@ def convert_from_db(
             except Exception as e:
                 print(f"{to_change_list} -> {after_word}: {e}")
                 raise Exception(f"{to_change_list} -> {after_word}: {e}")
+
     return dict_sentence, used_idx_list
 
 
@@ -344,6 +345,11 @@ def insert_footer_to_sentence(sentence: str, footer: str, convert_keyword: str):
     sentence = sentence + footer
 
     return sentence
+
+
+def replace_keyword(text: str, convert_keyword: str):
+    text = text.replace("$키워드$", convert_keyword)
+    return text
 
 
 # 테스트용 코드

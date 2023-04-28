@@ -28,7 +28,7 @@ from config import get_save_data_ACCOUNT, write_save_data_ACCOUNT
 from common.utils import global_log_append
 
 
-# pyinstaller -n "tistory convert v1.1.4 이미지 대기시간 추가" -w --onefile --clean  "main.py" --icon "assets\icon.png" --noupx --add-data "venv\Lib\site-packages\newspaper;newspaper"
+# pyinstaller -n "tistory convert v1.1.7 머리맺음말 한칸변경" -w --onefile --clean  "main.py" --icon "assets\icon.png" --noupx --add-data "venv\Lib\site-packages\newspaper;newspaper"
 def my_exception_hook(exctype, value, traceback):
     print(exctype, value, traceback)
     global_log_append(str(value))

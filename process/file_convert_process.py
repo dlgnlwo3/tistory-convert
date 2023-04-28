@@ -115,7 +115,7 @@ class FileConvert:
             doc = Document(file_path)
             all_text = []
             for para in doc.paragraphs:
-                all_text.append(para.text)
+                all_text.append(para.text + "\n")
             for table in doc.tables:
                 for row in table.rows:
                     for cell in row.cells:
@@ -130,6 +130,8 @@ class FileConvert:
                 sentence = text
         else:
             pass
+
+        sentence = sentence.replace("\n ", "\n")
 
         return sentence
 

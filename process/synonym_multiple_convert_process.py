@@ -19,10 +19,10 @@ from docx.enum import text
 from features.convert_sentence import (
     convert_from_db,
     shuffle_sentence,
-    insert_header_to_sentence,
-    insert_footer_to_sentence,
+    replace_keyword,
 )
 import random
+from docx.text.paragraph import Paragraph
 
 
 class SynonymMultipleConvert:
@@ -37,7 +37,13 @@ class SynonymMultipleConvert:
 
     # 워드 저장
     def sentence_to_docx(
-        self, file_name: str, dict_sentence: dict, used_idx_list: list, limit=""
+        self,
+        file_name: str,
+        header: str,
+        footer: str,
+        dict_sentence: dict,
+        used_idx_list: list,
+        limit="",
     ):
         save_path = os.path.join(self.guiDto.convert_path, f"유의어 변환 {self.run_time}")
 
@@ -55,24 +61,37 @@ class SynonymMultipleConvert:
             )
 
         doc = Document()
-
         paragraph = doc.add_paragraph()
 
-        runs = []
+        # 머리말 입력
+        if header:
+            for header_word in header:
+                run = paragraph.add_run(header_word)
+                font = run.font
+                font.color.rgb = RGBColor(0, 0, 255)  # 빨간색으로 설정
 
+            paragraph = doc.add_paragraph()
+            paragraph = doc.add_paragraph()
+
+        # 본문입력 # 여기까지 넣고난 뒤에 섞어야함.
         for sentence_i in dict_sentence.keys():
             word = dict_sentence[sentence_i]
-            run = paragraph.add_run()
-            # if sentence_i in used_idx_list:
-            #     font = run.font
-            #     font.color.rgb = RGBColor(255, 0, 0)  # 빨간색으로 설정
             if word == "\n":
-                run = paragraph.add_run()
-                run.add_break(text.WD_BREAK.LINE)  # 줄바꿈 추가
+                paragraph = doc.add_paragraph()
             else:
                 run = paragraph.add_run(word)
 
-            runs.append(run)
+            if sentence_i in used_idx_list:
+                font = run.font
+                font.color.rgb = RGBColor(255, 0, 0)  # 빨간색으로 설정
+
+        # 맺음말 입력
+        if footer:
+            paragraph = doc.add_paragraph()
+            for footer_word in footer:
+                run = paragraph.add_run(footer_word)
+                font = run.font
+                font.color.rgb = RGBColor(0, 0, 255)  # 빨간색으로 설정
 
         doc.save(sentence_docx)
 
@@ -106,6 +125,8 @@ class SynonymMultipleConvert:
         else:
             pass
 
+        sentence = sentence.replace("\n ", "\n")
+
         return sentence
 
     # 전체작업 시작
@@ -126,10 +147,12 @@ class SynonymMultipleConvert:
             # 파일에서 문자열 획득
             original_sentence = self.get_sentence_from_file(file_path)
 
+            # 문단 랜덤 섞기 체크 시
+            if self.guiDto.shuffle_paragraphs_check:
+                original_sentence = shuffle_sentence(original_sentence)
+
             # 횟수 제한 기능
             for limit in range(1, self.guiDto.synonym_convert_limit + 1):
-                print(limit)
-
                 # 문자열 변환
                 dict_sentence, used_idx_list = convert_from_db(
                     original_sentence,
@@ -137,11 +160,6 @@ class SynonymMultipleConvert:
                     self.guiDto.df_two_way,
                     self.guiDto.df_one_way,
                 )
-                sentence = "".join(dict_sentence.values())
-
-                # 문단 랜덤 섞기 체크 시
-                if self.guiDto.shuffle_paragraphs_check:
-                    sentence = shuffle_sentence(sentence)
 
                 # 머리글 삽입
                 header = ""
@@ -149,9 +167,7 @@ class SynonymMultipleConvert:
                     header_topic = self.guiDto.header_topic
                     saved_data_header = get_save_data_HEADER()
                     header: str = random.choice(saved_data_header[header_topic])
-                    sentence = insert_header_to_sentence(
-                        sentence, header, convert_keyword=file.rstrip(file_format)
-                    )
+                    header = replace_keyword(header, file.rstrip(file_format))
 
                 # 맺음말 삽입
                 footer = ""
@@ -159,20 +175,54 @@ class SynonymMultipleConvert:
                     footer_topic = self.guiDto.footer_topic
                     saved_data_footer = get_save_data_FOOTER()
                     footer: str = random.choice(saved_data_footer[footer_topic])
-                    sentence = insert_footer_to_sentence(
-                        sentence, footer, convert_keyword=file.rstrip(file_format)
-                    )
-
-                # 누락 수정 -> 이걸 추가하면 문장의 위치가 변경돼서 색깔 적용 부분이 고장남
-                sentence_list = list(sentence)
-                dict_sentence = {i: word for i, word in enumerate(sentence_list)}
+                    footer = replace_keyword(footer, file.rstrip(file_format))
 
                 # 문자열 파일 저장
+                file_name = file.rstrip(file_format)
+
                 self.sentence_to_docx(
-                    file.rstrip(file_format), dict_sentence, used_idx_list, limit
+                    file_name,
+                    header,
+                    footer,
+                    dict_sentence,
+                    used_idx_list,
+                    limit,
                 )
 
 
 if __name__ == "__main__":
+    guiDto = GUIDto()
+    guiDto.synonym_convert_limit = 1
+    guiDto.convert_list = [
+        r"C:\consolework\tistory-convert\__test__\테스트_230428\감 효능.docx"
+    ]
+
+    file_path = r"C:\consolework\tistory-convert\excel\유의어db_정렬변경0416.xlsx"
+
+    # two_way_columns = self.two_way_data_type()
+    try:
+        df_two_way: pd.DataFrame = pd.read_excel(
+            file_path, sheet_name="양방향", keep_default_na=""
+        )
+        df_two_way = df_two_way.astype(str)
+        # self.df_two_way = self.df_two_way.loc[:, list(two_way_columns.keys())]
+    except Exception as e:
+        print(e)
+
+    try:
+        df_one_way = pd.read_excel(
+            file_path,
+            converters={"before": str, "after": str},
+            sheet_name="일방향",
+            keep_default_na="",
+        )
+        df_one_way = df_one_way.loc[:, ["before", "after"]]
+    except Exception as e:
+        print(e)
+
+    guiDto.df_two_way = df_two_way
+    guiDto.df_one_way = df_one_way
+
     converter = SynonymMultipleConvert()
+    converter.setGuiDto(guiDto=guiDto)
     converter.work_start()
