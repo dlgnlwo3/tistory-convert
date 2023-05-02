@@ -35,23 +35,14 @@ class GoogleSearchThread(QThread):
     def run(self):
         try:
             # debugpy.debug_this_thread()
-
             self.log_msg.emit(f"작업 시작")
-
             start_time = timer()
-
             search = GoogleSearch()
-
             search.setGuiDto(self.guiDto)
-
             search.setLogger(self.log_msg)
-
             search.work_start()
-
             end_time = timer()
-
             progress_time = timedelta(seconds=end_time - start_time).seconds
-
             self.log_msg.emit(f"총 {str(progress_time)}초 소요되었습니다.")
 
         except Exception as e:

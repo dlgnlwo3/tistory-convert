@@ -23,6 +23,7 @@ from features.convert_sentence import (
 )
 import random
 from docx.text.paragraph import Paragraph
+from pathlib import Path
 
 
 class SynonymMultipleConvert:
@@ -45,6 +46,8 @@ class SynonymMultipleConvert:
         used_idx_list: list,
         limit="",
     ):
+        print(dict_sentence)
+
         save_path = os.path.join(self.guiDto.convert_path, f"유의어 변환 {self.run_time}")
 
         if os.path.isdir(save_path) == False:
@@ -146,20 +149,27 @@ class SynonymMultipleConvert:
 
             # 파일에서 문자열 획득
             original_sentence = self.get_sentence_from_file(file_path)
-
-            # 문단 랜덤 섞기 체크 시
-            if self.guiDto.shuffle_paragraphs_check:
-                original_sentence = shuffle_sentence(original_sentence)
+            file_name = Path(file_path).stem
 
             # 횟수 제한 기능
             for limit in range(1, self.guiDto.synonym_convert_limit + 1):
+                # 문단 랜덤 섞기 체크 시
+
+                if self.guiDto.shuffle_paragraphs_check:
+                    original_sentence = shuffle_sentence(original_sentence)
+
+                dict_sentence = {}
+                used_idx_list = []
+
                 # 문자열 변환
                 dict_sentence, used_idx_list = convert_from_db(
                     original_sentence,
-                    "",
+                    file_name,
                     self.guiDto.df_two_way,
                     self.guiDto.df_one_way,
                 )
+
+                print(dict_sentence)
 
                 # 머리글 삽입
                 header = ""

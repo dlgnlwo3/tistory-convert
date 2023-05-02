@@ -97,15 +97,19 @@ class DaumSearch:
         # $x('//li[contains(@id, "br_tstory")]//a[contains(@class, "f_url")]')
         blog_links = driver.find_elements(By.XPATH, "//c-card//c-title//a")[:3]
 
+        title_driver: webdriver.Chrome = get_chrome_driver_new(
+            is_headless=True, is_secret=True, move_to_corner=False
+        )
+
         for blog_link in blog_links:
             blog_url = blog_link.get_attribute("href")
             print(blog_url)
 
             try:
                 # newspaper3k로 진행
-                top_blog_detail_dto: TopBlogDetailDto = (
-                    TistoryNewsPaper().get_article_from_blog_url(blog_url, daum_keyword)
-                )
+                top_blog_detail_dto: TopBlogDetailDto = TistoryNewsPaper(
+                    title_driver
+                ).get_article_from_blog_url(blog_url, daum_keyword)
             except Exception as e:
                 print(e)
                 top_blog_detail_dto = TopBlogDetailDto()

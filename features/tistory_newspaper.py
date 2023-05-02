@@ -14,19 +14,34 @@ import clipboard
 from bs4 import BeautifulSoup
 from dtos.top_blog_detail_dto import *
 from selenium import webdriver
+from common.chrome import get_chrome_driver_new
+from selenium.webdriver.common.by import By
 
 
 class TistoryNewsPaper:
-    def __init__(self):
-        pass
+    def __init__(self, driver):
+        self.driver: webdriver.Chrome = driver
 
     # 입력받은 url에서 이미지태그 개수와 키워드 반복횟수를 파악합니다.
     def get_article_from_blog_url(self, blog_url: str, keyword: str):
+        driver = self.driver
         top_blog_detail_dto = TopBlogDetailDto()
 
         blog_url = blog_url.replace(".com/", ".com/m/")
 
         print(f"{blog_url} {keyword}")
+
+        driver.get(blog_url)
+
+        article_title = ""
+
+        try:
+            driver.implicitly_wait(2)
+            article_title = driver.find_element(
+                By.CSS_SELECTOR, ".blogview_tit h3"
+            ).get_attribute("textContent")
+        except:
+            pass
 
         # raise Exception("테스트")
 
@@ -41,12 +56,15 @@ class TistoryNewsPaper:
         article.parse()
 
         article_url = article.url
-        article_title = article.title
+
+        if not article_title:
+            article_title = article.title
+
+        if not article_title:
+            article_title = keyword
+
         article_text = article.text
         article_html = article.html
-
-        if article_title == "":
-            article_title = keyword
 
         article_length = len(article_text.replace(" ", "").replace(f"\n", ""))
 

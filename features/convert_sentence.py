@@ -126,7 +126,6 @@ def convert_from_db_two_way(
     # 1. 양방향 변환 시작
     two_way_column_list = df_two_way.columns.to_list()
     for two_way_column in two_way_column_list:
-        print(two_way_column)
         synonym_dbs = df_two_way[str(two_way_column)].to_list()
 
         for synonym_db in synonym_dbs:
@@ -139,7 +138,6 @@ def convert_from_db_two_way(
                     if synonym == "을 만큼":
                         print("")
                     finded_count = sentence.count(synonym)
-                    print(synonym, finded_count)
                     if finded_count > 0:
                         for word_idx in range(finded_count + 1):
                             after_word = synonym_random_select(synonym_list, synonym)
@@ -151,8 +149,6 @@ def convert_from_db_two_way(
                 # 유의어 대상에 하나도 포함되어 있지 않다면?
                 if len(to_change_list) == 0:
                     continue
-
-                print("to_change_list", to_change_list)
 
                 for dict_change in to_change_list:
                     dict_sentence, used_idx_list = update_dict_sentence(
