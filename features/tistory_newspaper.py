@@ -55,6 +55,21 @@ class TistoryNewsPaper:
         article.download()
         article.parse()
 
+        # 이미지 카운트 수정
+        image_count = ""
+        try:
+            driver.implicitly_wait(2)
+            content_img_els = driver.find_elements( By.CSS_SELECTOR, 'article img')
+
+            if len(content_img_els) > 0:
+                image_count = len(content_img_els)
+
+            top_blog_detail_dto.img_count = str(image_count)
+            
+        except:
+            pass
+
+
         article_url = article.url
 
         if not article_title:

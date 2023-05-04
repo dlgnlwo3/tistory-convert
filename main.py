@@ -28,7 +28,7 @@ from config import get_save_data_ACCOUNT, write_save_data_ACCOUNT
 from common.utils import global_log_append
 
 
-# pyinstaller -n "tistory convert v1.1.8 파일일괄변환 수정" -w --onefile --clean  "main.py" --icon "assets\icon.png" --noupx --add-data "venv\Lib\site-packages\newspaper;newspaper"
+# pyinstaller -n "tistory convert v1.1.9 이미지갯수수정" -w --onefile --clean  "main.py" --icon "assets\icon.png" --noupx --add-data "venv\Lib\site-packages\newspaper;newspaper"
 def my_exception_hook(exctype, value, traceback):
     print(exctype, value, traceback)
     global_log_append(str(value))

@@ -36,6 +36,10 @@ class DaumSearch:
         self.run_time = str(datetime.now())[0:-10].replace(":", "")
         self.top_blog_detail_dtos = []
 
+        self.title_driver = get_chrome_driver_new(
+            is_headless=True, is_secret=True, move_to_corner=False
+        )
+
     def setGuiDto(self, guiDto: GUIDto):
         self.guiDto = guiDto
 
@@ -97,10 +101,6 @@ class DaumSearch:
         # $x('//li[contains(@id, "br_tstory")]//a[contains(@class, "f_url")]')
         blog_links = driver.find_elements(By.XPATH, "//c-card//c-title//a")[:3]
 
-        title_driver: webdriver.Chrome = get_chrome_driver_new(
-            is_headless=True, is_secret=True, move_to_corner=False
-        )
-
         for blog_link in blog_links:
             blog_url = blog_link.get_attribute("href")
             print(blog_url)
@@ -108,7 +108,7 @@ class DaumSearch:
             try:
                 # newspaper3k로 진행
                 top_blog_detail_dto: TopBlogDetailDto = TistoryNewsPaper(
-                    title_driver
+                    self.title_driver
                 ).get_article_from_blog_url(blog_url, daum_keyword)
             except Exception as e:
                 print(e)
@@ -122,11 +122,13 @@ class DaumSearch:
                 top_blog_detail_dto.article_url = blog_url
 
             try:
-                img_count = driver.find_element(
-                    By.XPATH, f'//a[contains(@href, "{blog_url}")]//c-badge-text/span'
-                ).get_attribute("textContent")
-                img_count = int(img_count)
-                top_blog_detail_dto.img_count = img_count
+                # img_count = driver.find_element(
+                #     By.XPATH, f'//a[contains(@href, "{blog_url}")]//c-badge-text/span'
+                # ).get_attribute("textContent")
+                if not top_blog_detail_dto.img_count:
+                    top_thumnail_imgs = driver.find_elements(By.CSS_SELECTOR, f'a[class="thumb_bf"][href="{blog_url}"]')
+                    img_count = len(top_thumnail_imgs)
+                    top_blog_detail_dto.img_count = img_count
             except Exception as e:
                 print(e)
                 print("이미지 개수 탐색 실패")
@@ -191,11 +193,9 @@ class DaumSearch:
                     ).get_attribute("href")
 
                     try:
-                        top_blog_detail_dto: TopBlogDetailDto = (
-                            TistoryNewsPaper().get_article_from_blog_url(
-                                blog_url, daum_keyword
-                            )
-                        )
+                        top_blog_detail_dto: TopBlogDetailDto = TistoryNewsPaper(
+                            self.title_driver
+                        ).get_article_from_blog_url(blog_url, daum_keyword)
                         top_blog_detail_dict = top_blog_detail_dto.get_dict()
                         article_text = top_blog_detail_dict["내용"]
                         article_title = (
