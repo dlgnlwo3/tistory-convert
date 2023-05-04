@@ -27,7 +27,13 @@ class TistoryNewsPaper:
         driver = self.driver
         top_blog_detail_dto = TopBlogDetailDto()
 
-        blog_url = blog_url.replace(".com/", ".com/m/")
+
+        if blog_url.find(".com") > -1 and blog_url.find(".com/m/") == -1:
+            blog_url = blog_url.replace(".com/", ".com/m/")
+        elif blog_url.find(".org") > -1 and blog_url.find(".org/m/") == -1:
+            blog_url = blog_url.replace(".org/", ".org/m/")
+        elif blog_url.find(".kr") > -1 and blog_url.find(".kr/m/") == -1:
+            blog_url = blog_url.replace(".kr/", ".kr/m/")
 
         print(f"{blog_url} {keyword}")
 
@@ -55,16 +61,19 @@ class TistoryNewsPaper:
         article.download()
         article.parse()
 
-        # 이미지 카운트 수정
-        image_count = ""
         try:
             driver.implicitly_wait(2)
-            content_img_els = driver.find_elements( By.CSS_SELECTOR, 'article img')
+            content_img_els = driver.find_elements(By.CSS_SELECTOR, 'article img')
 
-            if len(content_img_els) > 0:
-                image_count = len(content_img_els)
 
-            top_blog_detail_dto.img_count = str(image_count)
+            content_img_list = []
+            for content_img in content_img_els:
+                img_src = content_img.get_attribute('src')
+                if img_src.find('/thumb/') > - 1 or img_src.find('daumcdn.net/map') > - 1:
+                    continue
+                content_img_list.append(content_img)
+
+            top_blog_detail_dto.img_count = str(len(content_img_list))
             
         except:
             pass
