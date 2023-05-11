@@ -85,12 +85,13 @@ class SearchTab(QWidget):
             search_file_save_path = self.saved_data_setting[SaveFileSetting.SEARCH_FILE_SAVE_PATH.value]
             print(search_file_save_path)
 
+
         guiDto = GUIDto()
         guiDto.daum_keyword_list = selected_daum_keyword_list
         guiDto.daum_start_page = daum_start_page
         guiDto.daum_end_page = daum_end_page
         guiDto.daum_search_count = daum_search_count
-        guiDto.daum_search_date = self.daum_search_date.text()
+        guiDto.daum_search_date = self.daum_search_date.date().toString("yyyy-MM-dd")
         guiDto.search_file_save_path = search_file_save_path
         guiDto.system_sound_checkbox = self.system_sound_checkbox.isChecked()
         guiDto.system_down_checkbox = self.system_down_checkbox.isChecked()
@@ -540,6 +541,7 @@ class SearchTab(QWidget):
 
         # 수집할 글 작성일자 (이전에 작성된 글)
         daum_search_date_groupbox = QGroupBox("수집할 글 작성일자")
+
         self.daum_search_date = QDateEdit(QDate.currentDate().addMonths(-1))
 
         daum_search_date_inner_layout = QHBoxLayout()
