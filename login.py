@@ -1,12 +1,21 @@
-# tkinter를 사용하기 위한 import
-from main import MainUI
-import sys
+if 1 == 1:
+    import sys
+    import warnings
+    import os
+
+    sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
+    warnings.simplefilter("ignore", UserWarning)
+    sys.coinit_flags = 2
+
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
+from datetime import datetime
 from PyQt5.QtNetwork import QNetworkAccessManager, QNetworkRequest
-from config import get_save_data_ACCOUNT, write_save_data_ACCOUNT
+from config import *
 from features.google_sheet import login
+
+from main import MainUI
 
 
 class LoginForm(QWidget):
@@ -15,7 +24,7 @@ class LoginForm(QWidget):
         saved_account = get_save_data_ACCOUNT()
         self.save_login_id = saved_account["id"]
         self.save_login_pw = saved_account["pw"]
-        self.initUi()
+        self.initUI()
 
     def set_window_icon_from_response(self, http_response):
         pixmap = QPixmap()
@@ -23,7 +32,7 @@ class LoginForm(QWidget):
         icon = QIcon(pixmap)
         self.setWindowIcon(icon)
 
-    def initUi(self):
+    def initUI(self):
         # 이미지 주소
         ICON_IMAGE_URL = "https://i.imgur.com/yUWPOGp.png"
         self.icon = QNetworkAccessManager()
@@ -54,7 +63,7 @@ class LoginForm(QWidget):
         login_groupbox.setLayout(login_layout)
 
         layout = QVBoxLayout()
-        layout.addLayout(login_layout)
+        layout.addWidget(login_groupbox)
         self.setLayout(layout)
 
         # 앱 기본 설정
@@ -77,9 +86,7 @@ class LoginForm(QWidget):
         login_pw = self.login_pw_edit.text()
 
         question_msg = "저장하시겠습니까?"
-        reply = QMessageBox.question(
-            self, "계정 저장", question_msg, QMessageBox.Yes, QMessageBox.No
-        )
+        reply = QMessageBox.question(self, "계정 저장", question_msg, QMessageBox.Yes, QMessageBox.No)
         if reply != QMessageBox.Yes:
             return
 

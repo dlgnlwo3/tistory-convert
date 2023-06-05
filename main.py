@@ -65,9 +65,7 @@ class MainUI(QWidget):
     # 프로그램 닫기 클릭 시
     def closeEvent(self, event):
         quit_msg = "프로그램을 종료하시겠습니까?"
-        reply = QMessageBox.question(
-            self, "프로그램 종료", quit_msg, QMessageBox.Yes, QMessageBox.No
-        )
+        reply = QMessageBox.question(self, "프로그램 종료", quit_msg, QMessageBox.Yes, QMessageBox.No)
 
         if reply == QMessageBox.Yes:
             print(f"프로그램을 종료합니다.")
