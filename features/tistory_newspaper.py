@@ -100,6 +100,8 @@ class TistoryNewsPaper:
         # img_count = len(img_tags)
         # print(f"이미지 태그 개수: {img_count}")
 
+        # clipboard.copy(str(article_text))
+
         top_blog_detail_dto.keyword = keyword
         top_blog_detail_dto.article_url = article_url
         top_blog_detail_dto.article_title = article_title
@@ -112,9 +114,11 @@ class TistoryNewsPaper:
 
 
 if __name__ == "__main__":
-    blog_url = f"https://hello-hi-hello.com/28"
-    keyword = "4월 축제"
 
-    newspaper = TistoryNewsPaper()
+    blog_url = f"https://ruha007.tistory.com/95"
+    keyword = "변비"
+    driver = get_chrome_driver_new(is_headless=True, is_secret=True)
+
+    newspaper = TistoryNewsPaper(driver)
     topBlogDetailDto = newspaper.get_article_from_blog_url(blog_url, keyword)
     topBlogDetailDto.to_print()
