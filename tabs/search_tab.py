@@ -19,6 +19,7 @@ import pandas as pd
 import io
 import numpy as np
 import win32clipboard
+from widgets.qline_edit import CustomLineEdit
 
 
 class SearchTab(QWidget):
@@ -244,6 +245,7 @@ class SearchTab(QWidget):
             print(f"취소")
             return
 
+        clipboard_list = list(map(lambda x: str(x).strip(), clipboard_list))
         self.saved_data_daum[SaveFileDaum.DAUM.value].extend(clipboard_list)
         dict_save = {SaveFileDaum.DAUM.value: self.saved_data_daum[SaveFileDaum.DAUM.value]}
         write_save_data_daum(dict_save)
@@ -269,7 +271,9 @@ class SearchTab(QWidget):
         else:
             print(f"취소")
             return
+        
 
+        clipboard_list = list(map(lambda x: str(x).strip(), clipboard_list))
         self.saved_data_google[SaveFileGoogle.GOOGLE.value].extend(clipboard_list)
         dict_save = {SaveFileGoogle.GOOGLE.value: self.saved_data_google[SaveFileGoogle.GOOGLE.value]}
         write_save_data_google(dict_save)
@@ -439,7 +443,7 @@ class SearchTab(QWidget):
     def initUI(self):
         # 다음 입력 그룹박스
         daum_input_groupbox = QGroupBox("글 수집 키워드")
-        self.daum_input = QLineEdit()
+        self.daum_input = CustomLineEdit()
         self.daum_input.returnPressed.connect(self.daum_save_button_clicked)
 
         daum_input_inner_layout = QHBoxLayout()
@@ -476,7 +480,7 @@ class SearchTab(QWidget):
 
         # 구글 입력 그룹박스
         google_input_groupbox = QGroupBox(f"이미지 수집 키워드")
-        self.google_input = QLineEdit()
+        self.google_input = CustomLineEdit()
         self.google_input.returnPressed.connect(self.google_save_button_clicked)
 
         google_input_inner_layout = QHBoxLayout()
@@ -511,11 +515,11 @@ class SearchTab(QWidget):
 
         # 수집할 페이지 수
         daum_page_setting_groupbox = QGroupBox("수집할 페이지 수")
-        self.daum_start_page = QLineEdit()
+        self.daum_start_page = CustomLineEdit()
         self.daum_start_page.setPlaceholderText("5")
         self.daum_start_page.setValidator(QIntValidator())
         self.daum_page_between = QLabel(" ~ ")
-        self.daum_end_page = QLineEdit()
+        self.daum_end_page = CustomLineEdit()
         self.daum_end_page.setPlaceholderText("10")
         self.daum_end_page.setValidator(QIntValidator())
         self.daum_page_range = QLabel(" 페이지 사이")
@@ -529,7 +533,7 @@ class SearchTab(QWidget):
 
         # 키워드별로 수집할 글 개수
         daum_search_count_groupbox = QGroupBox("키워드별로 수집할 글 개수")
-        self.daum_search_count = QLineEdit()
+        self.daum_search_count = CustomLineEdit()
         self.daum_search_count.setPlaceholderText("10")
         self.daum_search_count.setValidator(QIntValidator())
         self.daum_search_count_label = QLabel("개")
@@ -550,7 +554,7 @@ class SearchTab(QWidget):
 
         # 키워드별로 수집할 이미지 개수
         google_search_count_groupbox = QGroupBox("키워드별로 수집할 이미지 개수")
-        self.google_search_count = QLineEdit()
+        self.google_search_count = CustomLineEdit()
         self.google_search_count.setPlaceholderText("10")
         self.google_search_count.setValidator(QIntValidator())
         self.google_search_count_label = QLabel("개")

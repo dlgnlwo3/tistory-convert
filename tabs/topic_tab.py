@@ -10,6 +10,7 @@ from datetime import *
 
 from common.utils import *
 from config import *
+from widgets.qline_edit import CustomLineEdit
 
 
 class TopicTab(QWidget):
@@ -353,7 +354,7 @@ class TopicTab(QWidget):
         # 주제 관리
         topic_groupbox = QGroupBox("주제 관리")
         self.topic_input_label = QLabel("주제 관리")
-        self.topic_input = QLineEdit()
+        self.topic_input = CustomLineEdit()
         self.topic_save_button = QPushButton("저장")
         self.topic_remove_button = QPushButton("제거")
         self.topic_list_tablewidget = QTableWidget()
@@ -374,7 +375,7 @@ class TopicTab(QWidget):
         header_groupbox = QGroupBox("머리글 관리")
         self.header_input_label = QLabel("머리글 관리")
         self.header_topic_combobox = QComboBox()
-        self.header_input = QLineEdit()
+        self.header_input = CustomLineEdit()
         self.header_save_button = QPushButton("저장")
         self.header_remove_button = QPushButton("제거")
         self.header_list_tablewidget = QTableWidget()
@@ -397,7 +398,7 @@ class TopicTab(QWidget):
         footer_groupbox = QGroupBox("맺음말 관리")
         self.footer_input_label = QLabel("맺음말 관리")
         self.footer_topic_combobox = QComboBox()
-        self.footer_input = QLineEdit()
+        self.footer_input = CustomLineEdit()
         self.footer_save_button = QPushButton("저장")
         self.footer_remove_button = QPushButton("제거")
         self.footer_list_tablewidget = QTableWidget()

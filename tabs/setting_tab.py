@@ -10,6 +10,7 @@ from datetime import *
 
 from common.utils import *
 from config import *
+from widgets.qline_edit import CustomLineEdit
 
 
 class SettingTab(QWidget):
@@ -90,7 +91,7 @@ class SettingTab(QWidget):
     def initUI(self):
         # 수집 파일 저장 경로
         search_file_save_path_groupbox = QGroupBox("수집 파일 저장 경로")
-        self.search_file_save_path = QLineEdit(
+        self.search_file_save_path = CustomLineEdit(
             f"{self.saved_data_setting[SaveFileSetting.SEARCH_FILE_SAVE_PATH.value]}"
         )
         self.search_file_save_path.setDisabled(True)
@@ -108,7 +109,7 @@ class SettingTab(QWidget):
 
         # 유의어 엑셀 DB 불러오기
         synonym_file_groupbox = QGroupBox("유의어 엑셀 DB 불러오기")
-        self.synonym_file = QLineEdit(f"{self.saved_data_synonym[SaveFileSYNONYM.SYNONYM_FILE_SAVE_PATH.value]}")
+        self.synonym_file = CustomLineEdit(f"{self.saved_data_synonym[SaveFileSYNONYM.SYNONYM_FILE_SAVE_PATH.value]}")
         self.synonym_file.setDisabled(True)
         self.synonym_file_select_button = QPushButton("파일 선택")
         self.synonym_file_save_button = QPushButton("저장")
