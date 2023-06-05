@@ -160,6 +160,15 @@ class SynonymConvertTab(QWidget):
     def copy_sentence_button_clicked(self):
         print("copy_sentence_button_clicked")
         sentence = self.result_sentence_textedit.toPlainText()
+
+        LF = '\n'
+        CRLF = '\r\n'
+        CR = '\r'
+
+        # sentence = sentence.replace(CRLF, LF).replace(CR, LF)
+        sentence = sentence.replace(LF, CRLF)
+
+
         clipboard.copy(str(sentence))
         QMessageBox.information(self, "복사", f"클립보드에 복사되었습니다.")
 
@@ -219,6 +228,7 @@ class SynonymConvertTab(QWidget):
         ban_synonym_groupbox = QGroupBox()
         self.ban_synonym_input_label = QLabel("변환 금지어 입력")
         self.ban_synonym_input = CustomLineEdit()
+        self.ban_synonym_input.setPlaceholderText('여러 금지어를 "="로 구분하여 입력할 수 있습니다. ex)바나나 효능=다이어트')
 
         ban_synonym_inner_layout = QHBoxLayout()
         ban_synonym_inner_layout.addWidget(self.ban_synonym_input_label)

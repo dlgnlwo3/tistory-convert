@@ -49,6 +49,10 @@ class DaumSearch:
 
     def log_append(self, text:str):
         print('log_append', text)
+        try:
+            self.log_msg.emit(text)
+        except:
+            pass
 
     # 엑셀 저장
     def blog_detail_to_excel(self, top_blog_detail_dtos):
@@ -220,7 +224,8 @@ class DaumSearch:
                             break
 
                     else:
-                        self.log_append(f"({search_date}) 보다 이후에 작성된 글입니다. ({blog_date})")
+                        # self.log_append(f"({search_date}) 보다 이후에 작성된 글입니다. ({blog_date})")
+                        print(f"({search_date}) 보다 이후에 작성된 글입니다. ({blog_date})")
                         continue
 
                 if len(search_blog_list) >= self.guiDto.daum_search_count:
