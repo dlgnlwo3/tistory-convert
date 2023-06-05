@@ -3,9 +3,9 @@ import warnings
 
 warnings.simplefilter("ignore", UserWarning)
 sys.coinit_flags = 2
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
-from PyQt5.QtCore import *
+from PySide6.QtGui import *
+from PySide6.QtWidgets import *
+from PySide6.QtCore import *
 from datetime import *
 
 from common.utils import *
@@ -42,8 +42,8 @@ class TopicTab(QWidget):
 
         for i, keyword in enumerate(self.saved_data_topic[SaveFileTopic.TOPIC.value]):
             self.topic_list_tablewidget.setItem(i, 0, QTableWidgetItem(keyword))
-
-        self.topic_list_tablewidget.horizontalHeader().setSectionResizeMode(1)
+        self.topic_list_tablewidget.horizontalHeader().setStretchLastSection(True)
+        # self.topic_list_tablewidget.horizontalHeader().resizeSection(0, 500)
         self.topic_list_tablewidget.setSelectionMode(QAbstractItemView.MultiSelection)
 
     def topic_save_button_clicked(self):
@@ -322,7 +322,10 @@ class TopicTab(QWidget):
         except Exception as e:
             pass
 
-        self.header_list_tablewidget.horizontalHeader().setSectionResizeMode(1)
+
+        self.header_list_tablewidget.horizontalHeader().setStretchLastSection(True)
+        # self.header_list_tablewidget.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeMode.Fixed)
+        # self.header_list_tablewidget.horizontalHeader().resizeSection(0, 500)
         self.header_list_tablewidget.setSelectionMode(QAbstractItemView.MultiSelection)
 
     def set_footer_list_tablewidget(self):
@@ -340,8 +343,9 @@ class TopicTab(QWidget):
                 self.footer_list_tablewidget.setItem(i, 0, QTableWidgetItem(footer))
         except Exception as e:
             pass
-
-        self.footer_list_tablewidget.horizontalHeader().setSectionResizeMode(1)
+        self.footer_list_tablewidget.horizontalHeader().setStretchLastSection(True)
+        # self.footer_list_tablewidget.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeMode.Fixed)
+        # self.footer_list_tablewidget.horizontalHeader().resizeSection(0, 500)
         self.footer_list_tablewidget.setSelectionMode(QAbstractItemView.MultiSelection)
 
     # 메인 UI

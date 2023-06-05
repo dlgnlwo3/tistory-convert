@@ -8,13 +8,14 @@ if 1 == 1:
     sys.coinit_flags = 2
 
 from tkinter import *
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
-from PyQt5.QtCore import *
+
+from PySide6.QtCore import *
+from PySide6.QtGui import *
+from PySide6.QtWidgets import *
 from datetime import datetime
 from common.chrome import *
 from dtos.gui_dto import *
-from PyQt5.QtNetwork import QNetworkAccessManager, QNetworkRequest
+from PySide6.QtNetwork import QNetworkAccessManager, QNetworkRequest
 from config import *
 
 from tabs.search_tab import SearchTab
@@ -74,7 +75,7 @@ class MainUI(QWidget):
     # 가운데 정렬
     def center(self):
         qr = self.frameGeometry()
-        cp = QDesktopWidget().availableGeometry().center()
+        cp = QGuiApplication.primaryScreen().availableGeometry().center()
         qr.moveCenter(cp)
         self.move(qr.topLeft())
 

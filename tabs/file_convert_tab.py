@@ -3,9 +3,9 @@ import warnings
 
 warnings.simplefilter("ignore", UserWarning)
 sys.coinit_flags = 2
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
-from PyQt5.QtCore import *
+from PySide6.QtGui import *
+from PySide6.QtWidgets import *
+from PySide6.QtCore import *
 from datetime import *
 
 from common.utils import *
@@ -22,7 +22,7 @@ class FileConvertTab(QWidget):
         self.initUI()
 
     # 로그 작성
-    @pyqtSlot(str)
+    @Slot(str)
     def log_append(self, text):
         today = str(datetime.now())[0:10]
         now = str(datetime.now())[0:-7]
@@ -115,13 +115,13 @@ class FileConvertTab(QWidget):
         self.poster_convert_stop_button.setDisabled(False)
         self.convert_thread.start()
 
-    @pyqtSlot()
+    @Slot()
     def convert_stop_button_clicked(self):
         print(f"search stop clicked")
         self.log_append(f"중지 클릭")
         self.convert_finished()
 
-    @pyqtSlot()
+    @Slot()
     def convert_finished(self):
         print(f"search thread finished")
         self.log_append(f"작업 종료")
