@@ -234,4 +234,4 @@ class AppWidget(QWidget):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     main_ui = MainUI()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())

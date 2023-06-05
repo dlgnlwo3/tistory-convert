@@ -36,9 +36,6 @@ class DaumSearch:
         self.run_time = str(datetime.now())[0:-10].replace(":", "")
         self.top_blog_detail_dtos = []
 
-        self.title_driver = get_chrome_driver_new(
-            is_headless=True, is_secret=True, move_to_corner=False
-        )
 
     def setGuiDto(self, guiDto: GUIDto):
         self.guiDto = guiDto
@@ -111,10 +108,8 @@ class DaumSearch:
             print(blog_url)
 
             try:
-                # newspaper3k로 진행
                 top_blog_detail_dto: TopBlogDetailDto = TistoryNewsPaper(
-                    self.title_driver
-                ).get_article_from_blog_url(blog_url, daum_keyword)
+                ).get_article_detail(blog_url, daum_keyword)
             except Exception as e:
                 print(e)
                 top_blog_detail_dto = TopBlogDetailDto()
@@ -145,7 +140,6 @@ class DaumSearch:
 
     def search_blog(self, daum_keyword: str):
         driver = self.driver
-
         search_blog_list = []
 
         for current_page in range(
@@ -200,8 +194,7 @@ class DaumSearch:
 
                         try:
                             top_blog_detail_dto: TopBlogDetailDto = TistoryNewsPaper(
-                                self.title_driver
-                            ).get_article_from_blog_url(blog_url, daum_keyword)
+                            ).get_article_detail(blog_url, daum_keyword)
                             top_blog_detail_dict = top_blog_detail_dto.get_dict()
                             article_text = top_blog_detail_dict["내용"]
                             article_title = (
