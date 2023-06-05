@@ -154,6 +154,15 @@ class LoginWidget(QWidget):
 class AppWidget(QWidget):
     def __init__(self):
         super().__init__()
+        print(f"LOG_FOLDER_NAME: {LOG_FOLDER_NAME}")
+        print(f"PROGRAM_PATH: {PROGRAM_PATH}")
+        print(f"USER_SAVE_PATH_DAUM: {USER_SAVE_PATH_DAUM}")
+        print(f"USER_SAVE_PATH_GOOGLE: {USER_SAVE_PATH_GOOGLE}")
+        print(f"USER_SAVE_PATH_SETTING: {USER_SAVE_PATH_SETTING}")
+        print(f"USER_SAVE_PATH_SYNONYM: {USER_SAVE_PATH_SYNONYM}")
+        print(f"USER_SAVE_PATH_TOPIC: {USER_SAVE_PATH_TOPIC}")
+        print(f"USER_SAVE_PATH_HEADER: {USER_SAVE_PATH_HEADER}")
+        print(f"USER_SAVE_PATH_FOOTER: {USER_SAVE_PATH_FOOTER}")
 
     def initIcon(self):
         # 이미지 주소
@@ -225,4 +234,4 @@ class AppWidget(QWidget):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     main_ui = MainUI()
-    sys.exit(app.exec())
+    sys.exit(app.exec_())

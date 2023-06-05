@@ -219,7 +219,6 @@ class DaumSearch:
                         search_blog_list.append(article_title)
 
                         if len(search_blog_list) >= self.guiDto.daum_search_count:
-
                             self.log_append(f"{daum_keyword}: 수집할 글 개수에 도달했습니다.")
                             break
 
@@ -232,6 +231,7 @@ class DaumSearch:
                     print(f"{daum_keyword}: 수집할 글 개수에 도달했습니다.")
                     self.log_append(f"{daum_keyword}: 수집할 글 개수에 도달했습니다.")
                     break
+
             except Exception as e:
                 self.log_append(f"{current_page}페이지 조회 실패")
                 self.log_append(f"입력하신 페이지 수가 존재하지 않아 수집할 글 개수에 도달하지 못했습니다.")
@@ -262,6 +262,7 @@ class DaumSearch:
 
                     # 2. 입력받은 페이지에서 입력한 갯수만큼 블로그 글 수집
                     self.search_blog(daum_keyword)
+                    
                 except Exception as e:
                     print(e)
                     self.log_append(str(e))
