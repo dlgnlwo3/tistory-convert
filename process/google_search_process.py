@@ -22,7 +22,9 @@ class GoogleSearch:
         # 현재 로컬에 저장된 크롬 기준으로 오픈한다.
         # open_browser()
         self.default_wait = 10
-        self.driver = get_chrome_driver_new(is_headless=True, is_secret=True, move_to_corner=False)
+        self.driver = get_chrome_driver_new(
+            is_headless=True, is_secret=True, move_to_corner=False
+        )
         self.driver.implicitly_wait(self.default_wait)
         self.run_time = str(datetime.now())[0:-10].replace(":", "")
 
@@ -34,7 +36,9 @@ class GoogleSearch:
 
     # 이미지 저장
     def save_img_from_url(self, url: str, keyword: str, i: str):
-        img_path = os.path.join(self.guiDto.search_file_save_path, f"이미지수집 {self.run_time}")
+        img_path = os.path.join(
+            self.guiDto.search_file_save_path, f"이미지수집 {self.run_time}"
+        )
         if self.guiDto.from_convert_tab == True:
             img_path = os.path.join(self.guiDto.search_file_save_path)
 
@@ -51,7 +55,9 @@ class GoogleSearch:
         if format in ("jpg", "JPG", "jpeg", "JPEG", "png", "PNG", "gif", "GIF"):
             img_format = format
 
-        img_file = os.path.join(keyword_img_path, f"{keyword}_{i.zfill(2)}.{img_format}")
+        img_file = os.path.join(
+            keyword_img_path, f"{keyword}_{i.zfill(2)}.{img_format}"
+        )
         print(img_file)
 
         try:
@@ -60,7 +66,7 @@ class GoogleSearch:
 
         except Exception as e:
             print(f"이미지 생성 실패 {e}")
-            self.log_msg.emit(f"{keyword}{i.zfill(2)}.{img_format} 이미지 생성 실패 {e}")
+            self.log_msg.emit(f"{keyword}{i.zfill(2)}.{img_format} 이미지 생성 실패 {e} {url}")
 
         finally:
             time.sleep(0.2)
@@ -68,9 +74,9 @@ class GoogleSearch:
         return img_file
 
     def repeat_scroll(self, driver: webdriver.Chrome):
-        driver.implicitly_wait(1)
+        driver.implicitly_wait(3)
 
-        SCROLL_PAUSE_TIME = 1
+        SCROLL_PAUSE_TIME = 5
 
         last_height = driver.execute_script("return document.body.scrollHeight")
 
@@ -104,16 +110,22 @@ class GoogleSearch:
         # 이미지가 있으면...
         # $x('//div/h3/following-sibling::a[1]//img')
         WebDriverWait(driver, 10).until(
-            EC.visibility_of_element_located((By.XPATH, "//div/h3/following-sibling::a[1]//img"))
+            EC.visibility_of_element_located(
+                (By.XPATH, "//div/h3/following-sibling::a[1]//img")
+            )
         )
 
         self.repeat_scroll(driver)
 
         time.sleep(1)
 
-        img_links = driver.find_elements(By.XPATH, "//div/h3/following-sibling::a[1]//img")
+        img_links = driver.find_elements(
+            By.XPATH, "//div/h3/following-sibling::a[1]//img"
+        )
 
         self.log_msg.emit(f"{google_keyword}: {len(img_links)}개의 이미지를 발견했습니다.")
+
+        image_count = 1
 
         for i, img_link in enumerate(img_links):
             action = ActionChains(driver)
@@ -138,15 +150,22 @@ class GoogleSearch:
             finally:
                 driver.implicitly_wait(self.default_wait)
 
-            img_file = self.save_img_from_url(img_url, google_keyword, str(i + 1))
+            print("img_url", img_url)
 
+            if not img_url:
+                continue
+
+            img_file = self.save_img_from_url(img_url, google_keyword, str(image_count))
             img_list.append(img_file)
+            image_count += 1
 
             if len(img_list) >= self.guiDto.google_search_count:
                 print("수집할 이미지 개수에 도달했습니다.")
                 break
 
-        self.log_msg.emit(f"{google_keyword}: {len(img_links)} 중 {len(img_list)}개의 이미지를 수집했습니다.")
+        self.log_msg.emit(
+            f"{google_keyword}: {len(img_links)} 중 {len(img_list)}개의 이미지를 수집했습니다."
+        )
         time.sleep(1)
 
     # 전체작업 시작

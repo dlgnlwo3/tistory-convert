@@ -6,10 +6,9 @@ if 1 == 1:
     sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
     warnings.simplefilter("ignore", UserWarning)
     sys.coinit_flags = 2
-from tkinter import *
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
-from PyQt5.QtCore import *
+from PySide6.QtGui import *
+from PySide6.QtWidgets import *
+from PySide6.QtCore import *
 from dtos.gui_dto import *
 from datetime import timedelta
 from timeit import default_timer as timer
@@ -21,8 +20,8 @@ from common.utils import beepsound
 
 
 class GoogleSearchThread(QThread):
-    log_msg = pyqtSignal(str)
-    search_finished = pyqtSignal()
+    log_msg = Signal(str)
+    search_finished = Signal()
 
     # 호출 시점
     def __init__(self):
@@ -35,23 +34,14 @@ class GoogleSearchThread(QThread):
     def run(self):
         try:
             # debugpy.debug_this_thread()
-
             self.log_msg.emit(f"작업 시작")
-
             start_time = timer()
-
             search = GoogleSearch()
-
             search.setGuiDto(self.guiDto)
-
             search.setLogger(self.log_msg)
-
             search.work_start()
-
             end_time = timer()
-
             progress_time = timedelta(seconds=end_time - start_time).seconds
-
             self.log_msg.emit(f"총 {str(progress_time)}초 소요되었습니다.")
 
         except Exception as e:

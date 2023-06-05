@@ -3,9 +3,9 @@ import warnings
 
 warnings.simplefilter("ignore", UserWarning)
 sys.coinit_flags = 2
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
-from PyQt5.QtCore import *
+from PySide6.QtGui import *
+from PySide6.QtWidgets import *
+from PySide6.QtCore import *
 from datetime import *
 
 from common.utils import *
@@ -25,7 +25,7 @@ class SettingTab(QWidget):
         self.initUI()
 
     # 로그 작성
-    @pyqtSlot(str)
+    @Slot(str)
     def log_append(self, text):
         today = str(datetime.now())[0:10]
         now = str(datetime.now())[0:-7]

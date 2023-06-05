@@ -3,9 +3,9 @@ import warnings
 
 warnings.simplefilter("ignore", UserWarning)
 sys.coinit_flags = 2
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
-from PyQt5.QtCore import *
+from PySide6.QtGui import *
+from PySide6.QtWidgets import *
+from PySide6.QtCore import *
 from datetime import *
 
 from common.utils import *
@@ -25,7 +25,7 @@ class SynonymMultipleConvertTab(QWidget):
         self.initUI()
 
     # 로그 작성
-    @pyqtSlot(str)
+    @Slot(str)
     def log_append(self, text):
         today = str(datetime.now())[0:10]
         now = str(datetime.now())[0:-7]
@@ -89,7 +89,6 @@ class SynonymMultipleConvertTab(QWidget):
         selected_file_list = []
         self.convert_listwidget.selectAll()
         if len(self.convert_listwidget.selectedItems()) <= 0:
-            print(f"선택된 파일이 없습니다.")
             QMessageBox.information(self, "작업 시작", f"선택된 파일이 없습니다.")
             return
         else:
@@ -101,12 +100,13 @@ class SynonymMultipleConvertTab(QWidget):
         # 엑셀 DB 확인
         self.saved_data_synonym = get_save_data_SYNONYM()
         if self.saved_data_synonym[SaveFileSYNONYM.SYNONYM_FILE_SAVE_PATH.value] == "":
-            print(f"엑셀DB 파일을 설정해주세요.")
             # self.log_append(f"저장 경로를 먼저 설정해주세요.")
             QMessageBox.information(self, "작업 시작", f"엑셀DB 파일을 설정해주세요.")
             return
         else:
-            search_file_save_path = self.saved_data_synonym[SaveFileSYNONYM.SYNONYM_FILE_SAVE_PATH.value]
+            search_file_save_path = self.saved_data_synonym[
+                SaveFileSYNONYM.SYNONYM_FILE_SAVE_PATH.value
+            ]
 
         # 파일 유효성 검사
         if not os.path.isfile(search_file_save_path):
@@ -140,8 +140,6 @@ class SynonymMultipleConvertTab(QWidget):
         guiDto.system_sound_checkbox = self.system_sound_checkbox.isChecked()
         guiDto.system_down_checkbox = self.system_down_checkbox.isChecked()
 
-        print(f"작업을 시작합니다.")
-
         # 스레드 호출
         self.convert_thread = ConvertThread()
         self.convert_thread.log_msg.connect(self.log_append)
@@ -152,13 +150,13 @@ class SynonymMultipleConvertTab(QWidget):
         self.convert_stop_button.setDisabled(False)
         self.convert_thread.start()
 
-    @pyqtSlot()
+    @Slot()
     def convert_stop_button_clicked(self):
         print(f"search stop clicked")
         self.log_append(f"중지 클릭")
         self.convert_finished()
 
-    @pyqtSlot()
+    @Slot()
     def convert_finished(self):
         print(f"search thread finished")
         self.log_append(f"작업 종료")
@@ -186,7 +184,6 @@ class SynonymMultipleConvertTab(QWidget):
         selected_google_keyword_list = []
         self.convert_listwidget.selectAll()
         if len(self.convert_listwidget.selectedItems()) <= 0:
-            print(f"선택된 파일이 없습니다.")
             QMessageBox.information(self, "작업 시작", f"선택된 파일이 없습니다.")
             return
         else:
@@ -195,14 +192,12 @@ class SynonymMultipleConvertTab(QWidget):
                 file_name = file_item.text()
                 file_name = file_name.replace(".docx", "").replace(".txt", "")
                 selected_google_keyword_list.append(file_name)
-        print(selected_google_keyword_list)
 
         # 고객 요구사항 -> 고정 100개
         google_search_count = "100"
 
         # 파일을 읽어온 폴더
         search_file_save_path = self.convert_path.text()
-        print(search_file_save_path)
 
         guiDto = GUIDto()
         guiDto.google_keyword_list = selected_google_keyword_list
@@ -210,8 +205,6 @@ class SynonymMultipleConvertTab(QWidget):
         guiDto.search_file_save_path = search_file_save_path
         guiDto.from_convert_tab = True
         guiDto.system_sound_checkbox = self.system_sound_checkbox.isChecked()
-
-        print(f"작업을 시작합니다.")
 
         self.google_search_thread = GoogleSearchThread()
         self.google_search_thread.log_msg.connect(self.log_append)
@@ -223,14 +216,14 @@ class SynonymMultipleConvertTab(QWidget):
         self.google_search_thread.start()
 
     # 검색 중지 클릭
-    @pyqtSlot()
+    @Slot()
     def google_search_stop_button_clicked(self):
         print(f"search stop clicked")
         self.log_append(f"중지 클릭")
         self.google_search_finished()
 
     # 검색 작업 종료
-    @pyqtSlot()
+    @Slot()
     def google_search_finished(self):
         print(f"search thread finished")
         self.log_append(f"작업 종료")
@@ -264,7 +257,9 @@ class SynonymMultipleConvertTab(QWidget):
         self.convert_path.setDisabled(True)
         self.convert_path_select_button = QPushButton("변환할 폴더 선택")
 
-        self.convert_path_select_button.clicked.connect(self.convert_path_select_button_clicked)
+        self.convert_path_select_button.clicked.connect(
+            self.convert_path_select_button_clicked
+        )
 
         convert_path_inner_layout = QHBoxLayout()
         convert_path_inner_layout.addWidget(self.convert_path, 4)
@@ -298,7 +293,9 @@ class SynonymMultipleConvertTab(QWidget):
         header_select_inner_layout.addWidget(self.header_topic_combobox)
         header_select_groupbox.setLayout(header_select_inner_layout)
 
-        self.header_select_checkbox.stateChanged.connect(self.header_select_checkbox_changed)
+        self.header_select_checkbox.stateChanged.connect(
+            self.header_select_checkbox_changed
+        )
 
         # 맺음말 삽입
         footer_select_groupbox = QGroupBox()
@@ -310,7 +307,9 @@ class SynonymMultipleConvertTab(QWidget):
         footer_select_inner_layout.addWidget(self.footer_topic_combobox)
         footer_select_groupbox.setLayout(footer_select_inner_layout)
 
-        self.footer_select_checkbox.stateChanged.connect(self.footer_select_checkbox_changed)
+        self.footer_select_checkbox.stateChanged.connect(
+            self.footer_select_checkbox_changed
+        )
 
         # 변환 시작 중지 그룹박스
         convert_start_stop_groupbox = QGroupBox("변환하기")
@@ -321,7 +320,9 @@ class SynonymMultipleConvertTab(QWidget):
 
         self.convert_start_button.clicked.connect(self.convert_start_button_clicked)
         self.convert_stop_button.clicked.connect(self.convert_stop_button_clicked)
-        self.convert_open_save_path_button.clicked.connect(self.open_save_path_button_clicked)
+        self.convert_open_save_path_button.clicked.connect(
+            self.open_save_path_button_clicked
+        )
 
         convert_start_stop_inner_layout = QHBoxLayout()
         convert_start_stop_inner_layout.addWidget(self.convert_start_button)
@@ -336,15 +337,21 @@ class SynonymMultipleConvertTab(QWidget):
         self.google_search_stop_button.setDisabled(True)
         self.open_save_path_button = QPushButton("저장된 경로 열기")
 
-        self.google_search_start_button.clicked.connect(self.google_search_start_button_clicked)
-        self.google_search_stop_button.clicked.connect(self.google_search_stop_button_clicked)
+        self.google_search_start_button.clicked.connect(
+            self.google_search_start_button_clicked
+        )
+        self.google_search_stop_button.clicked.connect(
+            self.google_search_stop_button_clicked
+        )
         self.open_save_path_button.clicked.connect(self.open_save_path_button_clicked)
 
         google_search_start_stop_inner_layout = QHBoxLayout()
         google_search_start_stop_inner_layout.addWidget(self.google_search_start_button)
         google_search_start_stop_inner_layout.addWidget(self.google_search_stop_button)
         google_search_start_stop_inner_layout.addWidget(self.open_save_path_button)
-        google_search_start_stop_groupbox.setLayout(google_search_start_stop_inner_layout)
+        google_search_start_stop_groupbox.setLayout(
+            google_search_start_stop_inner_layout
+        )
 
         # 작업 완료 시 작동하는 그룹박스
         system_down_groupbox = QGroupBox("작업 완료 시 설정")

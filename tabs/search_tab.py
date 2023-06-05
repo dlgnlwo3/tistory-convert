@@ -3,9 +3,9 @@ import warnings
 
 warnings.simplefilter("ignore", UserWarning)
 sys.coinit_flags = 2
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
-from PyQt5.QtCore import *
+from PySide6.QtGui import *
+from PySide6.QtWidgets import *
+from PySide6.QtCore import *
 from datetime import *
 
 from dtos.gui_dto import GUIDto
@@ -35,7 +35,7 @@ class SearchTab(QWidget):
         self.initUI()
 
     # 로그 작성
-    @pyqtSlot(str)
+    @Slot(str)
     def log_append(self, text):
         today = str(datetime.now())[0:10]
         now = str(datetime.now())[0:-7]
@@ -85,12 +85,13 @@ class SearchTab(QWidget):
             search_file_save_path = self.saved_data_setting[SaveFileSetting.SEARCH_FILE_SAVE_PATH.value]
             print(search_file_save_path)
 
+
         guiDto = GUIDto()
         guiDto.daum_keyword_list = selected_daum_keyword_list
         guiDto.daum_start_page = daum_start_page
         guiDto.daum_end_page = daum_end_page
         guiDto.daum_search_count = daum_search_count
-        guiDto.daum_search_date = self.daum_search_date.text()
+        guiDto.daum_search_date = self.daum_search_date.date().toString("yyyy-MM-dd")
         guiDto.search_file_save_path = search_file_save_path
         guiDto.system_sound_checkbox = self.system_sound_checkbox.isChecked()
         guiDto.system_down_checkbox = self.system_down_checkbox.isChecked()
@@ -107,14 +108,14 @@ class SearchTab(QWidget):
         self.daum_search_thread.start()
 
     # 검색 중지 클릭
-    @pyqtSlot()
+    @Slot()
     def daum_search_stop_button_clicked(self):
         print(f"search stop clicked")
         self.log_append(f"중지 클릭")
         self.daum_search_finished()
 
     # 검색 작업 종료
-    @pyqtSlot()
+    @Slot()
     def daum_search_finished(self):
         print(f"search thread finished")
         self.log_append(f"작업 종료")
@@ -180,14 +181,14 @@ class SearchTab(QWidget):
         self.google_search_thread.start()
 
     # 검색 중지 클릭
-    @pyqtSlot()
+    @Slot()
     def google_search_stop_button_clicked(self):
         print(f"search stop clicked")
         self.log_append(f"중지 클릭")
         self.google_search_finished()
 
     # 검색 작업 종료
-    @pyqtSlot()
+    @Slot()
     def google_search_finished(self):
         print(f"search thread finished")
         self.log_append(f"작업 종료")
@@ -209,7 +210,8 @@ class SearchTab(QWidget):
         for i, keyword in enumerate(self.saved_data_daum[SaveFileDaum.DAUM.value]):
             self.daum_keyword_list_tablewidget.setItem(i, 0, QTableWidgetItem(keyword))
 
-        self.daum_keyword_list_tablewidget.horizontalHeader().setSectionResizeMode(1)
+        # self.daum_keyword_list_tablewidget.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeMode.Stretch)
+        self.daum_keyword_list_tablewidget.horizontalHeader().setStretchLastSection(True)
         self.daum_keyword_list_tablewidget.setSelectionMode(QAbstractItemView.MultiSelection)
 
     def set_google_keyword_list_tablewidget(self):
@@ -220,12 +222,11 @@ class SearchTab(QWidget):
         for i, keyword in enumerate(self.saved_data_google[SaveFileGoogle.GOOGLE.value]):
             self.google_keyword_list_tablewidget.setItem(i, 0, QTableWidgetItem(keyword))
 
-        self.google_keyword_list_tablewidget.horizontalHeader().setSectionResizeMode(1)
+        self.google_keyword_list_tablewidget.horizontalHeader().setStretchLastSection(True)
+        # self.google_keyword_list_tablewidget.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeMode.Stretch)
         self.google_keyword_list_tablewidget.setSelectionMode(QAbstractItemView.MultiSelection)
 
     def refresh_daum_button_clicked(self):
-        # self.refresh_save_file()
-        # self.set_daum_keyword_list_tablewidget()
         win32clipboard.OpenClipboard()
         clipboard_data: str = win32clipboard.GetClipboardData()
         win32clipboard.CloseClipboard()
@@ -540,6 +541,7 @@ class SearchTab(QWidget):
 
         # 수집할 글 작성일자 (이전에 작성된 글)
         daum_search_date_groupbox = QGroupBox("수집할 글 작성일자")
+
         self.daum_search_date = QDateEdit(QDate.currentDate().addMonths(-1))
 
         daum_search_date_inner_layout = QHBoxLayout()

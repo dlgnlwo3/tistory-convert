@@ -39,9 +39,9 @@ pycparser==2.21
 pyinstaller==5.8.0
 pyinstaller-hooks-contrib==2023.0
 pyperclip==1.8.2
-PyQt5==5.15.9
-PyQt5-Qt5==5.15.2
-PyQt5-sip==12.11.1
+PySide6==5.15.9
+PySide6-Qt5==5.15.2
+PySide6-sip==12.11.1
 PySocks==1.7.1
 python-dateutil==2.8.2
 python-docx==0.8.11
