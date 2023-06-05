@@ -35,42 +35,27 @@ def my_exception_hook(exctype, value, traceback):
     global_log_append(str(value))
     sys._excepthook(exctype, value, traceback)
 
-
 sys.excepthook = my_exception_hook
 
 
-class MainUI(QWidget):
-    is_login = False
-
+class MainUI():
     # 초기화
     def __init__(self):
-        print(f"LOG_FOLDER_NAME: {LOG_FOLDER_NAME}")
-        print(f"PROGRAM_PATH: {PROGRAM_PATH}")
-        print(f"USER_SAVE_PATH_DAUM: {USER_SAVE_PATH_DAUM}")
-        print(f"USER_SAVE_PATH_GOOGLE: {USER_SAVE_PATH_GOOGLE}")
-        print(f"USER_SAVE_PATH_SETTING: {USER_SAVE_PATH_SETTING}")
-        print(f"USER_SAVE_PATH_SYNONYM: {USER_SAVE_PATH_SYNONYM}")
-        print(f"USER_SAVE_PATH_TOPIC: {USER_SAVE_PATH_TOPIC}")
-        print(f"USER_SAVE_PATH_HEADER: {USER_SAVE_PATH_HEADER}")
-        print(f"USER_SAVE_PATH_FOOTER: {USER_SAVE_PATH_FOOTER}")
-        saved_account = get_save_data_ACCOUNT()
-        self.save_login_id = saved_account["id"]
-        self.save_login_pw = saved_account["pw"]
-        # UI
+        self.login_widget = LoginWidget()
+        self.app_widget = AppWidget()
+        self.login_widget.login_checked.connect(self.app_widget.initUI)
+        self.login_widget.initLoginUI()
+
+
+class LoginWidget(QWidget):
+
+    login_checked = Signal()
+
+    def __init__(self):
         super().__init__()
-        self.initIcon()
-
-        if self.is_login:
-            self.initUI()  # 로그인 완료후 기본 MainUI 보여주기
-        else:
-            self.initLoginUI()  # 로그인 안되어있으면 로그인 시도
-
-    def initIcon(self):
-        # 이미지 주소
-        ICON_IMAGE_URL = "https://i.imgur.com/yUWPOGp.png"
-        self.icon = QNetworkAccessManager()
-        self.icon.finished.connect(self.set_window_icon_from_response)
-        self.icon.get(QNetworkRequest(QUrl(ICON_IMAGE_URL)))
+        saved_account = get_save_data_ACCOUNT()
+        self.saved_login_id = saved_account["id"]
+        self.saved_login_pw = saved_account["pw"]
 
     # 가운데 정렬
     def center(self):
@@ -79,25 +64,18 @@ class MainUI(QWidget):
         qr.moveCenter(cp)
         self.move(qr.topLeft())
 
-    # # 프로그램 닫기 클릭 시
-    def closeEvent(self, event):
-        quit_msg = "프로그램을 종료하시겠습니까?"
-        reply = QMessageBox.question(
-            self, "프로그램 종료", quit_msg, QMessageBox.Yes, QMessageBox.No
-        )
-
-        if reply == QMessageBox.Yes:
-            print(f"프로그램을 종료합니다.")
-            event.accept()
-        else:
-            print(f"종료 취소")
-            event.ignore()
-
     def set_window_icon_from_response(self, http_response):
         pixmap = QPixmap()
         pixmap.loadFromData(http_response.readAll())
         icon = QIcon(pixmap)
         self.setWindowIcon(icon)
+
+    def initIcon(self):
+        # 이미지 주소
+        ICON_IMAGE_URL = "https://i.imgur.com/yUWPOGp.png"
+        self.icon = QNetworkAccessManager()
+        self.icon.finished.connect(self.set_window_icon_from_response)
+        self.icon.get(QNetworkRequest(QUrl(ICON_IMAGE_URL)))
 
     def login_button_clicked(self):
         user_id = self.login_id_edit.text()
@@ -108,11 +86,9 @@ class MainUI(QWidget):
             return
 
         if login_sheet(user_id, user_pw):
-            self.is_login = True
             QMessageBox.information(self, "로그인성공", "로그인 하였습니다.")
+            self.login_checked.emit()
             self.destroy()
-            self.__init__()
-            return
 
         else:
             QMessageBox.warning(self, "로그인실패", "아이디, 비밀번호를 확인해주세요.")
@@ -142,11 +118,11 @@ class MainUI(QWidget):
 
         # 계정
         login_groupbox = QGroupBox("로그인")
-        self.login_id_edit = QLineEdit(f"{self.save_login_id}")
+        self.login_id_edit = QLineEdit(f"{self.saved_login_id}")
         self.login_id_edit.setPlaceholderText("아이디")
         self.login_id_edit.setFixedWidth = 500
 
-        self.login_pw_edit = QLineEdit(f"{self.save_login_pw}")
+        self.login_pw_edit = QLineEdit(f"{self.saved_login_pw}")
         self.login_pw_edit.setEchoMode(QLineEdit.Password)
         self.login_pw_edit.setPlaceholderText("비밀번호")
         self.login_pw_edit.setFixedWidth = 500
@@ -169,13 +145,56 @@ class MainUI(QWidget):
         self.setLayout(layout)
 
         # 앱 기본 설정
-        self.setWindowTitle("Re.writer")
+        self.setWindowTitle("Re.writer Login")
         self.resize(450, 150)
+        self.center()
         self.show()
+
+
+class AppWidget(QWidget):
+    def __init__(self):
+        super().__init__()
+
+    def initIcon(self):
+        # 이미지 주소
+        ICON_IMAGE_URL = "https://i.imgur.com/yUWPOGp.png"
+        self.icon = QNetworkAccessManager()
+        self.icon.finished.connect(self.set_window_icon_from_response)
+        self.icon.get(QNetworkRequest(QUrl(ICON_IMAGE_URL)))
+
+    # 가운데 정렬
+    def center(self):
+        qr = self.frameGeometry()
+        cp = QGuiApplication.primaryScreen().availableGeometry().center()
+        qr.moveCenter(cp)
+        self.move(qr.topLeft())
+
+    # # 프로그램 닫기 클릭 시
+    def closeEvent(self, event):
+        quit_msg = "프로그램을 종료하시겠습니까?"
+        reply = QMessageBox.question(self, "프로그램 종료", quit_msg, QMessageBox.Yes, QMessageBox.No)
+
+        if reply == QMessageBox.Yes:
+            print(f"프로그램을 종료합니다.")
+            event.accept()
+        else:
+            print(f"종료 취소")
+            event.ignore()
+
+    def set_window_icon_from_response(self, http_response):
+        pixmap = QPixmap()
+        pixmap.loadFromData(http_response.readAll())
+        icon = QIcon(pixmap)
+        self.setWindowIcon(icon)
 
     # 메인 UI
     def initUI(self):
-        # 탭 초기화
+        # 이미지 주소
+        ICON_IMAGE_URL = "https://i.imgur.com/yUWPOGp.png"
+        self.icon = QNetworkAccessManager()
+        self.icon.finished.connect(self.set_window_icon_from_response)
+        self.icon.get(QNetworkRequest(QUrl(ICON_IMAGE_URL)))
+
         self.search_tab = SearchTab()
         self.setting_tab = SettingTab()
         self.topic_tab = TopicTab()
@@ -205,5 +224,5 @@ class MainUI(QWidget):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    ex = MainUI()
-    sys.exit(app.exec_())
+    main_ui = MainUI()
+    sys.exit(app.exec())

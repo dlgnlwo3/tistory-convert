@@ -16,6 +16,7 @@ import pandas as pd
 from threads.synonym_multiple_convert_thread import ConvertThread
 from threads.google_search_thread import GoogleSearchThread
 from dtos.gui_dto import GUIDto
+from widgets.qline_edit import CustomLineEdit
 
 
 class SynonymMultipleConvertTab(QWidget):
@@ -242,7 +243,7 @@ class SynonymMultipleConvertTab(QWidget):
         # 유의어 변환 횟수
         synonym_convert_limit_groupbox = QGroupBox()
         self.synonym_convert_limit_label = QLabel("유의어 변환 횟수")
-        self.synonym_convert_limit = QLineEdit()
+        self.synonym_convert_limit = CustomLineEdit()
         self.synonym_convert_limit.setValidator(QIntValidator())
         self.synonym_convert_limit.setPlaceholderText("10")
 
@@ -253,7 +254,7 @@ class SynonymMultipleConvertTab(QWidget):
 
         # 변환할 폴더 선택
         convert_path_groupbox = QGroupBox()
-        self.convert_path = QLineEdit()
+        self.convert_path = CustomLineEdit()
         self.convert_path.setDisabled(True)
         self.convert_path_select_button = QPushButton("변환할 폴더 선택")
 

@@ -13,6 +13,7 @@ from config import *
 
 from dtos.gui_dto import GUIDto
 from threads.file_convert_thread import FileConvertThread
+from widgets.qline_edit import CustomLineEdit
 
 
 class FileConvertTab(QWidget):
@@ -155,7 +156,7 @@ class FileConvertTab(QWidget):
 
         # 변환할 폴더 선택
         convert_path_groupbox = QGroupBox()
-        self.convert_path = QLineEdit()
+        self.convert_path = CustomLineEdit()
         self.convert_path.setDisabled(True)
         self.convert_path_select_button = QPushButton("변환할 폴더 선택")
 

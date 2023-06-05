@@ -21,6 +21,7 @@ from common.synonym_file import SynonymFile
 import pandas as pd
 import clipboard
 import random
+from widgets.qline_edit import CustomLineEdit
 
 
 class SynonymConvertTab(QWidget):
@@ -217,7 +218,7 @@ class SynonymConvertTab(QWidget):
         # 변환 금지어 입력
         ban_synonym_groupbox = QGroupBox()
         self.ban_synonym_input_label = QLabel("변환 금지어 입력")
-        self.ban_synonym_input = QLineEdit()
+        self.ban_synonym_input = CustomLineEdit()
 
         ban_synonym_inner_layout = QHBoxLayout()
         ban_synonym_inner_layout.addWidget(self.ban_synonym_input_label)
@@ -262,7 +263,7 @@ class SynonymConvertTab(QWidget):
 
         # 치환 키워드 입력
         convert_keyword_groupbox = QGroupBox("치환 키워드 입력")
-        self.convert_keyword_input = QLineEdit()
+        self.convert_keyword_input = CustomLineEdit()
 
         convert_keyword_inner_layout = QHBoxLayout()
         convert_keyword_inner_layout.addWidget(self.convert_keyword_input)
