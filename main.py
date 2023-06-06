@@ -29,13 +29,16 @@ from config import get_save_data_ACCOUNT, write_save_data_ACCOUNT
 from common.utils import global_log_append
 
 
-# pyinstaller -n "tistory convert v1.1.12 날짜형식체크" -w --onefile --clean  "main.py" --icon "assets\icon.png" --noupx --add-data "venv\Lib\site-packages\newspaper;newspaper"
-def my_exception_hook(exctype, value, traceback):
-    print(exctype, value, traceback)
-    global_log_append(str(value))
-    sys._excepthook(exctype, value, traceback)
 
-sys.excepthook = my_exception_hook
+# pyinstaller -n "tistory convert v1.1.12 날짜형식체크" -w --onefile --clean  "main.py" --icon "assets\icon.png" --noupx --add-data "venv\Lib\site-packages\newspaper;newspaper"
+
+
+# def my_exception_hook(exctype, value, traceback):
+#     print(exctype, value, traceback)
+#     global_log_append(str(value))
+#     sys._excepthook(exctype, value, traceback)
+
+# sys.excepthook = my_exception_hook
 
 
 class MainUI():
@@ -44,7 +47,9 @@ class MainUI():
         self.login_widget = LoginWidget()
         self.app_widget = AppWidget()
         self.login_widget.login_checked.connect(self.app_widget.initUI)
-        self.login_widget.initLoginUI()
+        # self.login_widget.initLoginUI()
+
+        self.app_widget.initUI()
 
 
 class LoginWidget(QWidget):
@@ -154,15 +159,6 @@ class LoginWidget(QWidget):
 class AppWidget(QWidget):
     def __init__(self):
         super().__init__()
-        print(f"LOG_FOLDER_NAME: {LOG_FOLDER_NAME}")
-        print(f"PROGRAM_PATH: {PROGRAM_PATH}")
-        print(f"USER_SAVE_PATH_DAUM: {USER_SAVE_PATH_DAUM}")
-        print(f"USER_SAVE_PATH_GOOGLE: {USER_SAVE_PATH_GOOGLE}")
-        print(f"USER_SAVE_PATH_SETTING: {USER_SAVE_PATH_SETTING}")
-        print(f"USER_SAVE_PATH_SYNONYM: {USER_SAVE_PATH_SYNONYM}")
-        print(f"USER_SAVE_PATH_TOPIC: {USER_SAVE_PATH_TOPIC}")
-        print(f"USER_SAVE_PATH_HEADER: {USER_SAVE_PATH_HEADER}")
-        print(f"USER_SAVE_PATH_FOOTER: {USER_SAVE_PATH_FOOTER}")
 
     def initIcon(self):
         # 이미지 주소

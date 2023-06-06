@@ -27,7 +27,6 @@ from docx import Document
 class DaumSearch:
     def __init__(self):
         # 현재 로컬에 저장된 크롬 기준으로 오픈한다.
-        # open_browser()
         self.default_wait = 10
         self.driver: webdriver.Chrome = get_chrome_driver_new(
             is_headless=True, is_secret=True, move_to_corner=False
@@ -90,7 +89,6 @@ class DaumSearch:
         driver.get(
             f"https://search.daum.net/search?w=fusion&col=blog&q={daum_keyword}&p=2"
         )
-
         try:
             WebDriverWait(driver, 10).until(
                 EC.element_to_be_clickable((By.XPATH, "//c-card//c-title//a"))
@@ -100,7 +98,6 @@ class DaumSearch:
             raise Exception(f"{daum_keyword}: 다음 검색 결과가 없습니다.")
 
         # 현재 페이지의 블로그 검색 결과
-        # $x('//li[contains(@id, "br_tstory")]//a[contains(@class, "f_url")]')
         blog_links = driver.find_elements(By.XPATH, "//c-card//c-title//a")[:3]
 
         for blog_link in blog_links:
@@ -122,9 +119,6 @@ class DaumSearch:
                 top_blog_detail_dto.article_url = blog_url
 
             try:
-                # img_count = driver.find_element(
-                #     By.XPATH, f'//a[contains(@href, "{blog_url}")]//c-badge-text/span'
-                # ).get_attribute("textContent")
                 if not top_blog_detail_dto.img_count:
                     top_thumnail_imgs = driver.find_elements(By.CSS_SELECTOR, f'a[class="thumb_bf"][href="{blog_url}"]')
                     img_count = len(top_thumnail_imgs)

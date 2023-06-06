@@ -23,6 +23,7 @@ import clipboard
 import random
 from widgets.qline_edit import CustomLineEdit
 
+from enums.html_tag import ConvertHtml
 
 class SynonymConvertTab(QWidget):
     # 초기화
@@ -41,9 +42,20 @@ class SynonymConvertTab(QWidget):
                 to_sentence = "&gt;"
 
             if sentence_i in used_idx_list:
-                to_sentence = f'<span style="color : red">{to_sentence}</span>'
+                to_sentence = f'<span style="{ConvertHtml.COLOR_RED.value}">{to_sentence}</span>'
             dict_sentence.update({sentence_i: to_sentence})
         return "".join(dict_sentence.values())
+    
+
+    def remove_edits_button_clicked(self):
+        print('remove_edits_button_clicked')
+        self.result_sentence_textedit.clear()
+        self.input_sentence_textedit.clear()
+
+        self.input_word_count_label.setText("0자")
+        self.word_count_input_sentence_label.setText("0자")
+        self.convert_result_count_label.setText("0자")
+
 
     def convert_sentence_button_clicked(self):
         # 값이 입력되어있는지 확인
@@ -61,7 +73,6 @@ class SynonymConvertTab(QWidget):
                 print("치환 키워드 필수 입력")
                 QMessageBox.information(self, "작업 시작", f"치환 키워드를 입력해주세요.")
                 return
-            print(f"convert_keyword: {convert_keyword}")
 
         # 엑셀 DB 확인
         self.saved_data_synonym = get_save_data_SYNONYM()
@@ -97,6 +108,7 @@ class SynonymConvertTab(QWidget):
         sentence = self.input_sentence_textedit.toPlainText()
 
         # 변환 작업
+        converted_word_count = 0
         try:
             dict_sentence, used_idx_list = convert_from_db(
                 sentence, ban_synonym, df_two_way, df_one_way
@@ -133,26 +145,19 @@ class SynonymConvertTab(QWidget):
             sentence = insert_footer_to_sentence(sentence, footer, convert_keyword)
 
         sentence = sentence.replace(f"\n", "<br />")
-        print(sentence)
         self.result_sentence_textedit.clear()
         self.result_sentence_textedit.setText(sentence)
 
-        # # 배경색 적용
-        # # 문단 섞기, 머리글 등 위치가 바뀌기 때문에 사용이 불가능함
-        # # QTextCharFormat 생성 및 설정
-        # highlight_format = QTextCharFormat()
-        # highlight_format.setBackground(Qt.yellow)
 
-        # # 단어별로 QTextCharFormat 적용
-        # cursor = self.result_sentence_textedit.textCursor()
-        # document = self.result_sentence_textedit.document()
-        # for word in used_synonym_list:
-        #     index = sentence.find(word)
-        #     while index >= 0:
-        #         cursor.setPosition(index)
-        #         cursor.movePosition(QTextCursor.EndOfWord, 1)
-        #         cursor.mergeCharFormat(highlight_format)
-        #         index = sentence.find(word, index + 1)
+        # 변환결과 표시 
+        # html 제거된 원본 sentence의 크기
+        # span stype red로 둘러싸인 html 태그 안의 갯수
+        before_total_count,converted_word_count =  get_word_count_from_html(sentence, ConvertHtml.COLOR_RED.value)
+
+        # 현재 글자수 체크
+        self.input_word_count_label.setText(f" {format(before_total_count, ',')}자")
+        self.convert_result_count_label.setText(f" {format(converted_word_count, ',')}자")
+
 
     def retry_sentence_button_clicked(self):
         print("retry_sentence_button_clicked")
@@ -173,16 +178,12 @@ class SynonymConvertTab(QWidget):
         QMessageBox.information(self, "복사", f"클립보드에 복사되었습니다.")
 
     def header_select_checkbox_changed(self):
-        print(f"header: {self.header_select_checkbox.isChecked()}")
-
         if self.header_select_checkbox.isChecked():
             self.set_header_topic_combobox()
         else:
             self.header_topic_combobox.clear()
 
     def footer_select_checkbox_changed(self):
-        print(f"footer: {self.footer_select_checkbox.isChecked()}")
-
         if self.footer_select_checkbox.isChecked():
             self.set_footer_topic_combobox()
         else:
@@ -190,8 +191,6 @@ class SynonymConvertTab(QWidget):
 
     def set_header_topic_combobox(self):
         self.saved_data_topic = get_save_data_topic()
-        print(self.saved_data_topic)
-
         self.header_topic_combobox.clear()
 
         for i, topic in enumerate(self.saved_data_topic[SaveFileTopic.TOPIC.value]):
@@ -199,28 +198,26 @@ class SynonymConvertTab(QWidget):
 
     def set_footer_topic_combobox(self):
         self.saved_data_topic = get_save_data_topic()
-        print(self.saved_data_topic)
-
         self.footer_topic_combobox.clear()
 
         for i, topic in enumerate(self.saved_data_topic[SaveFileTopic.TOPIC.value]):
             self.footer_topic_combobox.addItem(f"{topic}")
 
-    # 문자 비교
-    # def compare_text(self, sentence: str, used_synonym_list: list):
-    #     print(used_synonym_list)
+    def on_input_sentence_textedit_keyReleaseEvent(self, event):
+        text = self.input_sentence_textedit.toPlainText()
+        word_count = get_word_count_without_empty(text)
+        self.word_count_input_sentence_label.setText(f" {format(word_count, ',')}자")
 
-    #     print(sentence)
 
-    #     # 태그를 제외한 문장을 추출하는 정규식 (사용x)
-    #     # sentence = re.sub("<[^<]+?>", "", sentence)
+    def on_result_sentence_textedit_keyReleaseEvent(self, event):
 
-    #     for used_synonym in used_synonym_list:
-    #         sentence = sentence.replace(
-    #             used_synonym, f'<span style="color : red">{used_synonym}</span>'
-    #         )
+        text = self.result_sentence_textedit.toHtml()
+        before_total_count,converted_word_count =  get_word_count_from_html(text, ConvertHtml.COLOR_RED.value)
 
-    #     return sentence
+        # 현재 글자수 체크
+        self.input_word_count_label.setText(f" {format(before_total_count, ',')}자")
+        self.convert_result_count_label.setText(f" {format(converted_word_count, ',')}자")
+
 
     # 메인 UI
     def initUI(self):
@@ -230,9 +227,15 @@ class SynonymConvertTab(QWidget):
         self.ban_synonym_input = CustomLineEdit()
         self.ban_synonym_input.setPlaceholderText('여러 금지어를 "="로 구분하여 입력할 수 있습니다. ex)바나나 효능=다이어트')
 
+        self.remove_edits_button = QPushButton("전체지우기")
+        self.remove_edits_button.clicked.connect(
+            self.remove_edits_button_clicked
+        )
+
         ban_synonym_inner_layout = QHBoxLayout()
         ban_synonym_inner_layout.addWidget(self.ban_synonym_input_label)
         ban_synonym_inner_layout.addWidget(self.ban_synonym_input)
+        ban_synonym_inner_layout.addWidget(self.remove_edits_button)
         ban_synonym_groupbox.setLayout(ban_synonym_inner_layout)
 
         # 문단 랜덤 섞기
@@ -290,6 +293,11 @@ class SynonymConvertTab(QWidget):
         #         )
 
         # self.input_sentence_textedit.setPlainText("바나나 효능이 좋습니다.")
+        self.input_sentence_textedit.keyReleaseEvent = self.on_input_sentence_textedit_keyReleaseEvent
+
+
+        self.word_count_input_sentence_label = QLabel("0자")
+        # self.word_count_input_sentence_label.setFont(QFont('Arial', 11))
 
         self.convert_sentence_button = QPushButton("변환하기")
         self.convert_sentence_button.clicked.connect(
@@ -298,6 +306,7 @@ class SynonymConvertTab(QWidget):
 
         input_sentence_inner_layout = QGridLayout()
         input_sentence_inner_layout.addWidget(self.input_sentence_textedit, 0, 1, 1, 2)
+        input_sentence_inner_layout.addWidget(self.word_count_input_sentence_label, 1, 1, 1, 1)
         input_sentence_inner_layout.addWidget(self.convert_sentence_button, 1, 2, 1, 1)
         input_sentence_groupbox.setLayout(input_sentence_inner_layout)
 
@@ -307,15 +316,26 @@ class SynonymConvertTab(QWidget):
         self.retry_sentence_button = QPushButton("다시 변환")
         self.copy_sentence_button = QPushButton("복사하기")
 
+        self.input_word_count_label = QLabel("0자")
+        self.slush_label = QLabel("/")
+        self.convert_result_count_label = QLabel("0자")
+        self.fixed_convert_label = QLabel("변환")
+        self.convert_result_count_label.setStyleSheet(ConvertHtml.COLOR_RED.value)
+
+
+        self.result_sentence_textedit.keyReleaseEvent = self.on_result_sentence_textedit_keyReleaseEvent
         self.retry_sentence_button.clicked.connect(self.retry_sentence_button_clicked)
         self.copy_sentence_button.clicked.connect(self.copy_sentence_button_clicked)
 
         result_sentence_inner_layout = QGridLayout()
         result_sentence_inner_layout.addWidget(
-            self.result_sentence_textedit, 0, 0, 1, 2
+            self.result_sentence_textedit, 0, 0, 1, 17
         )
-        # result_sentence_inner_layout.addWidget(self.retry_sentence_button, 1, 0, 1, 1)
-        result_sentence_inner_layout.addWidget(self.copy_sentence_button, 1, 1, 1, 1)
+        result_sentence_inner_layout.addWidget(self.input_word_count_label, 1, 0, 1, 1)
+        result_sentence_inner_layout.addWidget(self.slush_label, 1, 1, 1, 1)
+        result_sentence_inner_layout.addWidget(self.convert_result_count_label, 1, 2, 1, 1)
+        result_sentence_inner_layout.addWidget(self.fixed_convert_label, 1, 3, 1, 1)
+        result_sentence_inner_layout.addWidget(self.copy_sentence_button, 1, 10, 1, 7)
         result_sentence_groupbox.setLayout(result_sentence_inner_layout)
 
         # 레이아웃 배치

@@ -24,7 +24,7 @@ class TistoryNewsPaper:
     def __init__(self):
         self.driver = get_chrome_driver_new(is_headless=True, is_secret=True)
 
-    def get_title_img_count(self, blog_url:str):
+    def get_title_and_img_count(self, blog_url:str):
         
         article_title = ""
         img_count = 0 
@@ -83,7 +83,7 @@ class TistoryNewsPaper:
     def get_article_detail(self, blog_url: str, keyword: str):
         top_blog_detail_dto = TopBlogDetailDto()
 
-        article_title, img_count = self.get_title_img_count(blog_url)
+        article_title, img_count = self.get_title_and_img_count(blog_url)
         if not article_title:
             article_title = keyword
 
