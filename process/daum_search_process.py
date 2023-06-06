@@ -28,8 +28,11 @@ class DaumSearch:
     def __init__(self):
         # 현재 로컬에 저장된 크롬 기준으로 오픈한다.
         self.default_wait = 10
+        # self.driver: webdriver.Chrome = get_chrome_driver_new(
+        #     is_headless=True, is_secret=True, move_to_corner=False
+        # )
         self.driver: webdriver.Chrome = get_chrome_driver_new(
-            is_headless=True, is_secret=True, move_to_corner=False
+            is_headless=False, is_secret=True, move_to_corner=False
         )
         self.driver.implicitly_wait(self.default_wait)
         self.run_time = str(datetime.now())[0:-10].replace(":", "")
@@ -86,9 +89,12 @@ class DaumSearch:
 
     def search_top_blog(self, daum_keyword: str):
         driver = self.driver
-        driver.get(
-            f"https://search.daum.net/search?w=fusion&col=blog&q={daum_keyword}&p=2"
-        )
+        search_url = f"https://search.daum.net/search?w=fusion&col=blog&q={daum_keyword}&p=2"
+        if self.guiDto.period_start_date and self.guiDto.period_end_date:
+            search_url += f"&DA=STC&sd={self.guiDto.period_start_date}000000&ed={self.guiDto.period_end_date}235959&period=u"
+        print(search_url)
+        driver.get(search_url)
+
         try:
             WebDriverWait(driver, 10).until(
                 EC.element_to_be_clickable((By.XPATH, "//c-card//c-title//a"))
@@ -140,10 +146,13 @@ class DaumSearch:
             self.guiDto.daum_start_page, self.guiDto.daum_end_page + 1
         ):
             try:
-                driver.get(
-                    f"https://search.daum.net/search?w=fusion&col=blog&q={daum_keyword}&p={current_page}"
-                )
+                search_url = f"https://search.daum.net/search?w=fusion&col=blog&q={daum_keyword}&p={current_page}"
+                if self.guiDto.period_start_date and self.guiDto.period_end_date:
+                    search_url += f"&DA=STC&sd={self.guiDto.period_start_date}000000&ed={self.guiDto.period_end_date}235959&period=u"
 
+                print(search_url)
+                driver.get(search_url)
+                
                 WebDriverWait(driver, 10).until(
                     EC.element_to_be_clickable((By.XPATH, "//c-card//c-title//a"))
                 )

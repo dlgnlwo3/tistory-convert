@@ -28,9 +28,6 @@ class SearchTab(QWidget):
         self.saved_data_daum = get_save_data_daum()
         self.saved_data_google = get_save_data_google()
         self.saved_data_setting = get_save_data_setting()
-        print(self.saved_data_daum)
-        print(self.saved_data_google)
-        # print(self.saved_data_setting)
 
         super().__init__()
         self.initUI()
@@ -52,8 +49,7 @@ class SearchTab(QWidget):
         daum_items = self.daum_keyword_list_tablewidget.selectedItems()
         if len(daum_items) <= 0:
             print(f"글 수집 키워드가 없습니다.")
-            # self.log_append(f"글 수집 키워드가 없습니다.")
-            QMessageBox.information(self, "작업 시작", f"글 수집 키워드가 없습니다.")
+            QMessageBox.warning(self, "작업 시작", f"글 수집 키워드가 없습니다.")
             return
 
         for daum_item in daum_items:
@@ -80,11 +76,13 @@ class SearchTab(QWidget):
         if self.saved_data_setting[SaveFileSetting.SEARCH_FILE_SAVE_PATH.value] == "":
             print(f"저장 경로를 먼저 설정해주세요.")
             # self.log_append(f"저장 경로를 먼저 설정해주세요.")
-            QMessageBox.information(self, "작업 시작", f"저장 경로를 먼저 설정해주세요.")
+            QMessageBox.warning(self, "작업 시작", f"저장 경로를 먼저 설정해주세요.")
             return
         else:
             search_file_save_path = self.saved_data_setting[SaveFileSetting.SEARCH_FILE_SAVE_PATH.value]
             print(search_file_save_path)
+
+        # 날짜 유효성 검사 필요 2023-06-06
 
 
         guiDto = GUIDto()
@@ -96,6 +94,16 @@ class SearchTab(QWidget):
         guiDto.search_file_save_path = search_file_save_path
         guiDto.system_sound_checkbox = self.system_sound_checkbox.isChecked()
         guiDto.system_down_checkbox = self.system_down_checkbox.isChecked()
+
+        # 수집기간 옵션 선택 시 
+        if self.period_use_check.isChecked():
+
+            if self.daum_search_date.date() < self.period_start_date.date():
+                QMessageBox.warning(self, "작업 시작", f"수집할 글 작성일자를 수집 기간에 맞게 설정하세요.")
+                return
+
+            guiDto.period_start_date = self.period_start_date.date().toString("yyyyMMdd")
+            guiDto.period_end_date =   self.period_end_date.date().toString("yyyyMMdd")
 
         print(f"작업을 시작합니다.")
 
@@ -170,8 +178,6 @@ class SearchTab(QWidget):
         guiDto.system_sound_checkbox = self.system_sound_checkbox.isChecked()
         guiDto.system_down_checkbox = self.system_down_checkbox.isChecked()
 
-        print(f"작업을 시작합니다.")
-
         self.google_search_thread = GoogleSearchThread()
         self.google_search_thread.log_msg.connect(self.log_append)
         self.google_search_thread.search_finished.connect(self.google_search_finished)
@@ -211,7 +217,6 @@ class SearchTab(QWidget):
         for i, keyword in enumerate(self.saved_data_daum[SaveFileDaum.DAUM.value]):
             self.daum_keyword_list_tablewidget.setItem(i, 0, QTableWidgetItem(keyword))
 
-        # self.daum_keyword_list_tablewidget.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeMode.Stretch)
         self.daum_keyword_list_tablewidget.horizontalHeader().setStretchLastSection(True)
         self.daum_keyword_list_tablewidget.setSelectionMode(QAbstractItemView.MultiSelection)
 
@@ -224,7 +229,6 @@ class SearchTab(QWidget):
             self.google_keyword_list_tablewidget.setItem(i, 0, QTableWidgetItem(keyword))
 
         self.google_keyword_list_tablewidget.horizontalHeader().setStretchLastSection(True)
-        # self.google_keyword_list_tablewidget.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeMode.Stretch)
         self.google_keyword_list_tablewidget.setSelectionMode(QAbstractItemView.MultiSelection)
 
     def refresh_daum_button_clicked(self):
@@ -408,9 +412,6 @@ class SearchTab(QWidget):
 
                 write_save_data_google(dict_save)
 
-                print(current_items)
-
-                print(f"현재 상태를 저장했습니다.")
             except Exception as e:
                 print(e)
         else:
@@ -438,6 +439,14 @@ class SearchTab(QWidget):
     def on_google_keyword_list_delete_pressed(self, event):
         if event.key() == Qt.Key_Delete:
             self.google_remove_button_clicked()
+
+    def period_use_check_changed(self, state):
+        if self.period_use_check.isChecked():
+            self.period_start_date.setDisabled(False)
+            self.period_end_date.setDisabled(False)
+        else:
+            self.period_start_date.setDisabled(True)
+            self.period_end_date.setDisabled(True)
 
     # 메인 UI
     def initUI(self):
@@ -552,6 +561,26 @@ class SearchTab(QWidget):
         daum_search_date_inner_layout.addWidget(self.daum_search_date)
         daum_search_date_groupbox.setLayout(daum_search_date_inner_layout)
 
+        # 수집할 글 작성일자 (이전에 작성된 글)
+        period_groupbox = QGroupBox("수집기간 옵션")
+        self.period_use_check = QCheckBox("기간조회")
+        self.period_use_check.stateChanged.connect(self.period_use_check_changed)
+        
+        self.period_start_date = QDateEdit(QDate.currentDate().addMonths(-1))
+        self.period_between_label = QLabel("    ~")
+        self.period_end_date = QDateEdit(QDate.currentDate())
+
+        self.period_start_date.setDisabled(True)
+        self.period_end_date.setDisabled(True)
+
+        period_date_inner_layout = QHBoxLayout()
+        period_date_inner_layout.addWidget(self.period_use_check, 2)
+        period_date_inner_layout.addWidget(self.period_start_date, 3)
+        period_date_inner_layout.addWidget(self.period_between_label, 1)
+        period_date_inner_layout.addWidget(self.period_end_date, 3)
+        period_groupbox.setLayout(period_date_inner_layout)
+
+
         # 키워드별로 수집할 이미지 개수
         google_search_count_groupbox = QGroupBox("키워드별로 수집할 이미지 개수")
         self.google_search_count = CustomLineEdit()
@@ -631,6 +660,7 @@ class SearchTab(QWidget):
         right_layout.addWidget(daum_page_setting_groupbox)
         right_layout.addWidget(daum_search_count_groupbox)
         right_layout.addWidget(daum_search_date_groupbox)
+        right_layout.addWidget(period_groupbox)
         right_layout.addWidget(google_search_count_groupbox)
         right_layout.addWidget(daum_search_start_stop_groupbox)
         right_layout.addWidget(google_search_start_stop_groupbox)

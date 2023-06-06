@@ -52,7 +52,7 @@ class SynonymConvertTab(QWidget):
         self.result_sentence_textedit.clear()
         self.input_sentence_textedit.clear()
 
-        self.input_word_count_label.setText("0자")
+        self.input_word_count_label.setText(" 0자  /")
         self.word_count_input_sentence_label.setText("0자")
         self.convert_result_count_label.setText("0자")
 
@@ -155,7 +155,7 @@ class SynonymConvertTab(QWidget):
         before_total_count,converted_word_count =  get_word_count_from_html(sentence, ConvertHtml.COLOR_RED.value)
 
         # 현재 글자수 체크
-        self.input_word_count_label.setText(f" {format(before_total_count, ',')}자")
+        self.input_word_count_label.setText(f" {format(before_total_count, ',')}자  /")
         self.convert_result_count_label.setText(f" {format(converted_word_count, ',')}자")
 
 
@@ -215,7 +215,7 @@ class SynonymConvertTab(QWidget):
         before_total_count,converted_word_count =  get_word_count_from_html(text, ConvertHtml.COLOR_RED.value)
 
         # 현재 글자수 체크
-        self.input_word_count_label.setText(f" {format(before_total_count, ',')}자")
+        self.input_word_count_label.setText(f" {format(before_total_count, ',')}자 /")
         self.convert_result_count_label.setText(f" {format(converted_word_count, ',')}자")
 
 
@@ -297,7 +297,6 @@ class SynonymConvertTab(QWidget):
 
 
         self.word_count_input_sentence_label = QLabel("0자")
-        # self.word_count_input_sentence_label.setFont(QFont('Arial', 11))
 
         self.convert_sentence_button = QPushButton("변환하기")
         self.convert_sentence_button.clicked.connect(
@@ -316,7 +315,7 @@ class SynonymConvertTab(QWidget):
         self.retry_sentence_button = QPushButton("다시 변환")
         self.copy_sentence_button = QPushButton("복사하기")
 
-        self.input_word_count_label = QLabel("0자")
+        self.input_word_count_label = QLabel(" 0자  /")
         self.slush_label = QLabel("/")
         self.convert_result_count_label = QLabel("0자")
         self.fixed_convert_label = QLabel("변환")
@@ -332,9 +331,9 @@ class SynonymConvertTab(QWidget):
             self.result_sentence_textedit, 0, 0, 1, 17
         )
         result_sentence_inner_layout.addWidget(self.input_word_count_label, 1, 0, 1, 1)
-        result_sentence_inner_layout.addWidget(self.slush_label, 1, 1, 1, 1)
-        result_sentence_inner_layout.addWidget(self.convert_result_count_label, 1, 2, 1, 1)
-        result_sentence_inner_layout.addWidget(self.fixed_convert_label, 1, 3, 1, 1)
+        # result_sentence_inner_layout.addWidget(self.slush_label, 1, 2, 1, 1)
+        result_sentence_inner_layout.addWidget(self.convert_result_count_label, 1, 1, 1, 1)
+        result_sentence_inner_layout.addWidget(self.fixed_convert_label, 1, 2, 1, 1)
         result_sentence_inner_layout.addWidget(self.copy_sentence_button, 1, 10, 1, 7)
         result_sentence_groupbox.setLayout(result_sentence_inner_layout)
 

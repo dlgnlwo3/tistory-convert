@@ -55,6 +55,29 @@ class GUIDto:
         # 포스터용으로 변환하기
         self.__poster_option = bool
 
+
+        # 수집기간 옵션 시작일자
+        self.__period_start_date = ""
+
+        # 수집기간 옵션 종료일자
+        self.__period_end_date = ""
+
+    @property
+    def period_start_date(self):  # getter
+        return self.__period_start_date
+
+    @period_start_date.setter
+    def period_start_date(self, value):  # setter
+        self.__period_start_date = value
+
+    @property
+    def period_end_date(self):  # getter
+        return self.__period_end_date
+
+    @period_end_date.setter
+    def period_end_date(self, value):  # setter
+        self.__period_end_date = value
+
     @property
     def daum_keyword_list(self):  # getter
         return self.__daum_keyword_list
