@@ -30,7 +30,7 @@ from common.utils import global_log_append
 
 
 
-# pyinstaller -n "tistory convert v1.1.12 날짜형식체크" -w --onefile --clean  "main.py" --icon "assets\icon.png" --noupx --add-data "venv\Lib\site-packages\newspaper;newspaper"
+# pyinstaller -n "tistory convert v1.2.1 문단랜덤섞기 기능테스트" -w --onefile --clean  "main.py" --icon "assets\icon.png" --noupx --add-data "venv\Lib\site-packages\newspaper;newspaper"
 
 
 # def my_exception_hook(exctype, value, traceback):
@@ -48,7 +48,6 @@ class MainUI():
         self.app_widget = AppWidget()
         self.login_widget.login_checked.connect(self.app_widget.initUI)
         # self.login_widget.initLoginUI()
-
         self.app_widget.initUI()
 
 

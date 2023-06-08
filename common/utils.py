@@ -78,6 +78,5 @@ def get_word_count_from_html(html:str, convert_hint:str):
     return before_total_count, converted_word_count
 
 
-
 if __name__ == "__main__":
     beepsound()

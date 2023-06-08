@@ -1,6 +1,48 @@
 import random
 import pandas as pd
 from common.utils import check_common_element
+from enums.convert_enum import Words
+import re
+
+
+
+# 부분적인 $랜덤$ $랜덤/$ 사이의 문장만 섞습니다.
+def get_partial_suffle_sentence(text:str, start_word:str, end_word:str):
+
+    sentences = []
+    start_index = 0
+
+    while True:
+        find_first_index = text.find(start_word, start_index)
+
+        if find_first_index == -1:
+            
+            # 마지막 문장 넣기
+            sentences.append(text[start_index:])
+            break
+        
+        # 첫번째 $random$기호
+        before_sentence = text[start_index : find_first_index]
+        sentences.append(before_sentence)
+        start_index = find_first_index + len(start_word)
+        find_end_index = text.find(end_word, find_first_index)
+        between_sentence = text[start_index: find_end_index]
+        between_sentence = get_shuffle_sentence(between_sentence)
+        sentences.append(between_sentence)
+        
+        start_index = find_end_index + len(end_word) + 1
+
+    return "".join(sentences)
+
+def get_shuffle_sentence(sentence: str):
+    sentence_to_list = sentence.split(Words.SENTENCE_SPLIT.value)
+
+    random.shuffle(sentence_to_list)
+
+    if len(sentence_to_list) > 0:
+        sentence = Words.SENTENCE_SPLIT.value.join(sentence_to_list)
+
+    return sentence
 
 
 # 단어를 랜덤하게 선택합니다.
@@ -302,22 +344,19 @@ def convert_from_db(
 
     return dict_sentence, used_idx_list
 
-
 # 문단을 랜덤하게 섞습니다.
 def shuffle_sentence(sentence: str):
-    sentence_to_list = sentence.split(f"\n\n")
 
-    random.shuffle(sentence_to_list)
+    if sentence.find(Words.RANDOM_START_WORD.value) > -1 and sentence.find(Words.RANDOM_END_WORD.value) > 1:
+        return get_partial_suffle_sentence(sentence, Words.RANDOM_START_WORD.value, Words.RANDOM_END_WORD.value)
 
-    if len(sentence_to_list) > 0:
-        sentence = f"\n\n".join(sentence_to_list)
+    return get_shuffle_sentence(sentence)
 
-    return sentence
 
 
 def insert_header_to_sentence(sentence: str, header: str, convert_keyword: str):
-    header = header.replace("$키워드$", convert_keyword)
-    header += f"\n\n"
+    header = header.replace(Words.REPLACE_KEYWORD.value, convert_keyword)
+    header += Words.SENTENCE_SPLIT.value
 
     sentence = header + sentence
 
@@ -325,8 +364,8 @@ def insert_header_to_sentence(sentence: str, header: str, convert_keyword: str):
 
 
 def insert_footer_to_sentence(sentence: str, footer: str, convert_keyword: str):
-    footer = footer.replace("$키워드$", convert_keyword)
-    footer = f"\n\n" + footer
+    footer = footer.replace(Words.REPLACE_KEYWORD.value, convert_keyword)
+    footer = Words.SENTENCE_SPLIT.value + footer
 
     sentence = sentence + footer
 
@@ -334,7 +373,7 @@ def insert_footer_to_sentence(sentence: str, footer: str, convert_keyword: str):
 
 
 def replace_keyword(text: str, convert_keyword: str):
-    text = text.replace("$키워드$", convert_keyword)
+    text = text.replace(Words.REPLACE_KEYWORD.value, convert_keyword)
     return text
 
 

@@ -28,11 +28,8 @@ class DaumSearch:
     def __init__(self):
         # 현재 로컬에 저장된 크롬 기준으로 오픈한다.
         self.default_wait = 10
-        # self.driver: webdriver.Chrome = get_chrome_driver_new(
-        #     is_headless=True, is_secret=True, move_to_corner=False
-        # )
         self.driver: webdriver.Chrome = get_chrome_driver_new(
-            is_headless=False, is_secret=True, move_to_corner=False
+            is_headless=True, is_secret=True, move_to_corner=False
         )
         self.driver.implicitly_wait(self.default_wait)
         self.run_time = str(datetime.now())[0:-10].replace(":", "")
