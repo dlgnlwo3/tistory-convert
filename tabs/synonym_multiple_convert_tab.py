@@ -16,7 +16,7 @@ import pandas as pd
 from threads.synonym_multiple_convert_thread import ConvertThread
 from threads.google_search_thread import GoogleSearchThread
 from dtos.gui_dto import GUIDto
-from widgets.qline_edit import CustomLineEdit
+from widgets.qline_edit_widget import CustomLineEdit
 
 
 class SynonymMultipleConvertTab(QWidget):

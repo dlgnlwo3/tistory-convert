@@ -10,7 +10,7 @@ from datetime import *
 
 from common.utils import *
 from config import *
-from widgets.qline_edit import CustomLineEdit
+from widgets.qline_edit_widget import CustomLineEdit
 
 
 class SettingTab(QWidget):

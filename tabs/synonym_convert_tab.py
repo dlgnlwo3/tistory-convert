@@ -21,7 +21,7 @@ from common.synonym_file import SynonymFile
 import pandas as pd
 import clipboard
 import random
-from widgets.qline_edit import CustomLineEdit
+from widgets.qline_edit_widget import CustomLineEdit
 
 from enums.html_tag import ConvertHtml
 

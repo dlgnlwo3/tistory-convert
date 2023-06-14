@@ -13,6 +13,8 @@ import os
 from config import LOG_FOLDER_PATH
 import winsound as ws
 from bs4 import BeautifulSoup
+import getmac
+
 
 # 전역 로그
 def global_log_append(text):
@@ -78,5 +80,10 @@ def get_word_count_from_html(html:str, convert_hint:str):
     return before_total_count, converted_word_count
 
 
+
+def get_mac_address():
+    return getmac.get_mac_address()
+
+
 if __name__ == "__main__":
-    beepsound()
+    print(get_mac_address())
