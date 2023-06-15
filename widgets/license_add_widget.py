@@ -11,7 +11,7 @@ import requests
 from http import HTTPStatus
 import time
 from widgets.qline_edit_widget import CustomLineEdit
-
+import json
 class LicenseAddWidget(QWidget):
 
     register_checked = Signal()
@@ -97,14 +97,14 @@ class LicenseAddWidget(QWidget):
             if HTTPStatus.CREATED == response.status_code:
                 Config().write_data(dict_save)
                 time.sleep(2)
-                QMessageBox.information(self, "등록 성공", "등록 하였습니다.")
+                QMessageBox.information(self, "등록 성공", "등록 하였습니다. 프로그램을 종료하고 다시 시작해주세요.")
             elif HTTPStatus.INTERNAL_SERVER_ERROR == response.status_code:
                 QMessageBox.warning(self, "등록 실패", "서버에 오류가 발생하였습니다. 관리자에게 문의해주세요.")
                 global_log_append(response.text)
             else:
                 global_log_append(response.text)
-                data = response.json()
-                error = data[0]
+                js_data = json.loads(response.text)
+                error = js_data["error"]
                 QMessageBox.warning(self, "등록 실패", error)
                 return
 
