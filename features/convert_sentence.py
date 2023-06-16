@@ -7,16 +7,15 @@ import re
 
 
 # 부분적인 $랜덤$ $랜덤/$ 사이의 문장만 섞습니다.
-def get_partial_suffle_sentence(text:str, start_word:str, end_word:str):
+def get_partial_suffle_sentence(text:str):
 
     sentences = []
     start_index = 0
 
     while True:
-        find_first_index = text.find(start_word, start_index)
+        find_first_index = text.find(Words.RANDOM_START_WORD.value, start_index)
 
         if find_first_index == -1:
-            
             # 마지막 문장 넣기
             sentences.append(text[start_index:])
             break
@@ -24,13 +23,13 @@ def get_partial_suffle_sentence(text:str, start_word:str, end_word:str):
         # 첫번째 $random$기호
         before_sentence = text[start_index : find_first_index]
         sentences.append(before_sentence)
-        start_index = find_first_index + len(start_word)
-        find_end_index = text.find(end_word, find_first_index)
-        between_sentence = text[start_index: find_end_index]
+        start_index = find_first_index + len(Words.RANDOM_START_WORD.value)
+        find_end_index = text.find(Words.RANDOM_END_WORD.value, find_first_index)
+        between_sentence = text[start_index: find_end_index].lstrip()
         between_sentence = get_shuffle_sentence(between_sentence)
         sentences.append(between_sentence)
         
-        start_index = find_end_index + len(end_word) + 1
+        start_index = find_end_index + len(Words.RANDOM_END_WORD.value) + 1
 
     return "".join(sentences)
 
@@ -48,6 +47,8 @@ def get_shuffle_sentence(sentence: str):
 # 단어를 랜덤하게 선택합니다.
 def synonym_random_select(synonym_list: list, word: str):
     filtered_list = [synonym for synonym in synonym_list if synonym != word]
+    # if len(filtered_list) == 0:
+    #     return ""
     synonym = random.choice(filtered_list)
     return synonym
 
@@ -348,7 +349,7 @@ def convert_from_db(
 def shuffle_sentence(sentence: str):
 
     if sentence.find(Words.RANDOM_START_WORD.value) > -1 and sentence.find(Words.RANDOM_END_WORD.value) > 1:
-        return get_partial_suffle_sentence(sentence, Words.RANDOM_START_WORD.value, Words.RANDOM_END_WORD.value)
+        return get_partial_suffle_sentence(sentence)
 
     return get_shuffle_sentence(sentence)
 

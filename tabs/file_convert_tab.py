@@ -15,20 +15,11 @@ from dtos.gui_dto import GUIDto
 from threads.file_convert_thread import FileConvertThread
 from widgets.qline_edit_widget import CustomLineEdit
  
-from configs.tistory_convert_config import TistoryConverterConfig as Config
-from configs.tistory_convert_config import TistoryConverterData as ConfigData
-
 class FileConvertTab(QWidget):
     # 초기화
     def __init__(self):
         super().__init__()
         self.initUI()
-
-    def initConfig(self):
-        self.config = Config()
-        __saved_data = self.config.get_data()
-        self.saved_data = self.config.dict_to_data(__saved_data)
-
 
     # 로그 작성
     @Slot(str)

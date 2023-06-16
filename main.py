@@ -26,7 +26,7 @@ from tabs.synonym_multiple_convert_tab import SynonymMultipleConvertTab
 from widgets.license_add_widget import LicenseAddWidget
 
 
-# pyinstaller -n "tistory convert v2.0.0" -w --onefile --clean  "main.py" --icon "assets\icon.png" --noupx --add-data "venv\Lib\site-packages\newspaper;newspaper"
+# pyinstaller -n "tistory convert v2.0.1" -w --onefile --clean  "main.py" --icon "assets\icon.png" --noupx --add-data "venv\Lib\site-packages\newspaper;newspaper"
 
 
 # def my_exception_hook(exctype, value, traceback):

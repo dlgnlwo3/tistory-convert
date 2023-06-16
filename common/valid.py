@@ -6,3 +6,8 @@ def is_email_valid(email):
         return False
     
     return True
+
+
+def contains_empty(text):
+    stripped_text = text.strip()
+    return text != stripped_text

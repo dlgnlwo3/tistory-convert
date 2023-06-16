@@ -32,13 +32,6 @@ class TistoryNewsPaper:
         driver = self.driver
         driver.get(blog_url)
 
-        if blog_url.find(".com") > -1 and blog_url.find(".com/m/") == -1:
-            blog_url = blog_url.replace(".com/", ".com/m/")
-        elif blog_url.find(".org") > -1 and blog_url.find(".org/m/") == -1:
-            blog_url = blog_url.replace(".org/", ".org/m/")
-        elif blog_url.find(".kr") > -1 and blog_url.find(".kr/m/") == -1:
-            blog_url = blog_url.replace(".kr/", ".kr/m/")
-
         try:
             driver.implicitly_wait(2)
             article_title = driver.find_element(
@@ -73,14 +66,46 @@ class TistoryNewsPaper:
         response = requests.get(blog_url)
         response.raise_for_status()
         soup = BeautifulSoup(response.text, "html.parser")
-        div_soup = soup.find("div", class_="tt_article_useless_p_margin")
-        article_url = response.url
-        article_text = div_soup.text
+        article_text = ""
+
+        try:
+            div_soup = soup.find("div", class_="useless_p_margin")
+            article_url = response.url
+            article_text = div_soup.text
+        except:
+            pass
+        
+        if not article_text:
+            try:
+                div_soup = soup.find("div", class_="blogview_content")
+                article_url = response.url
+                article_text = div_soup.text
+            except:
+                pass
+        
+        if not article_text:
+            try:
+                div_soup = soup.find("div", class_="tt_article_useless_p_margin")
+                article_url = response.url
+                article_text = div_soup.text
+            except:
+                pass
+
+        if not article_text:
+            raise Exception("본문을 찾을 수 없습니다.")
 
         return article_text, article_url
 
     # 입력받은 url에서 이미지태그 개수와 키워드 반복횟수를 파악합니다.
     def get_article_detail(self, blog_url: str, keyword: str):
+
+        if blog_url.find(".com") > -1 and blog_url.find(".com/m/") == -1:
+            blog_url = blog_url.replace(".com/", ".com/m/")
+        elif blog_url.find(".org") > -1 and blog_url.find(".org/m/") == -1:
+            blog_url = blog_url.replace(".org/", ".org/m/")
+        elif blog_url.find(".kr") > -1 and blog_url.find(".kr/m/") == -1:
+            blog_url = blog_url.replace(".kr/", ".kr/m/")
+
         top_blog_detail_dto = TopBlogDetailDto()
 
         article_title, img_count = self.get_title_and_img_count(blog_url)
@@ -92,7 +117,6 @@ class TistoryNewsPaper:
         article_text = str(article_text)
         article_length = len(article_text.replace(" ", "").replace(f"\n", ""))
         keyword_count = str(article_text).count(keyword)
-
 
         top_blog_detail_dto.keyword = keyword
         top_blog_detail_dto.article_url = article_url

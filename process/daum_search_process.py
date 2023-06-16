@@ -207,8 +207,8 @@ class DaumSearch:
                             continue
 
                         # 워드 저장
+                        article_title = f"{article_title}_{top_blog_detail_dto.article_length}"
                         self.blog_detail_to_docx(article_title, article_text, daum_keyword)
-
                         search_blog_list.append(article_title)
 
                         if len(search_blog_list) >= self.guiDto.daum_search_count:
@@ -230,7 +230,7 @@ class DaumSearch:
                 self.log_append(f"입력하신 페이지 수가 존재하지 않아 수집할 글 개수에 도달하지 못했습니다.")
                 break
 
-        if len(search_blog_list) == 0:
+        if len(search_blog_list) == 0 or len(search_blog_list) < self.guiDto.daum_search_count:
             self.log_append("입력하신 수집할 글 조건에 맞는 글이 없어 수집할 글 개수에 도달하지 못했습니다.")         
             
         time.sleep(1)

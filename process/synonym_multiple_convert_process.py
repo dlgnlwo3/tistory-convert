@@ -91,6 +91,7 @@ class SynonymMultipleConvert:
         # 맺음말 입력
         if footer:
             paragraph = doc.add_paragraph()
+            paragraph = doc.add_paragraph()
             for footer_word in footer:
                 run = paragraph.add_run(footer_word)
                 font = run.font
@@ -156,6 +157,7 @@ class SynonymMultipleConvert:
                 # 문단 랜덤 섞기 체크 시
 
                 if self.guiDto.shuffle_paragraphs_check:
+                    print("문단 랜덤 섞기 체크 시")
                     original_sentence = shuffle_sentence(original_sentence)
 
                 dict_sentence = {}

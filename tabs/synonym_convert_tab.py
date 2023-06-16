@@ -117,10 +117,11 @@ class SynonymConvertTab(QWidget):
 
         except Exception as e:
             if str(e).find("Cannot choose from an empty sequence") > -1:
-                QMessageBox.information(
+                QMessageBox.warning(
                     self,
                     "오류 발생",
-                    f"[{str(e)[:str(e).find(':')]}] 유의어 데이터를 확인해주세요. \n{e}",
+                    # f"[{str(e)[:str(e).find(':')]}] 유의어 데이터를 확인해주세요. \n{e}",
+                     "'a=b=c'와 같은 형태로 DB를 수정해 주세요",
                 )
                 return
 

@@ -20,25 +20,20 @@ import io
 import numpy as np
 import win32clipboard
 from widgets.qline_edit_widget import CustomLineEdit
-from configs.tistory_convert_config import TistoryConverterConfig as Config
-from configs.tistory_convert_config import TistoryConverterData as ConfigData
+from common.valid import contains_empty
 
 class SearchTab(QWidget):
-    # 초기화
+   
+        # 초기화
     def __init__(self):
-
+        self.saved_data_daum = get_save_data_daum()
+        self.saved_data_google = get_save_data_google()
+        self.saved_data_setting = get_save_data_setting()
+        print(self.saved_data_daum)
+        print(self.saved_data_google)
         super().__init__()
-        self.initConfig()
         self.initUI()
 
-    def initConfig(self):
-        self.config = Config()
-        __saved_data = self.config.get_data()
-        self.saved_data = self.config.dict_to_data(__saved_data)
-
-        self.saved_data_daum = self.saved_data.daum
-        self.saved_data_google = self.saved_data.google
-        self.user_save_path = self.saved_data.user_save_path
     # 로그 작성
     @Slot(str)
     def log_append(self, text):
@@ -79,13 +74,14 @@ class SearchTab(QWidget):
         else:
             daum_search_count = self.daum_search_count.text()
 
-        if self.user_save_path == "":
+        self.saved_data_setting = get_save_data_setting()
+        if self.saved_data_setting[SaveFileSetting.SEARCH_FILE_SAVE_PATH.value] == "":
             print(f"저장 경로를 먼저 설정해주세요.")
             # self.log_append(f"저장 경로를 먼저 설정해주세요.")
-            QMessageBox.warning(self, "작업 시작", f"저장 경로를 먼저 설정해주세요.")
+            QMessageBox.information(self, "작업 시작", f"저장 경로를 먼저 설정해주세요.")
             return
         else:
-            search_file_save_path = self.user_save_path
+            search_file_save_path = self.saved_data_setting[SaveFileSetting.SEARCH_FILE_SAVE_PATH.value]
             print(search_file_save_path)
 
         # 날짜 유효성 검사 필요 2023-06-06
@@ -167,14 +163,15 @@ class SearchTab(QWidget):
         else:
             google_search_count = self.google_search_count.text()
 
-        if self.user_save_path == "":
+        self.saved_data_setting = get_save_data_setting()
+        if self.saved_data_setting[SaveFileSetting.SEARCH_FILE_SAVE_PATH.value] == "":
             print(f"저장 경로를 먼저 설정해주세요.")
-            # self.log_append(f"저장 경로를 먼저 설정해주세요.")
             QMessageBox.information(self, "작업 시작", f"저장 경로를 먼저 설정해주세요.")
             return
         else:
-            search_file_save_path = self.user_save_path
+            search_file_save_path = self.saved_data_setting[SaveFileSetting.SEARCH_FILE_SAVE_PATH.value]
             print(search_file_save_path)
+
 
         guiDto = GUIDto()
         guiDto.google_keyword_list = selected_google_keyword_list
@@ -217,9 +214,9 @@ class SearchTab(QWidget):
     def set_daum_keyword_list_tablewidget(self):
         self.daum_keyword_list_tablewidget.setColumnCount(1)
         self.daum_keyword_list_tablewidget.setHorizontalHeaderLabels(["글 수집 키워드"])
-        self.daum_keyword_list_tablewidget.setRowCount(len(self.saved_data_daum))
+        self.daum_keyword_list_tablewidget.setRowCount(len(self.saved_data_daum[SaveFileDaum.DAUM.value]))
 
-        for i, keyword in enumerate(self.saved_data_daum):
+        for i, keyword in enumerate(self.saved_data_daum[SaveFileDaum.DAUM.value]):
             self.daum_keyword_list_tablewidget.setItem(i, 0, QTableWidgetItem(keyword))
 
         self.daum_keyword_list_tablewidget.horizontalHeader().setStretchLastSection(True)
@@ -228,9 +225,9 @@ class SearchTab(QWidget):
     def set_google_keyword_list_tablewidget(self):
         self.google_keyword_list_tablewidget.setColumnCount(1)
         self.google_keyword_list_tablewidget.setHorizontalHeaderLabels(["이미지 수집 키워드"])
-        self.google_keyword_list_tablewidget.setRowCount(len(self.saved_data_google))
+        self.google_keyword_list_tablewidget.setRowCount(len(self.saved_data_google[SaveFileGoogle.GOOGLE.value]))
 
-        for i, keyword in enumerate(self.saved_data_google):
+        for i, keyword in enumerate(self.saved_data_google[SaveFileGoogle.GOOGLE.value]):
             self.google_keyword_list_tablewidget.setItem(i, 0, QTableWidgetItem(keyword))
 
         self.google_keyword_list_tablewidget.horizontalHeader().setStretchLastSection(True)
@@ -255,8 +252,8 @@ class SearchTab(QWidget):
             return
 
         clipboard_list = list(map(lambda x: str(x).strip(), clipboard_list))
-        self.saved_data_daum.extend(clipboard_list)
-        dict_save = {SaveFileDaum.DAUM.value: self.saved_data_daum}
+        self.saved_data_daum[SaveFileDaum.DAUM.value].extend(clipboard_list)
+        dict_save = {SaveFileDaum.DAUM.value: self.saved_data_daum[SaveFileDaum.DAUM.value]}
         write_save_data_daum(dict_save)
         self.refresh_save_file()
         self.set_daum_keyword_list_tablewidget()
@@ -281,11 +278,12 @@ class SearchTab(QWidget):
             return
 
         clipboard_list = list(map(lambda x: str(x).strip(), clipboard_list))
-        self.saved_data_google.extend(clipboard_list)
-        dict_save = {"google" : self.saved_data_google}
-        Config().write_data(dict_save)
+        self.saved_data_google[SaveFileGoogle.GOOGLE.value].extend(clipboard_list)
+        dict_save = {SaveFileGoogle.GOOGLE.value: self.saved_data_google[SaveFileGoogle.GOOGLE.value]}
+        write_save_data_google(dict_save)
         self.refresh_save_file()
         self.set_google_keyword_list_tablewidget()
+
 
     def daum_save_button_clicked(self):
         if self.daum_input.text() == "":
@@ -294,7 +292,11 @@ class SearchTab(QWidget):
             return
 
         keyword = self.daum_input.text()
-        print(keyword)
+        
+        if contains_empty(keyword):
+            print(f"입력한 키워드의 앞/뒤에 공백을 제거해 주세요.")
+            QMessageBox.warning(self, "키워드추가", "입력한 키워드의 앞/뒤에 공백을 제거해 주세요.")
+            return
 
         self.daum_keyword_list_tablewidget.selectAll()
         daum_items = self.daum_keyword_list_tablewidget.selectedItems()
@@ -306,18 +308,17 @@ class SearchTab(QWidget):
                 self.log_append(f"{daum}: 이미 등록된 키워드 입니다.")
                 return
 
-        self.saved_data_daum.append(keyword)
+        self.saved_data_daum[SaveFileDaum.DAUM.value].append(keyword)
 
-        dict_save = {"daum": self.saved_data_daum}
+        dict_save = {SaveFileDaum.DAUM.value: self.saved_data_daum[SaveFileDaum.DAUM.value]}
 
-        Config().write_data(dict_save)
+        write_save_data_daum(dict_save)
 
         self.refresh_save_file()
 
         self.set_daum_keyword_list_tablewidget()
 
         self.daum_input.clear()
-
     def google_save_button_clicked(self):
         if self.google_input.text() == "":
             print(f"이미지 수집 키워드를 입력해주세요.")
@@ -326,6 +327,12 @@ class SearchTab(QWidget):
 
         keyword = self.google_input.text()
         print(keyword)
+
+        if contains_empty(keyword):
+            print(f"입력한 키워드의 앞/뒤에 공백을 제거해 주세요.")
+            QMessageBox.warning(self, "키워드추가", "입력한 키워드의 앞/뒤에 공백을 제거해 주세요.")
+            return
+
 
         self.google_keyword_list_tablewidget.selectAll()
         google_items = self.google_keyword_list_tablewidget.selectedItems()
@@ -337,9 +344,11 @@ class SearchTab(QWidget):
                 self.log_append(f"{google}: 이미 등록된 키워드 입니다.")
                 return
 
-        self.saved_data_google.append(keyword)
-        dict_save = {"google": self.saved_data_google}
-        Config().write_data(dict_save)
+        self.saved_data_google[SaveFileGoogle.GOOGLE.value].append(keyword)
+
+        dict_save = {SaveFileGoogle.GOOGLE.value: self.saved_data_google[SaveFileGoogle.GOOGLE.value]}
+
+        write_save_data_google(dict_save)
 
         self.refresh_save_file()
 
@@ -370,9 +379,9 @@ class SearchTab(QWidget):
                 for i in range(self.daum_keyword_list_tablewidget.rowCount()):
                     current_items.append(self.daum_keyword_list_tablewidget.item(i, 0).text())
 
-                dict_save = {"daum": current_items}
+                dict_save = {SaveFileDaum.DAUM.value: current_items}
 
-                Config().write_data(dict_save)
+                write_save_data_daum(dict_save)
 
                 print(current_items)
 
@@ -409,9 +418,13 @@ class SearchTab(QWidget):
                 for i in range(self.google_keyword_list_tablewidget.rowCount()):
                     current_items.append(self.google_keyword_list_tablewidget.item(i, 0).text())
 
-                dict_save = {"google": current_items}
-                Config().write_data(dict_save)
+                dict_save = {SaveFileGoogle.GOOGLE.value: current_items}
 
+                write_save_data_google(dict_save)
+
+                print(current_items)
+
+                print(f"현재 상태를 저장했습니다.")
             except Exception as e:
                 print(e)
         else:
@@ -422,7 +435,8 @@ class SearchTab(QWidget):
         self.set_google_keyword_list_tablewidget()
 
     def open_save_path_button_clicked(self):
-        os.startfile(self.user_save_path)
+        self.saved_data_setting = get_save_data_setting()
+        os.startfile(self.saved_data_setting[SaveFileSetting.SEARCH_FILE_SAVE_PATH.value])
 
     # 저장파일 체크
     def refresh_save_file(self):
