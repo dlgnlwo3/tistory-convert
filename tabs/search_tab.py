@@ -170,7 +170,6 @@ class SearchTab(QWidget):
             return
         else:
             search_file_save_path = self.saved_data_setting[SaveFileSetting.SEARCH_FILE_SAVE_PATH.value]
-            print(search_file_save_path)
 
 
         guiDto = GUIDto()
@@ -217,7 +216,8 @@ class SearchTab(QWidget):
         self.daum_keyword_list_tablewidget.setRowCount(len(self.saved_data_daum[SaveFileDaum.DAUM.value]))
 
         for i, keyword in enumerate(self.saved_data_daum[SaveFileDaum.DAUM.value]):
-            self.daum_keyword_list_tablewidget.setItem(i, 0, QTableWidgetItem(keyword))
+            if not is_empty_or_nan(keyword):
+                self.daum_keyword_list_tablewidget.setItem(i, 0, QTableWidgetItem(keyword))
 
         self.daum_keyword_list_tablewidget.horizontalHeader().setStretchLastSection(True)
         self.daum_keyword_list_tablewidget.setSelectionMode(QAbstractItemView.MultiSelection)
@@ -240,6 +240,7 @@ class SearchTab(QWidget):
         df_clipboard = pd.read_csv(io.StringIO(clipboard_data), delimiter="\t", header=None)
         clipboard_list = df_clipboard[0].values
         print(clipboard_list)
+        clipboard_list = remove_empty_item(clipboard_list)
 
         quit_msg = f"클립보드에 있는 {len(clipboard_list)}개의 키워드를 추가하시겠습니까?"
         reply = QMessageBox.question(self, "클립보드 내용 추가", quit_msg, QMessageBox.Yes, QMessageBox.No)
@@ -266,6 +267,7 @@ class SearchTab(QWidget):
         win32clipboard.CloseClipboard()
         df_clipboard = pd.read_csv(io.StringIO(clipboard_data), delimiter="\t", header=None)
         clipboard_list = df_clipboard[0].values
+        clipboard_list = remove_empty_item(clipboard_list)
 
         quit_msg = f"클립보드에 있는 {len(clipboard_list)}개의 키워드를 추가하시겠습니까?"
         reply = QMessageBox.question(self, "클립보드 내용 추가", quit_msg, QMessageBox.Yes, QMessageBox.No)
@@ -333,7 +335,6 @@ class SearchTab(QWidget):
             QMessageBox.warning(self, "키워드추가", "입력한 키워드의 앞/뒤에 공백을 제거해 주세요.")
             return
 
-
         self.google_keyword_list_tablewidget.selectAll()
         google_items = self.google_keyword_list_tablewidget.selectedItems()
 
@@ -359,8 +360,6 @@ class SearchTab(QWidget):
     def daum_remove_button_clicked(self):
         items = self.daum_keyword_list_tablewidget.selectedItems()
         if len(items) <= 0:
-            print(f"선택된 글 수집 키워드가 없습니다.")
-            # self.log_append(f"선택된 글 수집 키워드가 없습니다.")
             QMessageBox.information(self, "키워드 삭제", f"선택된 글 수집 키워드가 없습니다.")
             return
 

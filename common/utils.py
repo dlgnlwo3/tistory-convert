@@ -85,5 +85,27 @@ def get_mac_address():
     return getmac.get_mac_address()
 
 
+import math
+
+def is_empty_or_nan(value):
+    if isinstance(value, float) and math.isnan(value):
+        return True
+
+    if isinstance(value, str) and not value.strip():
+        return True
+
+    if isinstance(value, (list, dict, tuple, set)) and not value:
+        return True
+
+    return False
+
+
+def remove_empty_item(items:list):
+
+    for item in items:
+        if is_empty_or_nan(item):
+            items.remove(item)
+    return items
+
 if __name__ == "__main__":
     print(get_mac_address())
