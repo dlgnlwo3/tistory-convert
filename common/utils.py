@@ -107,5 +107,18 @@ def remove_empty_item(items:list):
             items.remove(item)
     return items
 
+
+
+import re
+
+def convert_multiple_newlines(string):
+    converted_string = re.sub('\n{3,}', '\n\n', string)
+    return converted_string
+
+
 if __name__ == "__main__":
-    print(get_mac_address())
+    # Example usage
+    input_string = "Hello\n\n\n\n\nWorld!\n\n\n\n\n\nHow\nare\n\nyou?"
+    converted_string = convert_multiple_newlines(input_string)
+    print(converted_string)
+    # print(get_mac_address())

@@ -12,7 +12,7 @@ import clipboard
 from dtos.top_blog_detail_dto import *
 from bs4 import BeautifulSoup
 import requests
-
+from common.utils import convert_multiple_newlines
 
 class TistoryBeautifulsoup:
     def __init__(self):
@@ -67,8 +67,10 @@ class TistoryBeautifulsoup:
         article_title = '제목부분'
         article_text = div_soup.text
 
-        article_length = len(article_text)
+        # 줄바꿈 수정 3개이상인경우 2개로 수정
+        article_text = convert_multiple_newlines(article_text)
 
+        article_length = len(article_text.replace('\xa0', '').replace(" ", "").replace(f"\n", ""))
         keyword_count = article_text.count(keyword)
 
         clipboard.copy(str(article_text))

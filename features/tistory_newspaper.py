@@ -16,6 +16,7 @@ from dtos.top_blog_detail_dto import *
 from selenium import webdriver
 from common.chrome import get_chrome_driver_new
 from selenium.webdriver.common.by import By
+from common.utils import convert_multiple_newlines
 
 from bs4 import BeautifulSoup
 import requests
@@ -93,6 +94,10 @@ class TistoryNewsPaper:
 
         if not article_text:
             raise Exception("본문을 찾을 수 없습니다.")
+        
+
+        # 줄바꿈 수정 3개이상인경우 2개로 수정
+        article_text = convert_multiple_newlines(article_text)
 
         return article_text, article_url
 
@@ -115,7 +120,7 @@ class TistoryNewsPaper:
         article_text, article_url = self.get_article_text_and_url(blog_url)
 
         article_text = str(article_text)
-        article_length = len(article_text.replace(" ", "").replace(f"\n", ""))
+        article_length = len(article_text.replace('\xa0', '').replace(" ", "").replace(f"\n", ""))
         keyword_count = str(article_text).count(keyword)
 
         top_blog_detail_dto.keyword = keyword

@@ -113,6 +113,25 @@ class LicenseAddWidget(QWidget):
             raise Exception(e)
         
 
+    # 초기화 버튼
+    def init_button_clicked(self):
+        question_msg = "등록된 기기정보가 초기화됩니다. 정말로 초기화 하시겠습니까?"
+        reply = QMessageBox.question(
+            self, "초기화", question_msg, QMessageBox.Yes, QMessageBox.No
+        )
+        if reply != QMessageBox.Yes:
+            return
+
+        dict_save = {"license_key": "","email": ""}
+        Config().write_data(dict_save)
+
+        self.license_key_edit.setText("")
+        self.email_edit.setText("")
+
+        QMessageBox.information(self, "성공", "제품키가 초기화 되었습니다.")
+
+        
+
     def license_check(self):
         # 컴퓨터 로컬 안에 license_key가 존재한다면 해당 license_key + mac_Address로 존재여부, 유효기간을 체크하여 존재체크한다.
         # 존재하면 리턴
@@ -191,12 +210,18 @@ class LicenseAddWidget(QWidget):
         self.register_button.clicked.connect(self.register_button_clicked)
         self.register_button.setFixedHeight(40)
 
+
+        self.init_button = QPushButton("초기화")
+        self.init_button.clicked.connect(self.init_button_clicked)
+        self.init_button.setFixedHeight(40)
+
         register_layout = QGridLayout()
         register_layout.addWidget(license_key_label, 0, 0, 1, 1)
         register_layout.addWidget(self.license_key_edit, 0, 1, 1, 4)
         register_layout.addWidget(email_label, 1, 0, 1, 1)
         register_layout.addWidget(self.email_edit, 1, 1, 1, 4)
         register_layout.addWidget(self.register_button, 2, 0, 1, 5)
+        register_layout.addWidget(self.init_button, 3, 0, 1, 5)
         register_groupbox.setLayout(register_layout)
 
         layout = QVBoxLayout()
@@ -205,7 +230,7 @@ class LicenseAddWidget(QWidget):
 
         # 앱 기본 설정
         self.setWindowTitle("Re.writer 제품키 등록")
-        self.resize(600, 250)
+        self.resize(600, 350)
         self.center()
         self.show()
 

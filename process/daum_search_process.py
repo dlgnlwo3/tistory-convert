@@ -212,7 +212,6 @@ class DaumSearch:
                         search_blog_list.append(article_title)
 
                         if len(search_blog_list) >= self.guiDto.daum_search_count:
-                            self.log_append(f"{daum_keyword}: 수집할 글 개수에 도달했습니다.")
                             break
 
                     else:
@@ -221,7 +220,6 @@ class DaumSearch:
                         continue
 
                 if len(search_blog_list) >= self.guiDto.daum_search_count:
-                    print(f"{daum_keyword}: 수집할 글 개수에 도달했습니다.")
                     self.log_append(f"{daum_keyword}: 수집할 글 개수에 도달했습니다.")
                     break
 
