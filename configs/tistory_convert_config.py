@@ -8,13 +8,15 @@ import os
 import json
 from configs.program_config import ProgramConfig
 
+
 class TistoryConverterData:
     def __init__(self):
         self.license_key = ""  # 제품키
+        self.token = ""  # 제품키
         self.email = ""  # 이메일주소
         self.daum = []  # 다음
         self.google = []  # 구글
-        self.user_save_path = "" # 유저정보
+        self.user_save_path = ""  # 유저정보
         self.search_file_save_path = ""  # 저장경로
         self.synonym_file_save_path = ""  # 유의어 파일 저장경로
         self.user_save_path_topic = []  # 주제 파일 저장경로
@@ -82,6 +84,10 @@ class TistoryConverterConfig(ProgramConfig):
 
         return save_data
 
+    def write(self, data: TistoryConverterData):
+        save_data = self.data_to_dict(data)
+        self.write_data(save_data)
+
     def get_data(self) -> dict:
         saved_data = {}
         if os.path.isfile(self.save_path):
@@ -97,6 +103,10 @@ class TistoryConverterConfig(ProgramConfig):
                 exist_value = saved_data[member]
                 saved_data.update({member: exist_value})
         return saved_data
+
+    def get_saved_data(self) -> TistoryConverterData:
+        saved_data = self.get_data()
+        return self.dict_to_data(saved_data)
 
 
 if __name__ == "__main__":

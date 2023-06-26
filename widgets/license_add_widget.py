@@ -4,7 +4,7 @@ from PySide6.QtWidgets import *
 from PySide6.QtNetwork import QNetworkAccessManager, QNetworkRequest
 from configs.tistory_convert_config import TistoryConverterConfig as Config
 from configs.tistory_convert_config import TistoryConverterData as ConfigData
-from common.utils import get_mac_address, global_log_append
+from common.utils import get_mac_address, global_log_append, get_new_token
 from common.valid import is_email_valid
 from api_config import API_URL
 import requests
@@ -12,8 +12,9 @@ from http import HTTPStatus
 import time
 from widgets.qline_edit_widget import CustomLineEdit
 import json
-class LicenseAddWidget(QWidget):
 
+
+class LicenseAddWidget(QWidget):
     register_checked = Signal()
 
     def __init__(self):
@@ -26,7 +27,7 @@ class LicenseAddWidget(QWidget):
         self.saved_data = self.config.dict_to_data(__saved_data)
         self.license_key = self.saved_data.license_key
         self.email = self.saved_data.email
-        
+
     # # 프로그램 닫기 클릭 시
     def closeEvent(self, event):
         quit_msg = "프로그램을 종료하시겠습니까?"
@@ -38,6 +39,7 @@ class LicenseAddWidget(QWidget):
         else:
             print(f"종료 취소")
             event.ignore()
+
     # 가운데 정렬
     def center(self):
         qr = self.frameGeometry()
@@ -71,28 +73,20 @@ class LicenseAddWidget(QWidget):
             return
 
         question_msg = "등록하시겠습니까?"
-        reply = QMessageBox.question(
-            self, "라이센스 등록", question_msg, QMessageBox.Yes, QMessageBox.No
-        )
+        reply = QMessageBox.question(self, "라이센스 등록", question_msg, QMessageBox.Yes, QMessageBox.No)
         if reply != QMessageBox.Yes:
             return
-        
+
         mac_address = get_mac_address()
 
-        dict_save = {"license_key": license_key,"email": email}
+        dict_save = {"license_key": license_key, "email": email}
 
         url = f"{API_URL}/register/"
         try:
-            datas=  {
-            "customer_email": email,
-            "license_key": license_key,
-            "mac_address": mac_address
-            }
+            datas = {"customer_email": email, "license_key": license_key, "mac_address": mac_address}
             # 맥주소 다르게 한 경우
             # datas.update({"mac_address" : "2dd22:2d:2:2:dd"})
             response = requests.post(url, json=datas, timeout=5)
-            print(response)
-            print(response.text)
 
             if HTTPStatus.CREATED == response.status_code:
                 Config().write_data(dict_save)
@@ -111,49 +105,57 @@ class LicenseAddWidget(QWidget):
         except Exception as e:
             print(e)
             raise Exception(e)
-        
 
     # 초기화 버튼
     def init_button_clicked(self):
         question_msg = "등록된 기기정보가 초기화됩니다. 정말로 초기화 하시겠습니까?"
-        reply = QMessageBox.question(
-            self, "초기화", question_msg, QMessageBox.Yes, QMessageBox.No
-        )
+        reply = QMessageBox.question(self, "초기화", question_msg, QMessageBox.Yes, QMessageBox.No)
         if reply != QMessageBox.Yes:
             return
 
-        dict_save = {"license_key": "","email": ""}
-        Config().write_data(dict_save)
+        license_key = self.license_key_edit.text()
+        mac_address = get_mac_address()
 
-        self.license_key_edit.setText("")
-        self.email_edit.setText("")
+        if not license_key:
+            QMessageBox.warning(self, "초기화 실패", "초기화할 제품키가 없습니다. 제품키를 입력해주세요.")
+            return
 
-        QMessageBox.information(self, "성공", "제품키가 초기화 되었습니다.")
+        url = f"{API_URL}/mac_address/{mac_address}/{license_key}/"
+        try:
+            # datas.update({"mac_address" : "2dd22:2d:2:2:dd"})
+            response = requests.delete(url, timeout=5)
 
-        
+            if HTTPStatus.NO_CONTENT == response.status_code:
+                dict_save = {"license_key": "", "email": ""}
+                Config().write_data(dict_save)
+                self.license_key_edit.setText("")
+                self.email_edit.setText("")
+                QMessageBox.information(self, "성공", "제품키가 초기화 되었습니다.")
+
+            elif HTTPStatus.INTERNAL_SERVER_ERROR == response.status_code:
+                QMessageBox.warning(self, "초기화 실패", "서버에 오류가 발생하였습니다. 관리자에게 문의해주세요.")
+                global_log_append(response.text)
+            else:
+                global_log_append(response.text)
+                js_data = json.loads(response.text)
+                QMessageBox.warning(self, "초기화 실패", "서버에 오류가 발생하였습니다. 관리자에게 문의해주세요.")
+                return
+
+        except Exception as e:
+            print(e)
+            raise Exception(e)
 
     def license_check(self):
         # 컴퓨터 로컬 안에 license_key가 존재한다면 해당 license_key + mac_Address로 존재여부, 유효기간을 체크하여 존재체크한다.
         # 존재하면 리턴
-        print(self.license_key)
-        print(self.email)
-        print('')
-
-        check_result = dict(
-            is_valid=False,
-            error = ""
-        )
+        check_result = dict(is_valid=False, error="")
 
         if self.license_key:
-
             mac_address = get_mac_address()
 
             url = f"{API_URL}/license/"
             try:
-                datas=  {
-                "license_key": self.license_key,
-                "mac_address": mac_address
-                }
+                datas = {"license_key": self.license_key, "mac_address": mac_address}
                 # 맥주소 다르게 한 경우
                 # datas.update({"mac_address" : "2dd22:2d:2:2:dd"})
                 response = requests.post(url, json=datas, timeout=5)
@@ -161,31 +163,66 @@ class LicenseAddWidget(QWidget):
 
                 if HTTPStatus.OK == response.status_code:
                     time.sleep(2)
-                    check_result.update({"is_valid":True})
+
+                    # 제품키 인증이 끝나면 해당 제품키의 토큰을 업데이트
+                    patch_result = self.patch_token()
+
+                    dict_save = {
+                        "license_key": self.license_key,
+                        "email": self.email,
+                        "token": patch_result.get("token"),
+                    }
+                    Config().write_data(dict_save)
+
+                    check_result.update({"is_valid": True})
                 elif HTTPStatus.INTERNAL_SERVER_ERROR == response.status_code:
                     check_result.update({"error": "서버에 오류가 발생하였습니다. 관리자에게 문의해주세요."})
                 else:
                     data = response.json()
                     error = data["error"]
-                    check_result.update({"error":error})
+                    check_result.update({"error": error})
 
             except Exception as e:
                 print(e)
                 raise Exception(e)
         else:
-            check_result = dict(
-                is_valid=False,
-                error = "등록된 제품키가 없습니다."
-            )
+            check_result = dict(is_valid=False, error="등록된 제품키가 없습니다.")
         return check_result
-    
+
+    def patch_token(self):
+        # 컴퓨터 로컬 안에 license_key가 존재한다면 해당 license_key + mac_Address로 존재여부, 유효기간을 체크하여 존재체크한다.
+
+        patch_result = dict(result=False, error="", token="")
+
+        if self.license_key:
+            url = f"{API_URL}/token/"
+            try:
+                new_token = get_new_token()
+                datas = {"license_key": self.license_key, "token": new_token}
+                response = requests.patch(url, json=datas, timeout=5)
+                global_log_append(response.text)
+
+                if HTTPStatus.OK == response.status_code:
+                    time.sleep(2)
+                    patch_result.update({"result": True, "token": new_token})
+                elif HTTPStatus.INTERNAL_SERVER_ERROR == response.status_code:
+                    patch_result.update({"error": "서버에 오류가 발생하였습니다. 관리자에게 문의해주세요."})
+                else:
+                    data = response.json()
+                    error = data["error"]
+                    patch_result.update({"error": error})
+
+            except Exception as e:
+                print(e)
+                raise Exception(e)
+        else:
+            patch_result = dict(result=False, error="등록된 제품키가 없습니다.")
+        return patch_result
 
     def show_warning_msg(self, msg):
         QMessageBox.warning(self, "제품키 확인", msg)
 
-
     def initUI(self):
-
         # 이미지 주소
         ICON_IMAGE_URL = "https://i.imgur.com/yUWPOGp.png"
         self.icon = QNetworkAccessManager()
@@ -200,7 +237,6 @@ class LicenseAddWidget(QWidget):
         self.license_key_edit.setPlaceholderText("제품키")
         self.license_key_edit.setFixedWidth = 500
 
-
         email_label = QLabel("이메일")
         self.email_edit = CustomLineEdit(f"{self.email}")
         self.email_edit.setPlaceholderText("이메일주소")
@@ -209,7 +245,6 @@ class LicenseAddWidget(QWidget):
         self.register_button = QPushButton("제품등록")
         self.register_button.clicked.connect(self.register_button_clicked)
         self.register_button.setFixedHeight(40)
-
 
         self.init_button = QPushButton("초기화")
         self.init_button.clicked.connect(self.init_button_clicked)
@@ -233,4 +268,3 @@ class LicenseAddWidget(QWidget):
         self.resize(600, 350)
         self.center()
         self.show()
-

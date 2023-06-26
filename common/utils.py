@@ -14,6 +14,8 @@ from config import LOG_FOLDER_PATH
 import winsound as ws
 from bs4 import BeautifulSoup
 import getmac
+import hashlib
+import uuid
 
 
 # 전역 로그
@@ -61,24 +63,25 @@ def beepsound():
     ws.Beep(freq, dur)  # winsound.Beep(frequency, duration)
 
 
-
-def get_word_count_without_empty(text:str) -> int:
-    nospace = re.sub('&nbsp;| |\t|\r|\n', '', text)
+def get_word_count_without_empty(text: str) -> int:
+    nospace = re.sub("&nbsp;| |\t|\r|\n", "", text)
     return len(nospace)
 
 
-def get_word_count_from_html(html:str, convert_hint:str):
-    
+def get_word_count_without_empty2(article_text: str) -> int:
+    len(article_text.replace("\xa0", "").replace(" ", "").replace(f"\n", "").replace(f"\t", ""))
+
+
+def get_word_count_from_html(html: str, convert_hint: str):
     soup = BeautifulSoup(html, "html.parser")
     before_total_count = get_word_count_without_empty(soup.get_text())
     converted_word_count = 0
     # Find all <span> elements with style="color: red"
-    red_spans = soup.find_all('span', style=lambda value: value and convert_hint in value)
+    red_spans = soup.find_all("span", style=lambda value: value and convert_hint in value)
     for span in red_spans:
         converted_word_count += get_word_count_without_empty(str(span.text))
 
     return before_total_count, converted_word_count
-
 
 
 def get_mac_address():
@@ -86,6 +89,7 @@ def get_mac_address():
 
 
 import math
+
 
 def is_empty_or_nan(value):
     if isinstance(value, float) and math.isnan(value):
@@ -100,20 +104,61 @@ def is_empty_or_nan(value):
     return False
 
 
-def remove_empty_item(items:list):
-
+def remove_empty_item(items: list):
     for item in items:
         if is_empty_or_nan(item):
             items.remove(item)
     return items
 
 
-
 import re
 
+
 def convert_multiple_newlines(string):
-    converted_string = re.sub('\n{3,}', '\n\n', string)
+    # converted_string = re.sub('\n{3,}', '\n\n', string)
+    converted_string = re.sub(r"(\n\s*){3,}", "\n\n", string)
     return converted_string
+
+
+def filter_article_content(article_text: str):
+    # Remove advertisements
+    ad_patterns = [
+        r"<!--\s*google_ad_section_start.*?google_ad_section_end\s*-->",  # Match Google ad sections
+        r"<script[^>]*>.*?googlesyndication\.com.*?</script>",  # Match Google ad scripts
+        r"<iframe[^>]*src=\".*?googleadservices\.com.*?</iframe>",  # Match Google ad iframes
+        # Add more patterns for Google ads as needed
+    ]
+
+    for pattern in ad_patterns:
+        article_text = re.sub(pattern, "", article_text)
+
+    # Remove links
+    article_text = re.sub(r"<a\b[^>]*>(.*?)</a>", "", article_text)
+
+    # Remove image alt information
+    article_text = re.sub(r"<img[^>]*alt=\"(.*?)\"[^>]*>", "", article_text)
+
+    # over empty 3lines to 2lines
+    article_text = convert_multiple_newlines(article_text)
+
+    # Remove extra whitespace
+    # article_text = re.sub(r"\s+", " ", article_text.strip())
+
+    return article_text
+
+
+def get_new_token():
+    timestamp = str(int(time.time()))
+    software_id = str(uuid.uuid4())
+    license_data = timestamp + software_id
+    return hashlib.sha256(license_data.encode()).hexdigest()
+
+
+def destroy_parent_widgets(widget):
+    parent = widget.parentWidget()
+    while parent is not None:
+        parent.deleteLater()
+        parent = parent.parentWidget()
 
 
 if __name__ == "__main__":

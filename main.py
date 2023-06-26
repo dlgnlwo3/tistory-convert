@@ -24,20 +24,23 @@ from tabs.synonym_convert_tab import SynonymConvertTab
 from tabs.file_convert_tab import FileConvertTab
 from tabs.synonym_multiple_convert_tab import SynonymMultipleConvertTab
 from widgets.license_add_widget import LicenseAddWidget
+from common.utils import global_log_append
+from common.api import token_auth_check
+from widgets.auth_message_widget import QuitMessage
+
+# pyinstaller -n "tistory convert v2.0.6" -w --onefile --clean "main.py" --icon "assets\icon.png" --noupx --add-data "venv\Lib\site-packages\newspaper;newspaper"
 
 
-# pyinstaller -n "tistory convert v2.0.2" -w --onefile --clean  "main.py" --icon "assets\icon.png" --noupx --add-data "venv\Lib\site-packages\newspaper;newspaper"
+def my_exception_hook(exctype, value, traceback):
+    print(exctype, value, traceback)
+    global_log_append(str(value))
+    sys._excepthook(exctype, value, traceback)
 
 
-# def my_exception_hook(exctype, value, traceback):
-#     print(exctype, value, traceback)
-#     global_log_append(str(value))
-#     sys._excepthook(exctype, value, traceback)
-
-# sys.excepthook = my_exception_hook
+sys.excepthook = my_exception_hook
 
 
-class MainUI():
+class MainUI:
     # 초기화
     def __init__(self):
         self.licenseAddWidget = LicenseAddWidget()
@@ -45,15 +48,13 @@ class MainUI():
         self.licenseAddWidget.register_checked.connect(self.app_widget.initUI)
         result = self.licenseAddWidget.license_check()
 
-
         ##### 배포시주석처리 #####
         ##### 개발시주석해제 #####
         # result["is_valid"] = True
 
-        # result["is_valid"] = False
-
         if result["is_valid"] == True:
             self.app_widget.initUI()
+
         else:
             self.licenseAddWidget.initUI()
             self.licenseAddWidget.show_warning_msg(result["error"])
@@ -95,6 +96,13 @@ class AppWidget(QWidget):
         icon = QIcon(pixmap)
         self.setWindowIcon(icon)
 
+    def auth_check(self, index):
+        auth_reuslt = token_auth_check()
+        if auth_reuslt["result"] == False:
+            self.destroy()
+            return False
+        return True
+
     # 메인 UI
     def initUI(self):
         # 이미지 주소
@@ -118,6 +126,8 @@ class AppWidget(QWidget):
         tabs.addTab(self.file_convert_tab, "파일 변환")
         tabs.addTab(self.setting_tab, "설정")
         tabs.addTab(self.topic_tab, "주제 설정")
+
+        tabs.currentChanged.connect(self.auth_check)
 
         vbox = QVBoxLayout()
         vbox.addWidget(tabs)

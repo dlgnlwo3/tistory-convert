@@ -21,37 +21,42 @@ import numpy as np
 import win32clipboard
 from widgets.qline_edit_widget import CustomLineEdit
 from common.valid import contains_empty
+from common.api import token_auth_check
+
 
 class SearchTab(QWidget):
-   
-        # 초기화
+    # 초기화
     def __init__(self):
         self.saved_data_daum = get_save_data_daum()
         self.saved_data_google = get_save_data_google()
         self.saved_data_setting = get_save_data_setting()
-        print(self.saved_data_daum)
-        print(self.saved_data_google)
         super().__init__()
         self.initUI()
 
     # 로그 작성
     @Slot(str)
     def log_append(self, text):
-        today = str(datetime.now())[0:10]
         now = str(datetime.now())[0:-7]
         self.browser.append(f"[{now}] {str(text)}")
         global_log_append(text)
 
+    def auth_check(self):
+        auth_reuslt = token_auth_check()
+        if auth_reuslt["result"] == False:
+            destroy_parent_widgets(self)
+            return False
+        return True
+
     # 검색 시작 클릭
     def daum_search_start_button_clicked(self):
-        print(f"search start clicked")
+        if not self.auth_check():
+            return
 
         selected_daum_keyword_list = []
         self.daum_keyword_list_tablewidget.selectAll()
         daum_items = self.daum_keyword_list_tablewidget.selectedItems()
         if len(daum_items) <= 0:
-            print(f"글 수집 키워드가 없습니다.")
-            QMessageBox.warning(self, "작업 시작", f"글 수집 키워드가 없습니다.")
+            QMessageBox.warning(self, "작업 시작", "글 수집 키워드가 없습니다.")
             return
 
         for daum_item in daum_items:
@@ -76,16 +81,13 @@ class SearchTab(QWidget):
 
         self.saved_data_setting = get_save_data_setting()
         if self.saved_data_setting[SaveFileSetting.SEARCH_FILE_SAVE_PATH.value] == "":
-            print(f"저장 경로를 먼저 설정해주세요.")
-            # self.log_append(f"저장 경로를 먼저 설정해주세요.")
-            QMessageBox.information(self, "작업 시작", f"저장 경로를 먼저 설정해주세요.")
+            QMessageBox.information(self, "작업 시작", "저장 경로를 먼저 설정해주세요.")
             return
         else:
             search_file_save_path = self.saved_data_setting[SaveFileSetting.SEARCH_FILE_SAVE_PATH.value]
             print(search_file_save_path)
 
         # 날짜 유효성 검사 필요 2023-06-06
-
 
         guiDto = GUIDto()
         guiDto.daum_keyword_list = selected_daum_keyword_list
@@ -97,17 +99,14 @@ class SearchTab(QWidget):
         guiDto.system_sound_checkbox = self.system_sound_checkbox.isChecked()
         guiDto.system_down_checkbox = self.system_down_checkbox.isChecked()
 
-        # 수집기간 옵션 선택 시 
+        # 수집기간 옵션 선택 시
         if self.period_use_check.isChecked():
-
             if self.daum_search_date.date() < self.period_start_date.date():
-                QMessageBox.warning(self, "작업 시작", f"수집할 글 작성일자를 수집 기간에 맞게 설정하세요.")
+                QMessageBox.warning(self, "작업 시작", "수집할 글 작성일자를 수집 기간에 맞게 설정하세요.")
                 return
 
             guiDto.period_start_date = self.period_start_date.date().toString("yyyyMMdd")
-            guiDto.period_end_date =   self.period_end_date.date().toString("yyyyMMdd")
-
-        print(f"작업을 시작합니다.")
+            guiDto.period_end_date = self.period_end_date.date().toString("yyyyMMdd")
 
         self.daum_search_thread = DaumSearchThread()
         self.daum_search_thread.log_msg.connect(self.log_append)
@@ -121,20 +120,16 @@ class SearchTab(QWidget):
     # 검색 중지 클릭
     @Slot()
     def daum_search_stop_button_clicked(self):
-        print(f"search stop clicked")
         self.log_append(f"중지 클릭")
         self.daum_search_finished()
 
     # 검색 작업 종료
     @Slot()
     def daum_search_finished(self):
-        print(f"search thread finished")
         self.log_append(f"작업 종료")
         self.daum_search_thread.stop()
         self.daum_search_start_button.setDisabled(False)
         self.daum_search_stop_button.setDisabled(True)
-        print(f"thread_is_running: {self.daum_search_thread.isRunning()}")
-        print(f"시스템 종료: {self.system_down_checkbox.isChecked()}")
         if self.system_down_checkbox.isChecked():
             self.log_append(f"5초 후 시스템이 종료됩니다.")
             os_system_shutdown()
@@ -142,15 +137,14 @@ class SearchTab(QWidget):
 
     # 검색 시작 클릭
     def google_search_start_button_clicked(self):
-        print(f"google search start clicked")
-
+        if not self.auth_check():
+            return
         selected_google_keyword_list = []
         self.google_keyword_list_tablewidget.selectAll()
         google_items = self.google_keyword_list_tablewidget.selectedItems()
         if len(google_items) <= 0:
-            print(f"이미지 수집 키워드가 없습니다.")
             # self.log_append(f"이미지 수집 키워드가 없습니다.")
-            QMessageBox.information(self, "작업 시작", f"이미지 수집 키워드가 없습니다.")
+            QMessageBox.information(self, "작업 시작", "이미지 수집 키워드가 없습니다.")
             return
 
         for google_item in google_items:
@@ -165,12 +159,10 @@ class SearchTab(QWidget):
 
         self.saved_data_setting = get_save_data_setting()
         if self.saved_data_setting[SaveFileSetting.SEARCH_FILE_SAVE_PATH.value] == "":
-            print(f"저장 경로를 먼저 설정해주세요.")
-            QMessageBox.information(self, "작업 시작", f"저장 경로를 먼저 설정해주세요.")
+            QMessageBox.information(self, "작업 시작", "저장 경로를 먼저 설정해주세요.")
             return
         else:
             search_file_save_path = self.saved_data_setting[SaveFileSetting.SEARCH_FILE_SAVE_PATH.value]
-
 
         guiDto = GUIDto()
         guiDto.google_keyword_list = selected_google_keyword_list
@@ -191,20 +183,16 @@ class SearchTab(QWidget):
     # 검색 중지 클릭
     @Slot()
     def google_search_stop_button_clicked(self):
-        print(f"search stop clicked")
         self.log_append(f"중지 클릭")
         self.google_search_finished()
 
     # 검색 작업 종료
     @Slot()
     def google_search_finished(self):
-        print(f"search thread finished")
         self.log_append(f"작업 종료")
         self.google_search_thread.stop()
         self.google_search_start_button.setDisabled(False)
         self.google_search_stop_button.setDisabled(True)
-        print(f"thread_is_running: {self.google_search_thread.isRunning()}")
-        print(f"시스템 종료: {self.system_down_checkbox.isChecked()}")
         if self.system_down_checkbox.isChecked():
             self.log_append(f"5초 후 시스템이 종료됩니다.")
             os_system_shutdown()
@@ -286,17 +274,14 @@ class SearchTab(QWidget):
         self.refresh_save_file()
         self.set_google_keyword_list_tablewidget()
 
-
     def daum_save_button_clicked(self):
         if self.daum_input.text() == "":
-            print(f"글 수집 키워드를 입력해주세요.")
             self.log_append(f"글 수집 키워드를 입력해주세요.")
             return
 
         keyword = self.daum_input.text()
-        
+
         if contains_empty(keyword):
-            print(f"입력한 키워드의 앞/뒤에 공백을 제거해 주세요.")
             QMessageBox.warning(self, "키워드추가", "입력한 키워드의 앞/뒤에 공백을 제거해 주세요.")
             return
 
@@ -315,20 +300,16 @@ class SearchTab(QWidget):
         dict_save = {SaveFileDaum.DAUM.value: self.saved_data_daum[SaveFileDaum.DAUM.value]}
 
         write_save_data_daum(dict_save)
-
         self.refresh_save_file()
-
         self.set_daum_keyword_list_tablewidget()
-
         self.daum_input.clear()
+
     def google_save_button_clicked(self):
         if self.google_input.text() == "":
-            print(f"이미지 수집 키워드를 입력해주세요.")
             self.log_append(f"이미지 수집 키워드를 입력해주세요.")
             return
 
         keyword = self.google_input.text()
-        print(keyword)
 
         if contains_empty(keyword):
             print(f"입력한 키워드의 앞/뒤에 공백을 제거해 주세요.")
@@ -350,11 +331,8 @@ class SearchTab(QWidget):
         dict_save = {SaveFileGoogle.GOOGLE.value: self.saved_data_google[SaveFileGoogle.GOOGLE.value]}
 
         write_save_data_google(dict_save)
-
         self.refresh_save_file()
-
         self.set_google_keyword_list_tablewidget()
-
         self.google_input.clear()
 
     def daum_remove_button_clicked(self):
@@ -577,7 +555,7 @@ class SearchTab(QWidget):
         period_groupbox = QGroupBox("수집기간 옵션")
         self.period_use_check = QCheckBox("기간조회")
         self.period_use_check.stateChanged.connect(self.period_use_check_changed)
-        
+
         self.period_start_date = QDateEdit(QDate.currentDate().addMonths(-1))
         self.period_between_label = QLabel("    ~")
         self.period_end_date = QDateEdit(QDate.currentDate())
@@ -591,7 +569,6 @@ class SearchTab(QWidget):
         period_date_inner_layout.addWidget(self.period_between_label, 1)
         period_date_inner_layout.addWidget(self.period_end_date, 3)
         period_groupbox.setLayout(period_date_inner_layout)
-
 
         # 키워드별로 수집할 이미지 개수
         google_search_count_groupbox = QGroupBox("키워드별로 수집할 이미지 개수")

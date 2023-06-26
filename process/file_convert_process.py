@@ -14,6 +14,7 @@ from config import *
 import pandas as pd
 import re
 from docx import Document
+from common.utils import get_word_count_without_empty2
 
 # from docx.shared import Pt, RGBColor
 
@@ -36,8 +37,9 @@ class FileConvert:
             os.mkdir(save_path)
         else:
             pass
-
-        sentence_docx = os.path.join(save_path, f"{file_name}.docx")
+        
+        sentence_count = get_word_count_without_empty2(sentence)
+        sentence_docx = os.path.join(save_path, f"{file_name}_{sentence_count}.docx")
 
         doc = Document()
         doc.add_paragraph(sentence)

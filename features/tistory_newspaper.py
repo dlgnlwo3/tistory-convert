@@ -7,72 +7,100 @@ if 1 == 1:
     warnings.simplefilter("ignore", UserWarning)
     sys.coinit_flags = 2
 
-from newspaper import Article
-from newspaper import Config
 import os
-import clipboard
-from bs4 import BeautifulSoup
 from dtos.top_blog_detail_dto import *
-from selenium import webdriver
-from common.chrome import get_chrome_driver_new
-from selenium.webdriver.common.by import By
 from common.utils import convert_multiple_newlines
-
 from bs4 import BeautifulSoup
 import requests
 
 class TistoryNewsPaper:
     def __init__(self):
-        self.driver = get_chrome_driver_new(is_headless=True, is_secret=True)
-
-    def get_title_and_img_count(self, blog_url:str):
-        
-        article_title = ""
-        img_count = 0 
-
-        driver = self.driver
-        driver.get(blog_url)
-
-        try:
-            driver.implicitly_wait(2)
-            article_title = driver.find_element(
-                By.CSS_SELECTOR, ".blogview_tit h3"
-            ).get_attribute("textContent")
-        except:
-            pass
-
-        try:
-            driver.implicitly_wait(2)
-            content_img_els = driver.find_elements(By.CSS_SELECTOR, 'article img')
-            content_img_list = []
-            for content_img in content_img_els:
-                img_src = content_img.get_attribute('src')
-                if img_src.find('/thumb/') > - 1 or img_src.find('daumcdn.net/map') > - 1:
-                    continue
-                content_img_list.append(content_img)
-
-            img_count = str(len(content_img_list))
-            
-        except:
-            pass
-        
-        self.driver.quit()
-
-        return article_title, img_count
-
+        pass
 
     # 입력받은 url에서 이미지태그 개수와 키워드 반복횟수를 파악합니다.
-    def get_article_text_and_url(self, blog_url: str):
+    def get_detail_info(self, blog_url: str):
+
+        article_text = ""
+        article_title = ""
+        img_count = 0
+        article_url = ""
+
 
         response = requests.get(blog_url)
         response.raise_for_status()
         soup = BeautifulSoup(response.text, "html.parser")
-        article_text = ""
+        # Remove links
+
+        # Remove text within the <img> tags
+        # for img in soup.find_all("img"):
+        #     img.decompose()
+
+        # Remove text within the <a> tags
+        for a in soup.find_all("a"):
+            a.decompose()
+
+        # img_tags = soup.find_all('img')
+
+        # for img in img_tags:
+        #     alt_text = img.get('alt')
+        #     alt_text.decompose()  # Remove the img tag from the HTML
+            # Perform any desired processing or queries with the alt_text
+
+
+        for mark in soup.find_all("div", {"class": "mark"}):
+            mark.decompose()
+
+        # Remove <figcaption> tags and their text
+        for figcaption in soup.find_all("figcaption"):
+            figcaption.decompose()
+
+        # response = requests.get(blog_url)
+        # html_content = response.content
+
+
+        
+        # print('response.text', response.text)
+        # print('html_content', html_content)
+
+        # soup = BeautifulSoup(html_content, 'html.parser')
+
+        try:
+            article_title = soup.select_one('.blogview_tit h3').get_text()
+        except:
+            pass
+
+        content_img_els = soup.select('article img')
+        content_img_list = [
+            content_img
+            for content_img in content_img_els
+            if not any(
+                keyword in content_img['src']
+                for keyword in ['/thumb/', 'daumcdn.net/map', 'googlesyndication.com', 'https://adclick']
+            )
+        ]
+        img_count = str(len(content_img_list))
+        # try:
+        #     content_img_els = soup.select('article img')
+        #     content_img_list = []
+        #     for content_img in content_img_els:
+        #         img_src = content_img['src']
+        #         print(img_src)
+
+        #         if '/thumb/' in img_src or 'daumcdn.net/map' in img_src or 'googlesyndication.com' in img_src:
+        #             continue 
+        #         content_img_list.append(img_src)
+
+        #     # content_img_list = list(set(content_img_list))
+
+        #     img_count = str(len(content_img_list))
+
+        # except:
+        #     pass
 
         try:
             div_soup = soup.find("div", class_="useless_p_margin")
             article_url = response.url
-            article_text = div_soup.text
+            article_text = div_soup.get_text()
         except:
             pass
         
@@ -80,7 +108,7 @@ class TistoryNewsPaper:
             try:
                 div_soup = soup.find("div", class_="blogview_content")
                 article_url = response.url
-                article_text = div_soup.text
+                article_text = div_soup.get_text()
             except:
                 pass
         
@@ -88,18 +116,17 @@ class TistoryNewsPaper:
             try:
                 div_soup = soup.find("div", class_="tt_article_useless_p_margin")
                 article_url = response.url
-                article_text = div_soup.text
+                article_text = div_soup.get_text()
             except:
                 pass
 
         if not article_text:
             raise Exception("본문을 찾을 수 없습니다.")
-        
 
         # 줄바꿈 수정 3개이상인경우 2개로 수정
         article_text = convert_multiple_newlines(article_text)
 
-        return article_text, article_url
+        return article_title, article_text, article_url, img_count
 
     # 입력받은 url에서 이미지태그 개수와 키워드 반복횟수를 파악합니다.
     def get_article_detail(self, blog_url: str, keyword: str):
@@ -110,14 +137,14 @@ class TistoryNewsPaper:
             blog_url = blog_url.replace(".org/", ".org/m/")
         elif blog_url.find(".kr") > -1 and blog_url.find(".kr/m/") == -1:
             blog_url = blog_url.replace(".kr/", ".kr/m/")
+        elif blog_url.find(".net") > -1 and blog_url.find(".net/m/") == -1:
+            blog_url = blog_url.replace(".net/", ".net/m/")
 
         top_blog_detail_dto = TopBlogDetailDto()
 
-        article_title, img_count = self.get_title_and_img_count(blog_url)
+        article_title, article_text, article_url, img_count = self.get_detail_info(blog_url)
         if not article_title:
             article_title = keyword
-
-        article_text, article_url = self.get_article_text_and_url(blog_url)
 
         article_text = str(article_text)
         article_length = len(article_text.replace('\xa0', '').replace(" ", "").replace(f"\n", ""))
@@ -136,9 +163,20 @@ class TistoryNewsPaper:
 
 if __name__ == "__main__":
 
-    blog_url = f"https://ruha007.tistory.com/95"
-    keyword = "변비"
-    driver = get_chrome_driver_new(is_headless=True, is_secret=True)
+    # blog_url = f"https://sj.donnhyeokarea.com/49"
+    # keyword = "사과 효능"
+
+    # 불렛포인트 줄바꿈오류 수정
+    # blog_url = f"https://wlrmtwlrmt.againnew.co.kr/16"
+    # keyword = "불렛포인트"
+
+    # blog_url = f"https://moneyalarms.com/51"
+    # blog_url = f"https://rinte.net/866"
+    # keyword = "참외 효능 부작용"
+
+
+    blog_url = f"https://fff.98hee.com/86"
+    keyword = "참외 효능 부작용"
 
     newspaper = TistoryNewsPaper()
     topBlogDetailDto = newspaper.get_article_detail(blog_url, keyword)

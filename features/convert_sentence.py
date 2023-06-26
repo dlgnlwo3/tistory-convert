@@ -23,15 +23,16 @@ def get_partial_suffle_sentence(text:str):
         # 첫번째 $random$기호
         before_sentence = text[start_index : find_first_index]
         sentences.append(before_sentence)
+        sentences.append("\n")
         start_index = find_first_index + len(Words.RANDOM_START_WORD.value)
         find_end_index = text.find(Words.RANDOM_END_WORD.value, find_first_index)
-
 
         # 중간 문단 섞기
         between_sentence = text[start_index: find_end_index].strip()
         between_sentence = get_shuffle_sentence(between_sentence)
         between_sentence += "\n"
         sentences.append(between_sentence)
+        sentences.append("\n")
 
         start_index = find_end_index + len(Words.RANDOM_END_WORD.value) + 1
 

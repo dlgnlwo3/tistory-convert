@@ -59,9 +59,7 @@ class SynonymMultipleConvert:
             sentence_docx = os.path.join(save_path, f"{file_name}.docx")
         else:
             limit = str(limit)
-            sentence_docx = os.path.join(
-                save_path, f"{file_name}_{limit.zfill(2)}.docx"
-            )
+            sentence_docx = os.path.join(save_path, f"{file_name}_{limit.zfill(2)}.docx")
 
         doc = Document()
         paragraph = doc.add_paragraph()
@@ -155,17 +153,17 @@ class SynonymMultipleConvert:
             # 횟수 제한 기능
             for limit in range(1, self.guiDto.synonym_convert_limit + 1):
                 # 문단 랜덤 섞기 체크 시
-
                 if self.guiDto.shuffle_paragraphs_check:
-                    print("문단 랜덤 섞기 체크 시")
-                    original_sentence = shuffle_sentence(original_sentence)
+                    suffle_original_sentence = shuffle_sentence(original_sentence)
+                else:
+                    suffle_original_sentence = original_sentence
 
                 dict_sentence = {}
                 used_idx_list = []
 
                 # 문자열 변환
                 dict_sentence, used_idx_list = convert_from_db(
-                    original_sentence,
+                    suffle_original_sentence,
                     file_name,
                     self.guiDto.df_two_way,
                     self.guiDto.df_one_way,
@@ -205,17 +203,13 @@ class SynonymMultipleConvert:
 if __name__ == "__main__":
     guiDto = GUIDto()
     guiDto.synonym_convert_limit = 1
-    guiDto.convert_list = [
-        r"C:\consolework\tistory-convert\__test__\테스트_230428\감 효능.docx"
-    ]
+    guiDto.convert_list = [r"C:\consolework\tistory-convert\__test__\테스트_230428\감 효능.docx"]
 
     file_path = r"C:\consolework\tistory-convert\excel\유의어db_정렬변경0416.xlsx"
 
     # two_way_columns = self.two_way_data_type()
     try:
-        df_two_way: pd.DataFrame = pd.read_excel(
-            file_path, sheet_name="양방향", keep_default_na=""
-        )
+        df_two_way: pd.DataFrame = pd.read_excel(file_path, sheet_name="양방향", keep_default_na="")
         df_two_way = df_two_way.astype(str)
         # self.df_two_way = self.df_two_way.loc[:, list(two_way_columns.keys())]
     except Exception as e:
