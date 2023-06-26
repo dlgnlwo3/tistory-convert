@@ -13,7 +13,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium import webdriver
-from common.utils import global_log_append
+from common.utils import global_log_append, escape_xml_string
 from timeit import default_timer as timer
 from datetime import timedelta, datetime
 from features.tistory_newspaper import TistoryNewsPaper
@@ -28,15 +28,12 @@ class DaumSearch:
     def __init__(self):
         # 현재 로컬에 저장된 크롬 기준으로 오픈한다.
         self.default_wait = 10
-        self.driver: webdriver.Chrome = get_chrome_driver_new(
-            is_headless=True, is_secret=True, move_to_corner=False
-        )
+        self.driver: webdriver.Chrome = get_chrome_driver_new(is_headless=True, is_secret=True, move_to_corner=False)
         self.driver.implicitly_wait(self.default_wait)
         self.run_time = str(datetime.now())[0:-10].replace(":", "")
         self.top_blog_detail_dtos = []
 
         self.tistoryNewsPaper = TistoryNewsPaper()
-
 
     def setGuiDto(self, guiDto: GUIDto):
         self.guiDto = guiDto
@@ -44,9 +41,8 @@ class DaumSearch:
     def setLogger(self, log_msg):
         self.log_msg = log_msg
 
-
-    def log_append(self, text:str):
-        print('log_append', text)
+    def log_append(self, text: str):
+        print("log_append", text)
         try:
             self.log_msg.emit(text)
         except:
@@ -54,19 +50,13 @@ class DaumSearch:
 
     # 엑셀 저장
     def blog_detail_to_excel(self, top_blog_detail_dtos):
-        article_excel = os.path.join(
-            self.guiDto.search_file_save_path, f"상위노출데이터 {self.run_time}.xlsx"
-        )
-        pd.DataFrame.from_dict(top_blog_detail_dtos).to_excel(
-            article_excel, index=False
-        )
+        article_excel = os.path.join(self.guiDto.search_file_save_path, f"상위노출데이터 {self.run_time}.xlsx")
+        pd.DataFrame.from_dict(top_blog_detail_dtos).to_excel(article_excel, index=False)
         time.sleep(1)
 
     # 워드 저장
     def blog_detail_to_docx(self, article_title: str, article_text: str, keyword: str):
-        article_path = os.path.join(
-            self.guiDto.search_file_save_path, f"글수집 {self.run_time}"
-        )
+        article_path = os.path.join(self.guiDto.search_file_save_path, f"글수집 {self.run_time}")
 
         if os.path.isdir(article_path) == False:
             os.mkdir(article_path)
@@ -79,25 +69,28 @@ class DaumSearch:
 
         article_docx = os.path.join(keyword_img_path, f"{article_title}.docx")
 
+        article_text = article_text.encode("utf-8").decode("utf-8")
+        article_text = escape_xml_string(article_text)
+        print(article_text)
         doc = Document()
         doc.add_paragraph(article_text)
         doc.save(article_docx)
         self.log_append(f"{article_title}.docx 저장 완료")
 
-        time.sleep(1)
+        time.sleep(0.3)
 
     def search_top_blog(self, daum_keyword: str):
         driver = self.driver
         search_url = f"https://search.daum.net/search?w=fusion&col=blog&q={daum_keyword}&p=2"
         if self.guiDto.period_start_date and self.guiDto.period_end_date:
-            search_url += f"&DA=STC&sd={self.guiDto.period_start_date}000000&ed={self.guiDto.period_end_date}235959&period=u"
+            search_url += (
+                f"&DA=STC&sd={self.guiDto.period_start_date}000000&ed={self.guiDto.period_end_date}235959&period=u"
+            )
         print(search_url)
         driver.get(search_url)
 
         try:
-            WebDriverWait(driver, 10).until(
-                EC.element_to_be_clickable((By.XPATH, "//c-card//c-title//a"))
-            )
+            WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//c-card//c-title//a")))
         except Exception as e:
             print(e)
             raise Exception(f"{daum_keyword}: 다음 검색 결과가 없습니다.")
@@ -140,9 +133,7 @@ class DaumSearch:
         driver = self.driver
         search_blog_list = []
 
-        for current_page in range(
-            self.guiDto.daum_start_page, self.guiDto.daum_end_page + 1
-        ):
+        for current_page in range(self.guiDto.daum_start_page, self.guiDto.daum_end_page + 1):
             try:
                 search_url = f"https://search.daum.net/search?w=fusion&col=blog&q={daum_keyword}&p={current_page}"
                 if self.guiDto.period_start_date and self.guiDto.period_end_date:
@@ -150,10 +141,8 @@ class DaumSearch:
 
                 print(search_url)
                 driver.get(search_url)
-                
-                WebDriverWait(driver, 10).until(
-                    EC.element_to_be_clickable((By.XPATH, "//c-card//c-title//a"))
-                )
+
+                WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//c-card//c-title//a")))
 
                 # 현재 페이지의 블로그 검색 결과
                 # $x('//li[contains(@id, "br_tstory")]//a[contains(@class, "f_url")]')
@@ -166,9 +155,9 @@ class DaumSearch:
 
                 blog: webdriver.Chrome._web_element_cls
                 for blog in blog_list:
-                    blog_date = blog.find_element(
-                        By.CSS_SELECTOR, 'span[class*="gem-subdesc"]'
-                    ).get_attribute("textContent")
+                    blog_date = blog.find_element(By.CSS_SELECTOR, 'span[class*="gem-subdesc"]').get_attribute(
+                        "textContent"
+                    )
                     blog_date_format = f"%Y.%m.%d"
 
                     try:
@@ -178,9 +167,7 @@ class DaumSearch:
                         blog_date = datetime.now()
 
                     try:
-                        is_naver_blog = blog.find_element(
-                            By.CSS_SELECTOR, "c-title a"
-                        ).get_attribute("href")
+                        is_naver_blog = blog.find_element(By.CSS_SELECTOR, "c-title a").get_attribute("href")
                         if is_naver_blog.find("naver.com") > -1:
                             raise Exception(f"네이버는 제외하고 진행합니다.")
 
@@ -189,17 +176,15 @@ class DaumSearch:
                         continue
 
                     if search_date > blog_date:
-                        blog_url = blog.find_element(
-                            By.CSS_SELECTOR, "c-title a"
-                        ).get_attribute("href")
+                        blog_url = blog.find_element(By.CSS_SELECTOR, "c-title a").get_attribute("href")
 
                         try:
-                            top_blog_detail_dto: TopBlogDetailDto = self.tistoryNewsPaper.get_article_detail(blog_url, daum_keyword)
+                            top_blog_detail_dto: TopBlogDetailDto = self.tistoryNewsPaper.get_article_detail(
+                                blog_url, daum_keyword
+                            )
                             top_blog_detail_dict = top_blog_detail_dto.get_dict()
                             article_text = top_blog_detail_dict["내용"]
-                            article_title = (
-                                f'{top_blog_detail_dict["제목"]} {str(blog_date)[:10]}'
-                            )
+                            article_title = f'{top_blog_detail_dict["제목"]} {str(blog_date)[:10]}'
                             article_title = re.sub('[\/:*?"<>|]', "", article_title)
 
                         except Exception as e:
@@ -224,13 +209,14 @@ class DaumSearch:
                     break
 
             except Exception as e:
+                print(e)
                 self.log_append(f"{current_page}페이지 조회 실패")
                 self.log_append(f"입력하신 페이지 수가 존재하지 않아 수집할 글 개수에 도달하지 못했습니다.")
                 break
 
         if len(search_blog_list) == 0 or len(search_blog_list) < self.guiDto.daum_search_count:
-            self.log_append("입력하신 수집할 글 조건에 맞는 글이 없어 수집할 글 개수에 도달하지 못했습니다.")         
-            
+            self.log_append("입력하신 수집할 글 조건에 맞는 글이 없어 수집할 글 개수에 도달하지 못했습니다.")
+
         time.sleep(1)
 
     # 전체작업 시작
@@ -253,7 +239,7 @@ class DaumSearch:
 
                     # 2. 입력받은 페이지에서 입력한 갯수만큼 블로그 글 수집
                     self.search_blog(daum_keyword)
-                    
+
                 except Exception as e:
                     print(e)
                     self.log_append(str(e))

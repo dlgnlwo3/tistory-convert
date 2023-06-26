@@ -54,7 +54,6 @@ class DaumSearchThread(QThread):
             print("알림음")
             beepsound()
 
-
         self.search_finished.emit()
 
     def stop(self):

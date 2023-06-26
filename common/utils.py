@@ -147,6 +147,11 @@ def filter_article_content(article_text: str):
     return article_text
 
 
+def escape_xml_string(s):
+    s = re.sub("[\\x00-\\x08\\x0b\\x0e-\\x1f\\x7f]", "", s)
+    return s
+
+
 def get_new_token():
     timestamp = str(int(time.time()))
     software_id = str(uuid.uuid4())
