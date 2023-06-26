@@ -24,6 +24,7 @@ from features.convert_sentence import (
 import random
 from docx.text.paragraph import Paragraph
 from pathlib import Path
+from common.utils import get_word_count_without_empty2
 
 
 class SynonymMultipleConvert:
@@ -46,8 +47,6 @@ class SynonymMultipleConvert:
         used_idx_list: list,
         limit="",
     ):
-        print(dict_sentence)
-
         save_path = os.path.join(self.guiDto.convert_path, f"유의어 변환 {self.run_time}")
 
         if os.path.isdir(save_path) == False:
@@ -169,8 +168,6 @@ class SynonymMultipleConvert:
                     self.guiDto.df_one_way,
                 )
 
-                print(dict_sentence)
-
                 # 머리글 삽입
                 header = ""
                 if self.guiDto.header_check:
@@ -187,8 +184,18 @@ class SynonymMultipleConvert:
                     footer: str = random.choice(saved_data_footer[footer_topic])
                     footer = replace_keyword(footer, file.rstrip(file_format))
 
+                header_count = get_word_count_without_empty2(header)
+
+                docx_sentence = "".join(dict_sentence.values())
+                docx_sentence_count = get_word_count_without_empty2(docx_sentence)
+                footer_count = get_word_count_without_empty2(footer)
+
+                word_count = header_count + docx_sentence_count + footer_count
+
                 # 문자열 파일 저장
                 file_name = file.rstrip(file_format)
+                file_name = str(file_name).rsplit("_")[0]
+                file_name += f"_{word_count}"
 
                 self.sentence_to_docx(
                     file_name,

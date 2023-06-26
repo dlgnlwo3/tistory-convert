@@ -16,7 +16,7 @@ from selenium import webdriver
 from common.utils import global_log_append, escape_xml_string
 from timeit import default_timer as timer
 from datetime import timedelta, datetime
-from features.tistory_newspaper import TistoryNewsPaper
+from features.tistory_beautifulsoup import TistoryBeautifulSoup
 from dtos.top_blog_detail_dto import *
 from config import *
 import pandas as pd
@@ -32,8 +32,7 @@ class DaumSearch:
         self.driver.implicitly_wait(self.default_wait)
         self.run_time = str(datetime.now())[0:-10].replace(":", "")
         self.top_blog_detail_dtos = []
-
-        self.tistoryNewsPaper = TistoryNewsPaper()
+        self.tistoryBeautifulSoup = TistoryBeautifulSoup()
 
     def setGuiDto(self, guiDto: GUIDto):
         self.guiDto = guiDto
@@ -103,7 +102,9 @@ class DaumSearch:
             print(blog_url)
 
             try:
-                top_blog_detail_dto: TopBlogDetailDto = self.tistoryNewsPaper.get_article_detail(blog_url, daum_keyword)
+                top_blog_detail_dto: TopBlogDetailDto = self.tistoryBeautifulSoup.get_article_detail(
+                    blog_url, daum_keyword
+                )
             except Exception as e:
                 print(e)
                 top_blog_detail_dto = TopBlogDetailDto()
@@ -179,7 +180,7 @@ class DaumSearch:
                         blog_url = blog.find_element(By.CSS_SELECTOR, "c-title a").get_attribute("href")
 
                         try:
-                            top_blog_detail_dto: TopBlogDetailDto = self.tistoryNewsPaper.get_article_detail(
+                            top_blog_detail_dto: TopBlogDetailDto = self.tistoryBeautifulSoup.get_article_detail(
                                 blog_url, daum_keyword
                             )
                             top_blog_detail_dict = top_blog_detail_dto.get_dict()

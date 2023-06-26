@@ -5,10 +5,8 @@ from enums.convert_enum import Words
 import re
 
 
-
 # 부분적인 $랜덤$ $랜덤/$ 사이의 문장만 섞습니다.
-def get_partial_suffle_sentence(text:str):
-
+def get_partial_suffle_sentence(text: str):
     sentences = []
     start_index = 0
 
@@ -19,16 +17,16 @@ def get_partial_suffle_sentence(text:str):
             # 마지막 문장 넣기
             sentences.append(text[start_index:])
             break
-        
+
         # 첫번째 $random$기호
-        before_sentence = text[start_index : find_first_index]
+        before_sentence = text[start_index:find_first_index]
         sentences.append(before_sentence)
         sentences.append("\n")
         start_index = find_first_index + len(Words.RANDOM_START_WORD.value)
         find_end_index = text.find(Words.RANDOM_END_WORD.value, find_first_index)
 
         # 중간 문단 섞기
-        between_sentence = text[start_index: find_end_index].strip()
+        between_sentence = text[start_index:find_end_index].strip()
         between_sentence = get_shuffle_sentence(between_sentence)
         between_sentence += "\n"
         sentences.append(between_sentence)
@@ -37,6 +35,7 @@ def get_partial_suffle_sentence(text:str):
         start_index = find_end_index + len(Words.RANDOM_END_WORD.value) + 1
 
     return "".join(sentences)
+
 
 def get_shuffle_sentence(sentence: str):
     sentence_to_list = sentence.split(Words.SENTENCE_SPLIT.value)
@@ -65,11 +64,7 @@ def append_no_changed_idx_list(
     no_change_idx_list = []
     for word in ban_synonym_list:
         # 1. word가 포함된 문장 위치를 가져옴
-        start_idx_list = [
-            i
-            for i in range(len(origin_sentence))
-            if origin_sentence.startswith(word, i)
-        ]
+        start_idx_list = [i for i in range(len(origin_sentence)) if origin_sentence.startswith(word, i)]
 
         len_word = len(word)  # 변환대상 단어 길이
         for start_i in start_idx_list:
@@ -94,11 +89,7 @@ def update_dict_sentence(
     is_convert_once: bool,  # 한번만 변환
 ):
     # 1. before_word가 포함된 문장 위치를 가져옴
-    start_idx_list = [
-        i
-        for i in range(len(origin_sentence))
-        if origin_sentence.startswith(before_word, i)
-    ]
+    start_idx_list = [i for i in range(len(origin_sentence)) if origin_sentence.startswith(before_word, i)]
 
     len_before_word = len(before_word)  # 변환대상 단어 길이
     len_after_word = len(after_word)  # 변환할 유의어 길이
@@ -117,10 +108,7 @@ def update_dict_sentence(
 
             try:
                 value = after_word[include_i]
-                if (
-                    include_i == (len_before_word - 1)
-                    and len_before_word < len_after_word
-                ):
+                if include_i == (len_before_word - 1) and len_before_word < len_after_word:
                     # after_word가 더 긴 경우
                     value = after_word[include_i:len_after_word]
             except:
@@ -182,15 +170,12 @@ def convert_from_db_two_way(
 
                 to_change_list = []
                 for synonym in synonym_list:
-
                     finded_count = sentence.count(synonym)
                     if finded_count > 0:
                         for word_idx in range(finded_count + 1):
                             after_word = synonym_random_select(synonym_list, synonym)
                             if after_word:
-                                to_change_list.append(
-                                    {"Before": synonym, "After": after_word}
-                                )
+                                to_change_list.append({"Before": synonym, "After": after_word})
 
                 # 유의어 대상에 하나도 포함되어 있지 않다면?
                 if len(to_change_list) == 0:
@@ -303,7 +288,6 @@ def convert_from_db(
             )
 
         except Exception as e:
-            print(f"{before_word} -> {after_word}: {e}")
             raise Exception(f"{before_word} -> {after_word}: {e}")
 
     # 1. 양방향 변환 시작
@@ -318,16 +302,12 @@ def convert_from_db(
 
                 to_change_list = []
                 for synonym in synonym_list:
-                    if synonym == "을 만큼":
-                        print("")
                     finded_count = sentence.count(synonym)
                     if finded_count > 0:
                         for word_idx in range(finded_count + 1):
                             after_word = synonym_random_select(synonym_list, synonym)
                             if after_word:
-                                to_change_list.append(
-                                    {"Before": synonym, "After": after_word}
-                                )
+                                to_change_list.append({"Before": synonym, "After": after_word})
 
                 # 유의어 대상에 하나도 포함되어 있지 않다면?
                 if len(to_change_list) == 0:
@@ -345,19 +325,17 @@ def convert_from_db(
                     )
 
             except Exception as e:
-                print(f"{to_change_list} -> {after_word}: {e}")
                 raise Exception(f"{to_change_list} -> {after_word}: {e}")
 
     return dict_sentence, used_idx_list
 
+
 # 문단을 랜덤하게 섞습니다.
 def shuffle_sentence(sentence: str):
-
     if sentence.find(Words.RANDOM_START_WORD.value) > -1 and sentence.find(Words.RANDOM_END_WORD.value) > 1:
         return get_partial_suffle_sentence(sentence)
 
     return get_shuffle_sentence(sentence)
-
 
 
 def insert_header_to_sentence(sentence: str, header: str, convert_keyword: str):
@@ -390,4 +368,3 @@ origin_sentence = "예시문장"
 origin_sentence_list = list(origin_sentence)
 
 origin_sentence_dict = {i + 1: word for i, word in enumerate(origin_sentence_list)}
-

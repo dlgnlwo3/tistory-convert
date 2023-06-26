@@ -69,7 +69,7 @@ def get_word_count_without_empty(text: str) -> int:
 
 
 def get_word_count_without_empty2(article_text: str) -> int:
-    len(article_text.replace("\xa0", "").replace(" ", "").replace(f"\n", "").replace(f"\t", ""))
+    return len(article_text.replace("\xa0", "").replace(" ", "").replace(f"\n", "").replace(f"\t", ""))
 
 
 def get_word_count_from_html(html: str, convert_hint: str):

@@ -22,9 +22,7 @@ class GoogleSearch:
         # 현재 로컬에 저장된 크롬 기준으로 오픈한다.
         # open_browser()
         self.default_wait = 10
-        self.driver = get_chrome_driver_new(
-            is_headless=True, is_secret=True, move_to_corner=False
-        )
+        self.driver = get_chrome_driver_new(is_headless=True, is_secret=True, move_to_corner=False)
         self.driver.implicitly_wait(self.default_wait)
         self.run_time = str(datetime.now())[0:-10].replace(":", "")
 
@@ -36,9 +34,7 @@ class GoogleSearch:
 
     # 이미지 저장
     def save_img_from_url(self, url: str, keyword: str, i: str):
-        img_path = os.path.join(
-            self.guiDto.search_file_save_path, f"이미지수집 {self.run_time}"
-        )
+        img_path = os.path.join(self.guiDto.search_file_save_path, f"이미지수집 {self.run_time}")
         if self.guiDto.from_convert_tab == True:
             img_path = os.path.join(self.guiDto.search_file_save_path)
 
@@ -55,9 +51,7 @@ class GoogleSearch:
         if format in ("jpg", "JPG", "jpeg", "JPEG", "png", "PNG", "gif", "GIF"):
             img_format = format
 
-        img_file = os.path.join(
-            keyword_img_path, f"{keyword}_{i.zfill(2)}.{img_format}"
-        )
+        img_file = os.path.join(keyword_img_path, f"{keyword}_{i.zfill(2)}.{img_format}")
         print(img_file)
 
         try:
@@ -110,18 +104,14 @@ class GoogleSearch:
         # 이미지가 있으면...
         # $x('//div/h3/following-sibling::a[1]//img')
         WebDriverWait(driver, 10).until(
-            EC.visibility_of_element_located(
-                (By.XPATH, "//div/h3/following-sibling::a[1]//img")
-            )
+            EC.visibility_of_element_located((By.XPATH, "//div/h3/following-sibling::a[1]//img"))
         )
 
         self.repeat_scroll(driver)
 
         time.sleep(1)
 
-        img_links = driver.find_elements(
-            By.XPATH, "//div/h3/following-sibling::a[1]//img"
-        )
+        img_links = driver.find_elements(By.XPATH, "//div/h3/following-sibling::a[1]//img")
 
         self.log_msg.emit(f"{google_keyword}: {len(img_links)}개의 이미지를 발견했습니다.")
 
@@ -150,8 +140,6 @@ class GoogleSearch:
             finally:
                 driver.implicitly_wait(self.default_wait)
 
-            print("img_url", img_url)
-
             if not img_url:
                 continue
 
@@ -163,9 +151,7 @@ class GoogleSearch:
                 print("수집할 이미지 개수에 도달했습니다.")
                 break
 
-        self.log_msg.emit(
-            f"{google_keyword}: {len(img_links)} 중 {len(img_list)}개의 이미지를 수집했습니다."
-        )
+        self.log_msg.emit(f"{google_keyword}: {len(img_links)} 중 {len(img_list)}개의 이미지를 수집했습니다.")
         time.sleep(1)
 
     # 전체작업 시작

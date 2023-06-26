@@ -13,18 +13,17 @@ from common.utils import convert_multiple_newlines
 from bs4 import BeautifulSoup
 import requests
 
-class TistoryNewsPaper:
+
+class TistoryBeautifulSoup:
     def __init__(self):
         pass
 
     # 입력받은 url에서 이미지태그 개수와 키워드 반복횟수를 파악합니다.
     def get_detail_info(self, blog_url: str):
-
         article_text = ""
         article_title = ""
         img_count = 0
         article_url = ""
-
 
         response = requests.get(blog_url)
         response.raise_for_status()
@@ -44,8 +43,7 @@ class TistoryNewsPaper:
         # for img in img_tags:
         #     alt_text = img.get('alt')
         #     alt_text.decompose()  # Remove the img tag from the HTML
-            # Perform any desired processing or queries with the alt_text
-
+        # Perform any desired processing or queries with the alt_text
 
         for mark in soup.find_all("div", {"class": "mark"}):
             mark.decompose()
@@ -57,25 +55,23 @@ class TistoryNewsPaper:
         # response = requests.get(blog_url)
         # html_content = response.content
 
-
-        
         # print('response.text', response.text)
         # print('html_content', html_content)
 
         # soup = BeautifulSoup(html_content, 'html.parser')
 
         try:
-            article_title = soup.select_one('.blogview_tit h3').get_text()
+            article_title = soup.select_one(".blogview_tit h3").get_text()
         except:
             pass
 
-        content_img_els = soup.select('article img')
+        content_img_els = soup.select("article img")
         content_img_list = [
             content_img
             for content_img in content_img_els
             if not any(
-                keyword in content_img['src']
-                for keyword in ['/thumb/', 'daumcdn.net/map', 'googlesyndication.com', 'https://adclick']
+                keyword in content_img["src"]
+                for keyword in ["/thumb/", "daumcdn.net/map", "googlesyndication.com", "https://adclick"]
             )
         ]
         img_count = str(len(content_img_list))
@@ -87,7 +83,7 @@ class TistoryNewsPaper:
         #         print(img_src)
 
         #         if '/thumb/' in img_src or 'daumcdn.net/map' in img_src or 'googlesyndication.com' in img_src:
-        #             continue 
+        #             continue
         #         content_img_list.append(img_src)
 
         #     # content_img_list = list(set(content_img_list))
@@ -103,7 +99,7 @@ class TistoryNewsPaper:
             article_text = div_soup.get_text()
         except:
             pass
-        
+
         if not article_text:
             try:
                 div_soup = soup.find("div", class_="blogview_content")
@@ -111,7 +107,7 @@ class TistoryNewsPaper:
                 article_text = div_soup.get_text()
             except:
                 pass
-        
+
         if not article_text:
             try:
                 div_soup = soup.find("div", class_="tt_article_useless_p_margin")
@@ -130,7 +126,6 @@ class TistoryNewsPaper:
 
     # 입력받은 url에서 이미지태그 개수와 키워드 반복횟수를 파악합니다.
     def get_article_detail(self, blog_url: str, keyword: str):
-
         if blog_url.find(".com") > -1 and blog_url.find(".com/m/") == -1:
             blog_url = blog_url.replace(".com/", ".com/m/")
         elif blog_url.find(".org") > -1 and blog_url.find(".org/m/") == -1:
@@ -147,7 +142,7 @@ class TistoryNewsPaper:
             article_title = keyword
 
         article_text = str(article_text)
-        article_length = len(article_text.replace('\xa0', '').replace(" ", "").replace(f"\n", ""))
+        article_length = len(article_text.replace("\xa0", "").replace(" ", "").replace(f"\n", ""))
         keyword_count = str(article_text).count(keyword)
 
         top_blog_detail_dto.keyword = keyword
@@ -162,7 +157,6 @@ class TistoryNewsPaper:
 
 
 if __name__ == "__main__":
-
     # blog_url = f"https://sj.donnhyeokarea.com/49"
     # keyword = "사과 효능"
 
@@ -174,10 +168,9 @@ if __name__ == "__main__":
     # blog_url = f"https://rinte.net/866"
     # keyword = "참외 효능 부작용"
 
-
     blog_url = f"https://fff.98hee.com/86"
     keyword = "참외 효능 부작용"
 
-    newspaper = TistoryNewsPaper()
+    newspaper = TistoryBeautifulSoup()
     topBlogDetailDto = newspaper.get_article_detail(blog_url, keyword)
     topBlogDetailDto.to_print()
