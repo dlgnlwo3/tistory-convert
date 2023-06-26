@@ -16,7 +16,7 @@ import time
 from common.utils import beepsound
 from process.file_convert_process import FileConvert
 
-import debugpy
+# import debugpy
 
 
 class FileConvertThread(QThread):
@@ -33,7 +33,7 @@ class FileConvertThread(QThread):
 
     def run(self):
         try:
-            debugpy.debug_this_thread()
+            # debugpy.debug_this_thread()
             self.log_msg.emit(f"파일 변환 작업 시작")
             start_time = timer()
 

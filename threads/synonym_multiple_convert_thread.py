@@ -16,7 +16,7 @@ import time
 from common.utils import beepsound
 from process.synonym_multiple_convert_process import SynonymMultipleConvert
 
-import debugpy
+# import debugpy
 
 
 class ConvertThread(QThread):
@@ -33,7 +33,7 @@ class ConvertThread(QThread):
 
     def run(self):
         try:
-            debugpy.debug_this_thread()
+            # debugpy.debug_this_thread()
             self.log_msg.emit(f"유의어 변환 작업 시작")
             start_time = timer()
 

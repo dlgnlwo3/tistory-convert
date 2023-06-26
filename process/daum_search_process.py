@@ -13,7 +13,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium import webdriver
-from common.utils import global_log_append, escape_xml_string
+from common.utils import global_log_append, escape_xml_string, find_next_available_name
 from timeit import default_timer as timer
 from datetime import timedelta, datetime
 from features.tistory_beautifulsoup import TistoryBeautifulSoup
@@ -77,6 +77,7 @@ class DaumSearch:
         self.log_append(f"{article_title}.docx 저장 완료")
 
         time.sleep(0.3)
+        return True
 
     def search_top_blog(self, daum_keyword: str):
         driver = self.driver
@@ -194,8 +195,9 @@ class DaumSearch:
 
                         # 워드 저장
                         article_title = f"{article_title}_{top_blog_detail_dto.article_length}"
-                        self.blog_detail_to_docx(article_title, article_text, daum_keyword)
-                        search_blog_list.append(article_title)
+                        next_file_name = find_next_available_name(search_blog_list, article_title)
+                        self.blog_detail_to_docx(next_file_name, article_text, daum_keyword)
+                        search_blog_list.append(next_file_name)
 
                         if len(search_blog_list) >= self.guiDto.daum_search_count:
                             break

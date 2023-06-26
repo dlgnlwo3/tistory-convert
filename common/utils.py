@@ -166,9 +166,28 @@ def destroy_parent_widgets(widget):
         parent = parent.parentWidget()
 
 
+def get_unique_name(names: list, name: str) -> str:
+    unique_name = name
+    original_name = name
+    counter = 1
+    while name in names:
+        unique_name = f"{original_name} ({counter})"
+        counter += 1
+    return unique_name
+
+
+def find_next_available_name(names, name):
+    new_name = name
+    counter = 1
+    while new_name in names:
+        new_name = f"{name} ({counter})"
+        counter += 1
+    return new_name
+
+
 if __name__ == "__main__":
-    # Example usage
-    input_string = "Hello\n\n\n\n\nWorld!\n\n\n\n\n\nHow\nare\n\nyou?"
-    converted_string = convert_multiple_newlines(input_string)
-    print(converted_string)
-    # print(get_mac_address())
+    names = ["a", "a (1)", "b", "c"]
+    name_to_add = "a"
+
+    next_available_name = find_next_available_name(names, name_to_add)
+    print(next_available_name)

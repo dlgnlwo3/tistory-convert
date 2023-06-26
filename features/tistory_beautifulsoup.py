@@ -28,11 +28,6 @@ class TistoryBeautifulSoup:
         response = requests.get(blog_url)
         response.raise_for_status()
         soup = BeautifulSoup(response.text, "html.parser")
-        # Remove links
-
-        # Remove text within the <img> tags
-        # for img in soup.find_all("img"):
-        #     img.decompose()
 
         # Remove text within the <a> tags
         for a in soup.find_all("a"):
@@ -48,17 +43,8 @@ class TistoryBeautifulSoup:
         for mark in soup.find_all("div", {"class": "mark"}):
             mark.decompose()
 
-        # Remove <figcaption> tags and their text
         for figcaption in soup.find_all("figcaption"):
             figcaption.decompose()
-
-        # response = requests.get(blog_url)
-        # html_content = response.content
-
-        # print('response.text', response.text)
-        # print('html_content', html_content)
-
-        # soup = BeautifulSoup(html_content, 'html.parser')
 
         try:
             article_title = soup.select_one(".blogview_tit h3").get_text()
@@ -75,49 +61,40 @@ class TistoryBeautifulSoup:
             )
         ]
         img_count = str(len(content_img_list))
-        # try:
-        #     content_img_els = soup.select('article img')
-        #     content_img_list = []
-        #     for content_img in content_img_els:
-        #         img_src = content_img['src']
-        #         print(img_src)
-
-        #         if '/thumb/' in img_src or 'daumcdn.net/map' in img_src or 'googlesyndication.com' in img_src:
-        #             continue
-        #         content_img_list.append(img_src)
-
-        #     # content_img_list = list(set(content_img_list))
-
-        #     img_count = str(len(content_img_list))
-
-        # except:
-        #     pass
+        article_url = response.url
 
         try:
             div_soup = soup.find("div", class_="useless_p_margin")
-            article_url = response.url
-            article_text = div_soup.get_text()
         except:
             pass
 
-        if not article_text:
+        if not div_soup:
             try:
                 div_soup = soup.find("div", class_="blogview_content")
-                article_url = response.url
-                article_text = div_soup.get_text()
             except:
                 pass
 
-        if not article_text:
+        if not div_soup:
             try:
                 div_soup = soup.find("div", class_="tt_article_useless_p_margin")
-                article_url = response.url
-                article_text = div_soup.get_text()
             except:
                 pass
 
-        if not article_text:
+        if not div_soup:
             raise Exception("본문을 찾을 수 없습니다.")
+
+        # Find the ul and li tags
+        ul_tags = div_soup.find_all("ul")
+
+        for ul_tag in ul_tags:
+            li_tags = ul_tag.find_all("li")
+            for li_tag in li_tags:
+                br_tags = li_tag.find_all("br")
+                for br_tag in br_tags:
+                    br_tag.replace_with("\n")
+                li_tag.insert_after(soup.new_string("\n"))
+
+        article_text = div_soup.get_text()
 
         # 줄바꿈 수정 3개이상인경우 2개로 수정
         article_text = convert_multiple_newlines(article_text)
@@ -168,8 +145,11 @@ if __name__ == "__main__":
     # blog_url = f"https://rinte.net/866"
     # keyword = "참외 효능 부작용"
 
-    blog_url = f"https://fff.98hee.com/86"
-    keyword = "참외 효능 부작용"
+    # blog_url = f"https://fff.98hee.com/86"
+    # keyword = "참외 효능 부작용"
+
+    blog_url = f"https://wlrmtwlrmt.againnew.co.kr/16"
+    keyword = "사과고르는법"
 
     newspaper = TistoryBeautifulSoup()
     topBlogDetailDto = newspaper.get_article_detail(blog_url, keyword)

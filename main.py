@@ -28,7 +28,7 @@ from common.utils import global_log_append
 from common.api import token_auth_check
 from widgets.auth_message_widget import QuitMessage
 
-# pyinstaller -n "tistory convert v2.0.7" -w --onefile --clean "main.py" --icon "assets\icon.png" --noupx --add-data "venv\Lib\site-packages\newspaper;newspaper"
+# pyinstaller -n "tistory convert v2.0.8" -w --onefile --clean "main.py" --icon "assets\icon.png" --noupx --add-data "venv\Lib\site-packages\newspaper;newspaper"
 
 
 def my_exception_hook(exctype, value, traceback):
