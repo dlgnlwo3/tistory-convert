@@ -134,6 +134,7 @@ class DaumSearch:
     def search_blog(self, daum_keyword: str):
         driver = self.driver
         search_blog_list = []
+        search_url_list = []
 
         for current_page in range(self.guiDto.daum_start_page, self.guiDto.daum_end_page + 1):
             try:
@@ -180,6 +181,10 @@ class DaumSearch:
                     if search_date > blog_date:
                         blog_url = blog.find_element(By.CSS_SELECTOR, "c-title a").get_attribute("href")
 
+                        # 이미 검색한 블로그는 제외
+                        if blog_url in search_url_list:
+                            continue
+
                         try:
                             top_blog_detail_dto: TopBlogDetailDto = self.tistoryBeautifulSoup.get_article_detail(
                                 blog_url, daum_keyword
@@ -198,6 +203,7 @@ class DaumSearch:
                         next_file_name = find_next_available_name(search_blog_list, article_title)
                         self.blog_detail_to_docx(next_file_name, article_text, daum_keyword)
                         search_blog_list.append(next_file_name)
+                        search_url_list.append(blog_url)
 
                         if len(search_blog_list) >= self.guiDto.daum_search_count:
                             break
