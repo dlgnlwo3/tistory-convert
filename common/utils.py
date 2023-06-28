@@ -148,7 +148,7 @@ def filter_article_content(article_text: str):
 
 
 def escape_xml_string(s):
-    s = re.sub("[\\x00-\\x08\\x0b\\x0e-\\x1f\\x7f]", "", s)
+    s = re.sub("[\\x00-\\x08\\x0b\\x0e-\\x1f\\x7f\\xec]", "", s)
     return s
 
 

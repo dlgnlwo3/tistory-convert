@@ -9,7 +9,7 @@ if 1 == 1:
 
 import os
 from dtos.top_blog_detail_dto import *
-from common.utils import convert_multiple_newlines
+from common.utils import convert_multiple_newlines, escape_xml_string
 from bs4 import BeautifulSoup
 import requests
 
@@ -95,6 +95,7 @@ class TistoryBeautifulSoup:
                 li_tag.insert_after(soup.new_string("\n"))
 
         article_text = div_soup.get_text()
+        article_text = escape_xml_string(article_text)
 
         # 줄바꿈 수정 3개이상인경우 2개로 수정
         article_text = convert_multiple_newlines(article_text)
@@ -149,6 +150,7 @@ if __name__ == "__main__":
     # keyword = "참외 효능 부작용"
 
     blog_url = f"https://wlrmtwlrmt.againnew.co.kr/16"
+    blog_url = f"http://mmaum.tistory.com/121"
     keyword = "사과고르는법"
 
     newspaper = TistoryBeautifulSoup()
