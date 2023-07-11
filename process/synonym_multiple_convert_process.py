@@ -148,6 +148,7 @@ class SynonymMultipleConvert:
             # 파일에서 문자열 획득
             original_sentence = self.get_sentence_from_file(file_path)
             file_name = Path(file_path).stem
+            ban_synonym = Path(file_path).stem
 
             # 횟수 제한 기능
             for limit in range(1, self.guiDto.synonym_convert_limit + 1):
@@ -163,7 +164,7 @@ class SynonymMultipleConvert:
                 # 문자열 변환
                 dict_sentence, used_idx_list = convert_from_db(
                     suffle_original_sentence,
-                    file_name,
+                    ban_synonym,
                     self.guiDto.df_two_way,
                     self.guiDto.df_one_way,
                 )
